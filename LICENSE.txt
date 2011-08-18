@@ -1,0 +1,14 @@
+/**
+ * Package    	MultiColumnWizard Extension
+ * Copyright  	MEN AT WORK 2011
+ * Author       Andreas Isaak <cms@men-at-work.de>, David Maack <cms@men-at-work.de>, Stefan Heimes <cms@men-at-work.de>
+ * Link		http://www.men-at-work.de/
+ * License    	GNU/LGPL
+ */
+
+/**
+ * Copyright  	certo web & design GmbH 2011
+ * Author       Yanick Witschi <yanick.witschi@certo-net.ch> 
+ * Link		http://www.certo-net.ch/
+ * License    	GNU/LGPL
+ */
