@@ -255,7 +255,7 @@ class MultiColumnWizard extends Widget
 		for($i=0; $i<$intNumberOfRows; $i++)
 		{
 			$return .= '<tr>';
-                        
+                        $columnCount = 1;
 			// Walk every column
 			foreach($this->columnFields as $strKey => $arrField)
 			{   
@@ -345,13 +345,15 @@ class MultiColumnWizard extends Widget
                                
                                 $objWidget->__set('wizard', $wizard);
 
-				$return  .= '
-                            <td>
-                            '.$objWidget->parse().'
+				$return  .= '<td';
+                                if ($columnCount == 1) $return .= ' class="first"';
+
+                            $return .= '>'.$objWidget->parse().'
                             </td>';
+                            $columnCount++;
 			}
                         
-                        $return .= '<td>';
+                        $return .= '<td class="last">';
 
                         if ($this->maxCount < $intNumberOfRows && $this->maxCount >0)
                         {

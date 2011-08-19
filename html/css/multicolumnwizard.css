@@ -1,7 +1,9 @@
 @charset utf-8;
+.multicolumnwizard { margin-top:10px; }
 .multicolumnwizard h3 { display:none; }
 .multicolumnwizard .tl_textarea { width:auto; height:auto; }
 .multicolumnwizard .tl_select, .multicolumnwizard .tl_mselect { width:auto; }
 .multicolumnwizard .tl_checkbox_single_container { margin-top:0; }
 .multicolumnwizard label { font-weight:normal; float:left; }
 .multicolumnwizard input.tl_checkbox { float:left; }
+.multicolumnwizard td.last { padding-right:0; }
