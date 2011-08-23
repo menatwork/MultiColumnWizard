@@ -60,11 +60,22 @@ class MultiColumnWizard extends Widget
 	 */
 	protected $arrStoreCallback = array();
 	
-        /**
+	/**
 	 * Value
 	 * @var mixed
 	 */
 	protected $varValue = array();
+	
+	
+	/**
+	 * Initialize the object
+	 * @param array
+	 */
+	public function __construct($arrAttributes=false)
+	{
+		parent::__construct();
+		$this->import('Database');
+	}
 	
 	/**
 	 * Add specific attributes
@@ -180,7 +191,6 @@ class MultiColumnWizard extends Widget
                         $GLOBALS['TL_CSS'] = array('system/modules/multicolumnwizard/html/css/multicolumnwizard.css');
 		}
             
-		$this->import('Database');
 		$arrButtons = array('copy', 'up', 'down', 'delete');
 		$strCommand = 'cmd_' . $this->strField;
 
