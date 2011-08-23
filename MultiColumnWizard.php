@@ -73,7 +73,7 @@ class MultiColumnWizard extends Widget
 	 */
 	public function __construct($arrAttributes=false)
 	{
-		parent::__construct();
+		parent::__construct($arrAttributes);
 		$this->import('Database');
 	}
 	
