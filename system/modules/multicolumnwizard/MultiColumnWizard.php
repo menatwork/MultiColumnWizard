@@ -89,6 +89,7 @@ class MultiColumnWizard extends Widget
 		{
 			case 'value':
 				$this->varValue = (array) deserialize($varValue);
+				if (!is_array($this->varValue)) $this->varValue = array();				
 				break;
 
 			case 'mandatory':
