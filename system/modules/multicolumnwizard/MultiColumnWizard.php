@@ -347,6 +347,7 @@ class MultiColumnWizard extends Widget
                                             require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
                                             $dc = new $dataContainer($this->strTable);
                                             $dc->field = $arrField['name'];
+                                            $dc->inputName = $arrField['name'];											
                                             $this->import($callback[0]);
                                             $wizard .= $this->$callback[0]->$callback[1]($dc);
                                             unset($dc);
