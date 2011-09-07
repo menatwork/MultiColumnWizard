@@ -250,12 +250,35 @@ class MultiColumnWizard extends Widget
 		<thead>
 		<tr>';
 		
-		foreach($this->columnFields as $arrField)
+		$arrHeaderItems = array();
+		
+		
+		foreach($this->columnFields as $strKey=>$arrField)
 		{
-			$return .= '<td>' . $arrField['label'][0] . '</td>';
+			$label = $strKey;
+
+			if ($arrField['eval']['columnPos'])
+			{
+				$arrHeaderItems[$arrField['eval']['columnPos']]  = '';
+			}
+			else
+			{
+				if ($arrField['label'][0])
+					$arrHeaderItems[]  = $arrField['label'][0];
+				else
+					$arrHeaderItems[]  = $label;
+			}
+			
 		}
 
-    	$return .= '<td> </td>
+		foreach ($arrHeaderItems as $itemKey=>$itemValue)
+		{   
+			$arrHeaderItems[$itemKey] = '<td>'.$itemValue.'</td>';
+		}
+   
+		$return .= implode("",$arrHeaderItems);
+
+    	$return .= '<td></td>
 	  	</tr>
 	  	</thead>
 	  	<tbody>';
@@ -265,13 +288,15 @@ class MultiColumnWizard extends Widget
 		// Add input fields
 		for($i=0; $i<$intNumberOfRows; $i++)
 		{
+                    $arrItem = array();
 			$return .= '<tr>';
                         $columnCount = 1;
 			// Walk every column
 			foreach($this->columnFields as $strKey => $arrField)
 			{   
+                            if (!$arrField['eval']['columnPos'])
+                                unset($arrField['label']);
 
-                            unset($arrField['label']);
 				$arrField['name'] = $this->strName.'['.$i.']['.$strKey.']';
 				$arrField['id'] = $this->strId.'['.$i.']['.$strKey.']';
 				$arrField['value'] = $this->varValue[$i][$strKey];
@@ -356,16 +381,33 @@ class MultiColumnWizard extends Widget
                                 }
                                
                                 $objWidget->__set('wizard', $wizard);
-
-				$return  .= '<td';
-                                if ($columnCount == 1) $return .= ' class="first"';
-
-                            $return .= '>'.$objWidget->parse().'
-                            </td>';
+                                
+                                //Build array of items
+                                if ($objWidget->columnPos)
+                                {
+                                    $arrItem[$objWidget->columnPos]['entry'] .= $objWidget->parse();
+                                    $arrItem[$objWidget->columnPos]['valign'] = $arrField['eval']['valign'];
+                                }
+                                else
+                                {
+                                    $arrItem[] = array(
+                                        'entry' => $objWidget->parse(),
+                                        'valign' => $arrField['eval']['valign']);
+                                }
+                                
                             $columnCount++;
 			}
                         
-                        $return .= '<td class="last">';
+                        // new array for items so we get rid of the ['entry'] and ['valign']
+                        $arrReturnItems = array();
+                        foreach ($arrItem as $itemKey=>$itemValue)
+			{       
+                            $arrReturnItems[$itemKey] = '<td'.(($itemValue['valign'] != '') ? ' valign="'.$itemValue['valign'].'" ' : '').'>'.$itemValue['entry'].'</td>';
+			}
+
+			$return .= implode("",$arrReturnItems);
+                        
+                        $return .= '<td class="last"'.(($this->buttonPos != '') ? ' valign="'.$this->buttonPos.'" ' : '').'>';
 
                         if ($this->maxCount < $intNumberOfRows && $this->maxCount >0)
                         {
