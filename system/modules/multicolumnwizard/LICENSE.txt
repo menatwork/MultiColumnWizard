@@ -12,3 +12,10 @@
  * Link		http://www.certo-net.ch/
  * License    	GNU/LGPL
  */
+
+/**
+ * Copyright  	Andreas Schempp
+ * Author       Andreas Schempp <andreas@schempp.ch>
+ * Link		http://www.iserv.ch/
+ * License    	GNU/LGPL
+ */

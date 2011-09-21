@@ -1,9 +1,1 @@
-@charset utf-8;
-.multicolumnwizard { margin-top:5px; }
-.multicolumnwizard h3 { padding:0; overflow:hidden; }
-.multicolumnwizard .tl_textarea { width:auto; height:auto; }
-.multicolumnwizard .tl_select, .multicolumnwizard .tl_mselect { width:auto; }
-.multicolumnwizard .tl_checkbox_single_container { margin-top:0; }
-.multicolumnwizard label { font-weight:normal; float:left; }
-.multicolumnwizard input.tl_checkbox { float:left; }
-.multicolumnwizard td.last { padding-right:0; }
+.multicolumnwizard{margin-top:5px}.multicolumnwizard h3{padding:0;overflow:hidden}.multicolumnwizard .tl_textarea{width:auto;height:auto}.multicolumnwizard .tl_select,.multicolumnwizard .tl_mselect{width:auto}.multicolumnwizard .tl_checkbox_single_container{margin-top:0}.multicolumnwizard label{font-weight:normal;float:left}.multicolumnwizard input.tl_checkbox{float:left}.multicolumnwizard td.col_last{padding-right:0}.multicolumnwizard .w50{float:none;width:auto;height:auto}

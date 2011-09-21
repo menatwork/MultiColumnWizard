@@ -32,102 +32,109 @@
  * Provide methods to handle back end tasks.
  * @copyright  Leo Feyer 2005-2011
  * @author     Leo Feyer <http://www.contao.org>
- * @author     David Maack
  * @package    Backend
  */
 var MultiSelect =
 {
-
-        changeNamerecursive: function(arrEl, first, level)
+    changeNamerecursive: function(arrEl, level)
+    {
+        arrEl.each(function(el)
         {
-            arrEl.each(function(el){
-                if (el.name != undefined && el.name != null && el.name != '' ){
-                    el.name = el.name.replace(/\[[0-9]+\]/ig, '[' + level + ']');
+            if (el.name != undefined && el.name != null && el.name != '' )
+            {
+                var name = el.name.substring(0, el.name.indexOf('['));
+                el.name = el.name.replace(new RegExp(name+'\[[0-9]+\]', 'ig'), name+'[' + level + ']');
+            }
+			
+            $H(el.getProperties('for', 'id', 'onclick')).each(function(value, key)
+            {
+                if (value != undefined && value != null && value != '')
+                {
+                    el.setProperty(key, value.replace(/_row[0-9]+_/ig, '_row' + level + '_'));
                 }
-                if (el.getProperty('for') != undefined && el.getProperty('for') != null && el.getProperty('for') != '' ){
-                   el.setProperty('for', el.getProperty('for').replace(/\[[0-9]+\]/ig, '[' + level + ']'));
-                }
-                if (first.id != undefined && first.id != null && first.id != '' ){
-                    el.id = first.id.replace(/\[[0-9]+\]/ig, '[' + level + ']');
-                }
+            });
+			
+            if (el.getChildren().length > 0)
+            {
+                MultiSelect.changeNamerecursive(el.getChildren(), level);
+            }
+        })
+    },
 
-                if (el.getChildren().length > 0)
-                    MultiSelect.changeNamerecursive(el.getChildren(), first, level);
-                
-            })
-            
-            
-            
-            
-        },
-
-	/**
+    /**
 	 * Module wizard
 	 * @param object
 	 * @param string
 	 * @param string
 	 */
-	moduleWizard: function(el, command, id)
-	{
-		var table = $(id);
-		var tbody = table.getFirst().getNext();
-		var parent = $(el).getParent('tr');
-                var rows = tbody.getChildren();
-                var maxCount = table.getProperty('rel').match(/\[[0-9]+\]/ig)[0].replace('[','').replace(']','').toInt();
-                console.log('maxcount' + maxCount);
-                
-		Backend.getScrollOffset();
+    moduleWizard: function(el, command, id)
+    {
+        var table = $(id);
+        var tbody = table.getFirst().getNext();
+        var parent = $(el).getParent('tr');
+        var rows = tbody.getChildren();
+        var maxCount = table.getProperty('rel').match(/\[[0-9]+\]/ig)[0].replace('[','').replace(']','').toInt();
+		
+        if (window.Backend)
+            Backend.getScrollOffset();
 
-		switch (command)
-		{
-			case 'copy':
-				var tr = new Element('tr');
-				var childs = parent.getChildren();
+        switch (command)
+        {
+            case 'copy':
+                var tr = new Element('tr');
+                var childs = parent.getChildren();
 
-				for (var i=0; i<childs.length; i++)
-				{
-					var next = childs[i].clone(true).injectInside(tr);
-					next.getFirst().value = childs[i].getFirst().value;
-				}
+                for (var i=0; i<childs.length; i++)
+                {
+                    var next = childs[i].clone(true, true).injectInside(tr);
+                    next.getFirst().value = childs[i].getFirst().value;
+                }
 
-				tr.injectAfter(parent);
-                                if (maxCount <= tbody.getChildren().length && maxCount != 0 ){
-                                    console.log(tbody.getChildren().length);
-                                    tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'none');                    
-                                }
-				break;
+                tr.injectAfter(parent);
+                if (maxCount <= tbody.getChildren().length && maxCount != 0 ){
+                    console.log(tbody.getChildren().length);
+                    tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'none');
+                }
+                break;
 
-			case 'up':
-				parent.getPrevious() ? parent.injectBefore(parent.getPrevious()) : parent.injectInside(tbody);
-				break;
+            case 'up':
+                parent.getPrevious() ? parent.injectBefore(parent.getPrevious()) : parent.injectInside(tbody);
+                break;
 
-			case 'down':
-				parent.getNext() ? parent.injectAfter(parent.getNext()) : parent.injectBefore(tbody.getFirst());
-				break;
+            case 'down':
+                parent.getNext() ? parent.injectAfter(parent.getNext()) : parent.injectBefore(tbody.getFirst());
+                break;
 
-			case 'delete':
-				(rows.length > 1) ? parent.destroy() : null;
-                                if (maxCount > tbody.getChildren().length ){
-                                    tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'inline');                       
-                                }
-				break;
-		}
+            case 'delete':
+                if(rows.length > 1){
+                    parent.destroy();
+                } 
+                else 
+                {
+                    var childs = parent.getElements('input','select','textarea');
+                    for (var i=0; i<childs.length; i++)
+                    {
+                        // perhaps we have to unselect/uncheck ?
+                        childs[i].set('value','');
+                    }
+                }
+                if (maxCount > tbody.getChildren().length ){
+                    tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'inline');                       
+                }
+                break;
+        }
 
-		rows = tbody.getChildren();
-                var firstRow = rows[0].getChildren();
+        rows = tbody.getChildren();
 
-		for (var i=0; i<rows.length; i++)
-		{
-			var childs = rows[i].getChildren();
-			for (var j=0; j<childs.length; j++)
-			{
-                                var children = childs[j].getChildren();
-                                var firstRow0 = firstRow[j].getFirst();
-                                MultiSelect.changeNamerecursive(children,firstRow0, i)
-                                
-			}
-		}
-	}
-
+        for (var i=0; i<rows.length; i++)
+        {
+            var childs = rows[i].getChildren();
+            for (var j=0; j<childs.length; j++)
+            {
+                var children = childs[j].getChildren();
+                MultiSelect.changeNamerecursive(children, i)
+            }
+        }
+    }
 };
 
