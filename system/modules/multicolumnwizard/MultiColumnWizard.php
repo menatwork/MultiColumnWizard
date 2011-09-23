@@ -235,7 +235,11 @@ class MultiColumnWizard extends Widget
 
         foreach ($this->columnFields as $strKey => $arrField)
         {
-            if ($arrField['eval']['columnPos'])
+        	if ($arrField['inputType'] == 'hidden')
+        	{
+        		continue;
+        	}
+            elseif ($arrField['eval']['columnPos'])
             {
                 $arrHeaderItems[$arrField['eval']['columnPos']] = '<td></td>';
             }
@@ -258,6 +262,7 @@ class MultiColumnWizard extends Widget
         for ($i = 0; $i < $intNumberOfRows; $i++)
         {
             $arrItem = array();
+            $strHidden = '';
             $return .= '<tr>';
 
             // Walk every column
@@ -271,6 +276,12 @@ class MultiColumnWizard extends Widget
                 }
 
                 $objWidget->storeValues = true;
+
+				if ($arrField['inputType'] == 'hidden')
+				{
+					$strHidden .= $objWidget->generate();
+					continue;
+				}
 
                 // Add custom wizard
                 if (is_array($arrField['wizard']))
@@ -320,7 +331,7 @@ class MultiColumnWizard extends Widget
 
             $return .= implode('', $arrReturnItems);
 
-            $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>';
+            $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>'.$strHidden;
 
             if ($this->maxCount < $intNumberOfRows && $this->maxCount > 0)
             {
