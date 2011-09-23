@@ -226,15 +226,17 @@ class MultiColumnWizard extends Widget
             $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($strCommand, '/') . '=[^&]*/i', '', $this->Environment->request)));
         }
 
-        // Add label and return wizard
-        $return .= '<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . (($this->maxCount) ? $this->maxCount : '0') . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">
-		<thead>
-		<tr>';
-
+		$arrUnique = array();
         $arrHeaderItems = array();
 
         foreach ($this->columnFields as $strKey => $arrField)
         {
+        	// Store unique fields
+        	if ($arrField['eval']['unique'])
+        	{
+        		$arrUnique[] = $strKey;
+        	}
+        	
         	if ($arrField['inputType'] == 'hidden')
         	{
         		continue;
@@ -249,12 +251,16 @@ class MultiColumnWizard extends Widget
             }
         }
 
-        $return .= implode('', $arrHeaderItems);
-
-        $return .= '<td></td>
-		</tr>
-		</thead>
-		<tbody>';
+		// Add label and return wizard
+        $return = '
+<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] unique[' . implode(',', $arrUnique) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">
+  <thead>
+    <tr>
+      ' . implode("\n      ", $arrHeaderItems) . '
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>';
 
         $intNumberOfRows = max(count($this->varValue), 1);
 

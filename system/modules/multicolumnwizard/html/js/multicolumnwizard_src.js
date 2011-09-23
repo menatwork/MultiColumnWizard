@@ -37,7 +37,8 @@ var MultiColumnWizard =
 		var tbody = table.getFirst().getNext();
 		var parent = $(el).getParent('tr');
 		var options = {
-			'maxCount': table.getProperty('rel').match(/\[[0-9]+\]/ig)[0].replace('[','').replace(']','').toInt()
+			'maxCount': table.getProperty('rel').match(/maxCount\[[0-9]+\]/ig)[0].replace('maxCount[','').replace(']','').toInt(),
+        	'uniqueFields': table.getProperty('rel').match(/unique\[[a-z0-9,]*\]/ig)[0].replace('unique[','').replace(']','').split(','),
 		};
 		
 		// Do not run this in the frontend, Backend class would not be available
@@ -75,8 +76,20 @@ var MultiColumnWizard =
 		
 		if (options.maxCount <= tbody.getChildren().length && options.maxCount != 0 )
 		{
-			console.log(tbody.getChildren().length);
 			tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'none');
+		}
+		
+		if (options.uniqueFields.length > 1 || options.uniqueFields[0] != '')
+		{
+			for(var i=0; i<options.uniqueFields.length; i++)
+			{
+				var el = tr.getElements('*[name*=\['+options.uniqueFields[i]+'\]]');
+				
+				if (el)
+				{
+					MultiColumnWizard.clearElementValue(el);
+				}
+			}
 		}
 	},
 	
@@ -101,14 +114,7 @@ var MultiColumnWizard =
 			var childs = parent.getElements('input,select,textarea');
 			for (var i=0; i<childs.length; i++)
 			{
-				if (childs[i].get('type') == 'checkbox' || childs[i].get('type') == 'radio')
-				{
-					childs[i].checked = false;
-				}
-				else
-				{
-					childs[i].set('value', '');
-				}
+				MultiColumnWizard.clearElementValue(childs[i]);
 			}
 		}
 		
@@ -141,6 +147,18 @@ var MultiColumnWizard =
 				MultiColumnWizard.updateAttributes(el.getChildren(), level);
 			}
 		});
+	},
+	
+	clearElementValue: function(el)
+	{
+		if (el.get('type') == 'checkbox' || el.get('type') == 'radio')
+		{
+			el.checked = false;
+		}
+		else
+		{
+			el.set('value', '');
+		}
 	}
 };
 
