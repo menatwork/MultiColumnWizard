@@ -53,6 +53,12 @@ class MultiColumnWizard extends Widget
      * @var mixed
      */
     protected $varValue = array();
+    
+    /**
+     * Buttons
+     * @var array
+     */
+    protected $arrButtons = array('copy'=>'copy.gif', 'up'=>'up.gif', 'down'=>'down.gif', 'delete'=>'delete.gif');
 
     /**
      * Initialize the object
@@ -96,8 +102,15 @@ class MultiColumnWizard extends Widget
                 $this->import($varValue[0]);
                 $this->columnFields = $this->$varValue[0]->$varValue[1]($this);
                 break;
+			
+			case 'buttons':
+				if (is_array($varValue))
+				{
+					$this->arrButtons = array_merge($this->arrButtons, array_intersect_key($varValue, $this->arrButtons));
+				}
+				break;
 
-            default:
+			default:
                 parent::__set($strKey, $varValue);
                 break;
         }
@@ -175,7 +188,6 @@ class MultiColumnWizard extends Widget
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard.js';
         $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
-        $arrButtons = array('copy', 'up', 'down', 'delete');
         $strCommand = 'cmd_' . $this->strField;
 
         // Change the order
@@ -291,7 +303,7 @@ class MultiColumnWizard extends Widget
                 else
                 {
                     $arrItem[] = array
-                        (
+                    (
                         'entry' => $objWidget->parse(),
                         'valign' => $arrField['eval']['valign'],
                         'tl_class' => $arrField['eval']['tl_class'],
@@ -312,13 +324,13 @@ class MultiColumnWizard extends Widget
 
             if ($this->maxCount < $intNumberOfRows && $this->maxCount > 0)
             {
-                unset($arrButtons[0]);
+                unset($this->arrButtons['copy']);
             }
 
             // Add buttons
-            foreach ($arrButtons as $button)
+            foreach ($this->arrButtons as $button => $image)
             {
-                $return .= '<a href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '" onclick="MultiSelect.moduleWizard(this, \'' . $button . '\',  \'ctrl_' . $this->strId . '\'); return false;">' . $this->generateImage($button . '.gif', $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+                $return .= '<a href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '" onclick="MultiSelect.moduleWizard(this, \'' . $button . '\',  \'ctrl_' . $this->strId . '\'); return false;">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
             }
 
             $return .= '</td></tr>';
