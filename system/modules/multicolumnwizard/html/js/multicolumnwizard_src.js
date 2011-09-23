@@ -106,7 +106,8 @@ var MultiSelect =
                 break;
 
             case 'delete':
-                if(rows.length > 1){
+                if(rows.length > 1)
+                {
                     parent.destroy();
                 } 
                 else 
@@ -114,8 +115,18 @@ var MultiSelect =
                     var childs = parent.getElements('input','select','textarea');
                     for (var i=0; i<childs.length; i++)
                     {
-                        // perhaps we have to unselect/uncheck ?
-                        childs[i].set('value','');
+                    	if (childs[i].get('type') == 'checkbox' || childs[i].get('type') == 'radio')
+                		{
+                			childs[i].checked = false;
+                		}
+                		else if (childs[i].get('tag') == 'select')
+                		{
+                			childs[i].selectedIndex = 0;
+                		}
+                		else
+                		{
+                			childs[i].set('value', '');
+                		}
                     }
                 }
                 if (maxCount > tbody.getChildren().length ){
