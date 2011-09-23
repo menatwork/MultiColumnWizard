@@ -341,7 +341,7 @@ class MultiColumnWizard extends Widget
             // Add buttons
             foreach ($this->arrButtons as $button => $image)
             {
-                $return .= '<a href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '" onclick="MultiSelect.moduleWizard(this, \'' . $button . '\',  \'ctrl_' . $this->strId . '\'); return false;">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+                $return .= '<a href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '" onclick="MultiColumnWizard.execute(this, \'' . $button . '\',  \'ctrl_' . $this->strId . '\'); return false;">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
             }
 
             $return .= '</td></tr>';

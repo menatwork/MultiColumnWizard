@@ -20,132 +20,127 @@
  *
  * PHP version 5
  * @copyright  MEN AT WORK 2011
- * @package    MultiColumnWizard
- * @license    GNU/LGPL
- * @filesource
+ * @author	Andreas Isaak <isaak@men-at-work.de>
+ * @author	Yanick Witschi <yanick.witschi@certo-net.ch>
+ * @author	Andreas Schempp <andreas@schempp.ch>
+ * @package	MultiColumnWizard
+ * @license	http://opensource.org/licenses/lgpl-3.0.html
  */
 
 
-/**
- * Class MultiSelect
- *
- * Provide methods to handle back end tasks.
- * @copyright  Leo Feyer 2005-2011
- * @author     Leo Feyer <http://www.contao.org>
- * @package    Backend
- */
-var MultiSelect =
+var MultiColumnWizard =
 {
-    changeNamerecursive: function(arrEl, level)
-    {
-        arrEl.each(function(el)
-        {
-            if (el.name != undefined && el.name != null && el.name != '' )
-            {
-                var name = el.name.substring(0, el.name.indexOf('['));
-                el.name = el.name.replace(new RegExp(name+'\[[0-9]+\]', 'ig'), name+'[' + level + ']');
-            }
-			
-            $H(el.getProperties('for', 'id', 'onclick')).each(function(value, key)
-            {
-                if (value != undefined && value != null && value != '')
-                {
-                    el.setProperty(key, value.replace(/_row[0-9]+_/ig, '_row' + level + '_'));
-                }
-            });
-			
-            if (el.getChildren().length > 0)
-            {
-                MultiSelect.changeNamerecursive(el.getChildren(), level);
-            }
-        })
-    },
 
-    /**
-	 * Module wizard
-	 * @param object
-	 * @param string
-	 * @param string
-	 */
-    moduleWizard: function(el, command, id)
-    {
-        var table = $(id);
-        var tbody = table.getFirst().getNext();
-        var parent = $(el).getParent('tr');
-        var rows = tbody.getChildren();
-        var maxCount = table.getProperty('rel').match(/\[[0-9]+\]/ig)[0].replace('[','').replace(']','').toInt();
+	'execute': function(el, command, id)
+	{
+		var table = $(id);
+		var tbody = table.getFirst().getNext();
+		var parent = $(el).getParent('tr');
+		var options = {
+			'maxCount': table.getProperty('rel').match(/\[[0-9]+\]/ig)[0].replace('[','').replace(']','').toInt()
+		};
 		
-        if (window.Backend)
-            Backend.getScrollOffset();
+		// Do not run this in the frontend, Backend class would not be available
+		if (window.Backend)
+			Backend.getScrollOffset();
 
-        switch (command)
-        {
-            case 'copy':
-                var tr = new Element('tr');
-                var childs = parent.getChildren();
+		// Execute the command
+		MultiColumnWizard[command](tbody,parent,options);
 
-                for (var i=0; i<childs.length; i++)
-                {
-                    var next = childs[i].clone(true, true).injectInside(tr);
-                    next.getFirst().value = childs[i].getFirst().value;
-                }
+		var rows = tbody.getChildren();
 
-                tr.injectAfter(parent);
-                if (maxCount <= tbody.getChildren().length && maxCount != 0 ){
-                    console.log(tbody.getChildren().length);
-                    tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'none');
-                }
-                break;
+		for (var i=0; i<rows.length; i++)
+		{
+			var childs = rows[i].getChildren();
+			for (var j=0; j<childs.length; j++)
+			{
+				var children = childs[j].getChildren();
+				MultiColumnWizard.updateAttributes(children, i);
+			}
+		}
+	},
+	
+	'copy': function(tbody, parent, options)
+	{
+		var tr = new Element('tr');
+		var childs = parent.getChildren();
 
-            case 'up':
-                parent.getPrevious() ? parent.injectBefore(parent.getPrevious()) : parent.injectInside(tbody);
-                break;
+		for (var i=0; i<childs.length; i++)
+		{
+			var next = childs[i].clone(true, true).injectInside(tr);
+			next.getFirst().value = childs[i].getFirst().value;
+		}
 
-            case 'down':
-                parent.getNext() ? parent.injectAfter(parent.getNext()) : parent.injectBefore(tbody.getFirst());
-                break;
-
-            case 'delete':
-                if(rows.length > 1)
-                {
-                    parent.destroy();
-                } 
-                else 
-                {
-                    var childs = parent.getElements('input','select','textarea');
-                    for (var i=0; i<childs.length; i++)
-                    {
-                    	if (childs[i].get('type') == 'checkbox' || childs[i].get('type') == 'radio')
-                		{
-                			childs[i].checked = false;
-                		}
-                		else if (childs[i].get('tag') == 'select')
-                		{
-                			childs[i].selectedIndex = 0;
-                		}
-                		else
-                		{
-                			childs[i].set('value', '');
-                		}
-                    }
-                }
-                if (maxCount > tbody.getChildren().length ){
-                    tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'inline');                       
-                }
-                break;
-        }
-
-        rows = tbody.getChildren();
-
-        for (var i=0; i<rows.length; i++)
-        {
-            var childs = rows[i].getChildren();
-            for (var j=0; j<childs.length; j++)
-            {
-                var children = childs[j].getChildren();
-                MultiSelect.changeNamerecursive(children, i)
-            }
-        }
-    }
+		tr.injectAfter(parent);
+		
+		if (options.maxCount <= tbody.getChildren().length && options.maxCount != 0 )
+		{
+			console.log(tbody.getChildren().length);
+			tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'none');
+		}
+	},
+	
+	'up': function(tbody, parent, options)
+	{
+		parent.getPrevious() ? parent.injectBefore(parent.getPrevious()) : parent.injectInside(tbody);
+	},
+	
+	'down': function(tbody, parent, options)
+	{
+		parent.getNext() ? parent.injectAfter(parent.getNext()) : parent.injectBefore(tbody.getFirst());
+	},
+	
+	'delete': function(tbody, parent, options)
+	{
+		if (tbody.getChildren().length > 1)
+		{
+			parent.destroy();
+		} 
+		else 
+		{
+			var childs = parent.getElements('input,select,textarea');
+			for (var i=0; i<childs.length; i++)
+			{
+				if (childs[i].get('type') == 'checkbox' || childs[i].get('type') == 'radio')
+				{
+					childs[i].checked = false;
+				}
+				else
+				{
+					childs[i].set('value', '');
+				}
+			}
+		}
+		
+		if (options.maxCount > tbody.getChildren().length )
+		{
+			tbody.getElements('img[src=system/themes/default/images/copy.gif]').setStyle('display', 'inline');   					
+		}
+	},
+	
+	updateAttributes: function(arrEl, level)
+	{
+		arrEl.each(function(el)
+		{
+			if (el.name != undefined && el.name != null && el.name != '' )
+			{
+				var name = el.name.substring(0, el.name.indexOf('['));
+				el.name = el.name.replace(new RegExp(name+'\[[0-9]+\]', 'ig'), name+'[' + level + ']');
+			}
+			
+			$H(el.getProperties('for', 'id', 'onclick')).each(function(value, key)
+			{
+				if (value != undefined && value != null && value != '')
+				{
+					el.setProperty(key, value.replace(/_row[0-9]+_/ig, '_row' + level + '_'));
+				}
+			});
+			
+			if (el.getChildren().length > 0)
+			{
+				MultiColumnWizard.updateAttributes(el.getChildren(), level);
+			}
+		});
+	}
 };
 
