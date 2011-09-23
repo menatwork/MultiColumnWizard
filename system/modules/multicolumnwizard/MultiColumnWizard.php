@@ -109,6 +109,14 @@ class MultiColumnWizard extends Widget
 					$this->arrButtons = array_merge($this->arrButtons, array_intersect_key($varValue, $this->arrButtons));
 				}
 				break;
+			
+			case 'disableSorting':
+				if ($varValue == true)
+				{
+					unset($this->arrButtons['up']);
+					unset($this->arrButtons['down']);
+				}
+				break;
 
 			default:
                 parent::__set($strKey, $varValue);
