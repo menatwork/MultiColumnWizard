@@ -38,7 +38,7 @@ var MultiColumnWizard =
 		var parent = $(el).getParent('tr');
 		var options = {
 			'maxCount': table.getProperty('rel').match(/maxCount\[[0-9]+\]/ig)[0].replace('maxCount[','').replace(']','').toInt(),
-        	'uniqueFields': table.getProperty('rel').match(/unique\[[a-z0-9,]*\]/ig)[0].replace('unique[','').replace(']','').split(','),
+        	'uniqueFields': table.getProperty('rel').match(/unique\[[a-z0-9,]*\]/ig)[0].replace('unique[','').replace(']','').split(',')
 		};
 		
 		// Do not run this in the frontend, Backend class would not be available
@@ -56,8 +56,11 @@ var MultiColumnWizard =
 			for (var j=0; j<childs.length; j++)
 			{
 				var children = childs[j].getChildren();
-				MultiColumnWizard.updateAttributes(children, i);
+				MultiColumnWizard.updateFieldName(children, i);
 			}
+			
+			// Update things like ID and "for" attribute
+			rows[i].set('html', rows[i].get('html').replace(/_row[0-9]+_/ig, '_row' + i + '_'));
 		}
 	},
 	
@@ -124,27 +127,36 @@ var MultiColumnWizard =
 		}
 	},
 	
-	updateAttributes: function(arrEl, level)
+	updateFieldName: function(arrEl, level)
 	{
 		arrEl.each(function(el)
 		{
 			if (el.name != undefined && el.name != null && el.name != '' )
 			{
 				var name = el.name.substring(0, el.name.indexOf('['));
-				el.name = el.name.replace(new RegExp(name+'\[[0-9]+\]', 'ig'), name+'[' + level + ']');
-			}
-			
-			$H(el.getProperties('for', 'id', 'onclick')).each(function(value, key)
-			{
-				if (value != undefined && value != null && value != '')
+				
+				// More about this hack:
+				// http://stackoverflow.com/questions/2094618/changing-name-attr-of-cloned-input-element-in-jquery-doesnt-work-in-ie6-7
+				// http://matts411.com/post/setting_the_name_attribute_in_ie_dom/
+				if (Browser.ie || Browser.Engine.trident)
 				{
-					el.setProperty(key, value.replace(/_row[0-9]+_/ig, '_row' + level + '_'));
+					var oldName = el.name;
+					var newName = el.name.replace(new RegExp(name+'\[[0-9]+\]', 'ig'), name+'[' + level + ']');
+					
+					if (oldName != newName)
+					{
+						el.mergeAttributes(document.createElement("<INPUT name='" + newName + "'/>"), false);
+					}
 				}
-			});
+				else
+				{
+					el.name = el.name.replace(new RegExp(name+'\[[0-9]+\]', 'ig'), name+'[' + level + ']');
+				}
+			}
 			
 			if (el.getChildren().length > 0)
 			{
-				MultiColumnWizard.updateAttributes(el.getChildren(), level);
+				MultiColumnWizard.updateFieldName(el.getChildren(), level);
 			}
 		});
 	},
