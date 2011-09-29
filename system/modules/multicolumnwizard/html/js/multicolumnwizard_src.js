@@ -59,6 +59,25 @@ var MultiColumnWizard =
 				MultiColumnWizard.updateFieldName(children, i);
 			}
 			
+			// Store attributes in the DOM or they would be lost when getting & setting innerHTML
+			rows[i].getElements('select, input, textarea').each( function(el)
+			{
+				if (el.get('type') == 'checkbox' || el.get('type') == 'radio')
+				{
+					el.checked ? el.setAttribute('checked', 'checked') : el.removeAttribute('checked');
+				}
+				else if (el.get('tag') == 'select' && el.selectedIndex > 0)
+				{
+					var options = el.getChildren();
+					options.each( function(option) { option.removeAttribute('selected') } );
+					options[el.selectedIndex].setAttribute('selected', 'selected');
+				}
+				else
+				{
+					el.setAttribute('value', el.value);
+				}
+			});
+			
 			// Update things like ID and "for" attribute
 			rows[i].set('html', rows[i].get('html').replace(/_row[0-9]+_/ig, '_row' + i + '_'));
 		}
