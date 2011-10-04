@@ -69,8 +69,17 @@ var MultiColumnWizard =
 				else if (el.get('tag') == 'select' && el.selectedIndex > 0)
 				{
 					var options = el.getChildren();
-					options.each( function(option) { option.removeAttribute('selected') } );
-					options[el.selectedIndex].setAttribute('selected', 'selected');
+					options.each( function(option, index)
+					{
+						if (el.selectedIndex == index)
+						{
+							option.setAttribute('selected', true);
+						}
+						else
+						{
+							option.removeAttribute('selected')
+						}
+					});
 				}
 				else
 				{
