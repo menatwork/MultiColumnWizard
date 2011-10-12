@@ -307,7 +307,7 @@ class MultiColumnWizard extends Widget
 
                     $dc = new $dataContainer($this->strTable);
                     $dc->field = $objWidget->id;
-                    $dc->inputName = $arrField['name'];
+                    $dc->inputName = $objWidget->id;
 
                     foreach ($arrField['wizard'] as $callback)
                     {
