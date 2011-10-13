@@ -261,7 +261,7 @@ class MultiColumnWizard extends Widget
 
 		// Add label and return wizard
         $return = '
-<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] unique[' . implode(',', $arrUnique) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">
+<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">
   <thead>
     <tr>
       ' . implode("\n      ", $arrHeaderItems) . '
@@ -347,15 +347,21 @@ class MultiColumnWizard extends Widget
 
             $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>'.$strHidden;
 
-            if ($this->maxCount < $intNumberOfRows && $this->maxCount > 0)
-            {
-                unset($this->arrButtons['copy']);
-            }
-
             // Add buttons
             foreach ($this->arrButtons as $button => $image)
             {
-                $return .= '<a href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '" onclick="MultiColumnWizard.execute(this, \'' . $button . '\',  \'ctrl_' . $this->strId . '\'); return false;">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+                $return .= '<a ';
+                $style = '';
+                if ($button == "copy" && $this->maxCount <= $intNumberOfRows && $this->maxCount > 0)
+                {
+                    $return .= 'style="display:none" ';
+                }
+                if ($button == "delete" && $this->minCount >= $intNumberOfRows && $this->minCount > 0)
+                {
+                    $return .= 'style="display:none" ';
+                }
+                
+                $return .= 'href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '" onclick="MultiColumnWizard.execute(this, \'' . $button . '\',  \'ctrl_' . $this->strId . '\'); return false;">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
             }
 
             $return .= '</td></tr>';
