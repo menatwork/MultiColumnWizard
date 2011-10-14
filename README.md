@@ -1,4 +1,5 @@
-== Usage with columnFields ==
+Usage with columnFields
+=============
 
 <pre><code>
 $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
@@ -38,7 +39,8 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
 );
 </code></pre>
 
-== Usage with callback ==
+Usage with callback
+=============
 
 <pre><code>
 $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = array
@@ -54,7 +56,8 @@ $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = array
 );
 </code></pre>
 
-== More information ==
+More information
+=============
 
 More information can be found in the contao wiki
 http://de.contaowiki.org/MultiColumnWizard
