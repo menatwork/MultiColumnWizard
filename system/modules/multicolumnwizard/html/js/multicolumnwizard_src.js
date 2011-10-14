@@ -19,10 +19,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
- * @author	Andreas Isaak <isaak@men-at-work.de>
- * @author	Yanick Witschi <yanick.witschi@certo-net.ch>
- * @author	Andreas Schempp <andreas@schempp.ch>
+ * @copyright Andreas Schempp 2011, certo web & design GmbH 2011, MEN AT WORK 2011
  * @package	MultiColumnWizard
  * @license	http://opensource.org/licenses/lgpl-3.0.html
  */
