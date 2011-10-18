@@ -133,7 +133,8 @@ class MultiColumnWizard extends Widget
             {
                 $objWidget = $this->initializeWidget($arrField, $i, $strKey, $varInput[$i][$strKey]);
 
-                if ($objWidget == null)
+				// can be null on error, or a string on input_field_callback
+                if (!is_object($objWidget))
                 {
                     continue;
                 }
@@ -235,6 +236,7 @@ class MultiColumnWizard extends Widget
         }
 
 		$arrUnique = array();
+		$arrDatepicker = array();
         $arrHeaderItems = array();
 
         foreach ($this->columnFields as $strKey => $arrField)
@@ -243,6 +245,12 @@ class MultiColumnWizard extends Widget
         	if ($arrField['eval']['unique'])
         	{
         		$arrUnique[] = $strKey;
+        	}
+        	
+        	// Store date picker fields
+        	if ($arrField['eval']['datepicker'])
+        	{
+        		$arrDatepicker[] = $strKey;
         	}
         	
         	if ($arrField['inputType'] == 'hidden')
@@ -261,7 +269,7 @@ class MultiColumnWizard extends Widget
 
 		// Add label and return wizard
         $return = '
-<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">
+<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">
   <thead>
     <tr>
       ' . implode("\n      ", $arrHeaderItems) . '
@@ -282,46 +290,95 @@ class MultiColumnWizard extends Widget
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
             {
+            	$strWidget = '';
                 $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
 
-                if ($objWidget == null)
+                if ($objWidget === null)
                 {
                     continue;
                 }
-
-                $objWidget->storeValues = true;
-
-				if ($arrField['inputType'] == 'hidden')
+				elseif (is_string($objWidget))
+				{
+					$strWidget = $objWidget;
+				}
+				elseif ($arrField['inputType'] == 'hidden')
 				{
 					$strHidden .= $objWidget->generate();
 					continue;
 				}
-
-                // Add custom wizard
-                if (is_array($arrField['wizard']))
-                {
-                    $wizard = '';
-
-                    $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-                    require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
-
-                    $dc = new $dataContainer($this->strTable);
-                    $dc->field = $objWidget->id;
-                    $dc->inputName = $objWidget->id;
-
-                    foreach ($arrField['wizard'] as $callback)
-                    {
-                        $this->import($callback[0]);
-                        $wizard .= $this->$callback[0]->$callback[1]($dc, $objWidget);
-                    }
-
-                    $objWidget->wizard = $wizard;
-                }
+				else
+				{
+					$datepicker = '';
+	
+					// Datepicker
+					if ($arrField['eval']['datepicker'])
+					{
+						$rgxp = $arrField['eval']['rgxp'];
+						$format = $GLOBALS['TL_CONFIG'][$rgxp.'Format'];
+			
+						switch ($rgxp)
+						{
+							case 'datim':
+								$time = ",\n      timePicker:true";
+								break;
+			
+							case 'time':
+								$time = ",\n      timePickerOnly:true";
+								break;
+			
+							default:
+								$time = '';
+								break;
+						}
+			
+						$datepicker = ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
+<script>
+window.addEvent(\'domready\', function() {
+window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $objWidget->id . '\', {
+  allowEmpty:true,
+  toggleElements:\'#toggle_' . $objWidget->id . '\',
+  pickerClass:\'datepicker_dashboard\',
+  format:\'' . $format . '\',
+  inputOutputFormat:\'' . $format . '\',
+  positionOffset:{x:130,y:-185}' . $time . ',
+  startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
+  days:[\''. implode("','", $GLOBALS['TL_LANG']['DAYS']) . '\'],
+  dayShort:' . $GLOBALS['TL_LANG']['MSC']['dayShortLength'] . ',
+  months:[\''. implode("','", $GLOBALS['TL_LANG']['MONTHS']) . '\'],
+  monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
+});
+});
+</script>';
+					}
+	
+	                // Add custom wizard
+	                if (is_array($arrField['wizard']))
+	                {
+	                    $wizard = '';
+	
+	                    $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
+	                    require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
+	
+	                    $dc = new $dataContainer($this->strTable);
+	                    $dc->field = $objWidget->id;
+	                    $dc->inputName = $objWidget->id;
+	
+	                    foreach ($arrField['wizard'] as $callback)
+	                    {
+	                        $this->import($callback[0]);
+	                        $wizard .= $this->$callback[0]->$callback[1]($dc, $objWidget);
+	                    }
+	
+	                    $objWidget->wizard = $wizard;
+	                }
+	                
+	                $strWidget = $objWidget->parse() . $datepicker;
+				}
 
                 // Build array of items
-                if ($objWidget->columnPos)
+                if ($arrField['eval']['columnPos'] != '')
                 {
-                    $arrItem[$objWidget->columnPos]['entry'] .= $objWidget->parse();
+                    $arrItem[$objWidget->columnPos]['entry'] .= $strWidget;
                     $arrItem[$objWidget->columnPos]['valign'] = $arrField['eval']['valign'];
                     $arrItem[$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
                 }
@@ -329,7 +386,7 @@ class MultiColumnWizard extends Widget
                 {
                     $arrItem[] = array
                     (
-                        'entry' => $objWidget->parse(),
+                        'entry' => $strWidget,
                         'valign' => $arrField['eval']['valign'],
                         'tl_class' => $arrField['eval']['tl_class'],
                     );
@@ -372,30 +429,100 @@ class MultiColumnWizard extends Widget
 
     /**
      * Initialize widget
+     *
+     * Based on DataContainer::row() from Contao 2.10.1
+     *
      * @param	array
      * @param	int
      * @param	string
      * @param	mixed
      * @return	Widget|null
      */
-    protected function initializeWidget($arrField, $intRow, $strKey, $varValue)
+    protected function initializeWidget(&$arrField, $intRow, $strKey, $varValue)
     {
-        // Map checkboxWizard to regular checkbox widget
-        if ($arrField['inputType'] == 'checkboxWizard')
-        {
-            $arrField['inputType'] = 'checkbox';
-        }
+    	$xlabel = '';
 
+		// Toggle line wrap (textarea)
+		if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '')
+		{
+			$xlabel .= ' ' . $this->generateImage('wrap.gif', $GLOBALS['TL_LANG']['MSC']['wordWrap'], 'title="' . specialchars($GLOBALS['TL_LANG']['MSC']['wordWrap']) . '" class="toggleWrap" onclick="Backend.toggleWrap(\'ctrl_'.$this->strId . '_row' . $intRow . '_' . $strKey.'\');"');
+		}
+		
+		// Add the help wizard
+		if ($arrField['eval']['helpwizard'])
+		{
+			$xlabel .= ' <a href="contao/help.php?table='.$this->strTable.'&amp;field='.$this->strName.'_'.$strKey.'" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" rel="lightbox[help 610 80%]">'.$this->generateImage('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom;"').'</a>';
+		}
+		
+		// Add the popup file manager
+		if ($arrField['inputType'] == 'fileTree')
+		{
+			$path = '';
+
+			if (isset($arrField['eval']['path']))
+			{
+				$path = '?node=' . $arrField['eval']['path'];
+			}
+
+			$xlabel .= ' <a href="contao/files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" rel="lightbox[files 765 80%]">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
+		}
+		
+		// Add the table import wizard
+		elseif ($arrField['inputType'] == 'tableWizard')
+		{
+			$xlabel .= ' <a href="' . $this->addToUrl('key=table') . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['tw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . $this->generateImage('tablewizard.gif', $GLOBALS['TL_LANG']['MSC']['tw_import'][0], 'style="vertical-align:text-bottom;"') . '</a>';
+			$xlabel .= ' ' . $this->generateImage('demagnify.gif', '', 'title="' . specialchars($GLOBALS['TL_LANG']['MSC']['tw_shrink']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(0.9);"') . $this->generateImage('magnify.gif', '', 'title="' . specialchars($GLOBALS['TL_LANG']['MSC']['tw_expand']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(1.1);"');
+		}
+		
+		// Add the list import wizard
+		elseif ($arrField['inputType'] == 'listWizard')
+		{
+			$xlabel .= ' <a href="' . $this->addToUrl('key=list') . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['lw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . $this->generateImage('tablewizard.gif', $GLOBALS['TL_LANG']['MSC']['tw_import'][0], 'style="vertical-align:text-bottom;"') . '</a>';
+		}
+		
+		// Input field callback
+		if (is_array($arrField['input_field_callback']))
+		{
+			if (!is_object($this->$arrField['input_field_callback'][0]))
+			{
+				$this->import($arrField['input_field_callback'][0]);
+			}
+
+			return $this->$arrField['input_field_callback'][0]->$arrField['input_field_callback'][1]($this, $xlabel);
+		}
+		
         $strClass = $GLOBALS[(TL_MODE == 'BE' ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType']];
 
-        if (!$this->classFileExists($strClass))
+        if ($strClass == '' || !$this->classFileExists($strClass))
         {
             return null;
         }
+        
+        $arrField['eval']['required'] = false;
 
-        if (!$arrField['eval']['columnPos'])
+		// Use strlen() here (see #3277)
+		if ($arrField['eval']['mandatory'])
+		{
+			if (is_array($this->varValue[$intRow][$strKey]))
+			{
+				 if (empty($this->varValue[$intRow][$strKey]))
+				 {
+				 	$arrField['eval']['required'] = true;
+				 }
+			}
+			else
+			{
+				if (!strlen($this->varValue[$intRow][$strKey]))
+				{
+					$arrField['eval']['required'] = true;
+				}
+			}
+		}
+        
+        // Hide label except if multiple widgets are in one column
+        if ($arrField['eval']['columnPos'] == '')
         {
-            unset($arrField['label']);
+        	$arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' hidelabel');
         }
 
         // load callback
@@ -412,12 +539,12 @@ class MultiColumnWizard extends Widget
         $arrField['id'] = $this->strId . '_row' . $intRow . '_' . $strKey;
         $arrField['value'] = $varValue ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
-        $arrField['eval']['required'] = ($this->varValue[$intRow][$strKey] == '' && $arrField['eval']['mandatory']) ? true : false;
 
         $objWidget = new $strClass($this->prepareForWidget($arrField, $arrField['name'], $arrField['value'], null, $this->strTable));
 
         $objWidget->strId = $arrField['id'];
         $objWidget->storeValues = true;
+        $objWidget->xlabel = $xlabel;
         $objWidget->currentRecord = $this->currentRecord;
 
         return $objWidget;
