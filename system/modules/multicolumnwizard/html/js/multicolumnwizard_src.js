@@ -19,14 +19,14 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright Andreas Schempp 2011, certo web & design GmbH 2011, MEN AT WORK 2011
- * @package    MultiColumnWizard
- * @license    http://opensource.org/licenses/lgpl-3.0.html
+ * @copyright   Andreas Schempp 2011, certo web & design GmbH 2011, MEN AT WORK 2011
+ * @package     MultiColumnWizard
+ * @license     http://opensource.org/licenses/lgpl-3.0.html
  */
-
 
 var MultiColumnWizard =
 {
+    execHOOK: Array(),
 
     'execute': function(el, command, id)
     {
@@ -41,8 +41,10 @@ var MultiColumnWizard =
         };
 
         // Do not run this in the frontend, Backend class would not be available
-        if (window.Backend)
+        if (window.Backend) {
+            
             Backend.getScrollOffset();
+        }
 
         // Execute the command
         MultiColumnWizard[command](tbody,parent,options);
@@ -111,6 +113,11 @@ var MultiColumnWizard =
                 window[datepicker].attach();
             }
         }
+        
+        for(var i=0; i<MultiColumnWizard.execHOOK.length; i++) {      
+            MultiColumnWizard.execHOOK[i](el, command, id);
+        }      
+
     },
 
     'copy': function(tbody, parent, options)
@@ -162,7 +169,6 @@ var MultiColumnWizard =
 
     'delete': function(tbody, parent, options)
     {
-
         if (tbody.getChildren().length > 1)
         {
             parent.destroy();
@@ -233,4 +239,3 @@ var MultiColumnWizard =
         }
     }
 };
-
