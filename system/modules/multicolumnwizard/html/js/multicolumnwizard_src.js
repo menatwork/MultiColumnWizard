@@ -36,84 +36,39 @@ var MultiColumnWizard =
         var options = {
             'maxCount': table.getProperty('rel').match(/maxCount\[[0-9]+\]/ig)[0].replace('maxCount[','').replace(']','').toInt(),
             'minCount': table.getProperty('rel').match(/minCount\[[0-9]+\]/ig)[0].replace('minCount[','').replace(']','').toInt(),
-            'uniqueFields': table.getProperty('rel').match(/unique\[[a-z0-9,]*\]/ig)[0].replace('unique[','').replace(']','').split(','),
-            'datepickers': table.getProperty('rel').match(/datepicker\[[a-z0-9,]*\]/ig)[0].replace('datepicker[','').replace(']','').split(',')
+            'uniqueFields': table.getProperty('rel').match(/unique\[[a-z0-9,]*\]/ig)[0].replace('unique[','').replace(']','').split(',')
         };
 
         // Do not run this in the frontend, Backend class would not be available
-        if (window.Backend) {
-            
+        if (window.Backend)
+        {
             Backend.getScrollOffset();
         }
-
+        
+        
         // Execute the command
         MultiColumnWizard[command](tbody,parent,options);
 
-        var rows = tbody.getChildren();
 
-        for (var i=0; i<rows.length; i++)
-        {
-            var childs = rows[i].getChildren();
-            for (var j=0; j<childs.length; j++)
-            {
-                var children = childs[j].getChildren();
-                MultiColumnWizard.updateFieldName(children, i);
-            }
+		// set name attribute to a dummy to avoid duplicate names
+		tbody.getElements('input[type=radio], input[type=checkbox]').each(function(el,i){
+        	if(typeof el.get('name') == 'string')
+        		el.set('name', el.get('name')+'DUMMYNAME'+i);
+		});
+		
+		// rewrite attributes 
+		tbody.getChildren().each(function(el,i){
+			MultiColumnWizard.updateFields(el.getChildren(), i)
+		});
+		
+		// kill dummy names
+		tbody.getElements('input[type=radio], input[type=checkbox]').each(function(el,i){
+        	if(typeof el.get('name') == 'string')
+        		el.set('name', el.get('name').replace('DUMMYNAME'+i,''));
+		});
 
-            // Store attributes in the DOM or they would be lost when getting & setting innerHTML
-            rows[i].getElements('select, input, textarea').each( function(el)
-            {
-                if (el.get('type') == 'checkbox' || el.get('type') == 'radio')
-                {
-                    el.checked ? el.setAttribute('checked', 'checked') : el.removeAttribute('checked');
-                }
-                else if (el.get('tag') == 'select' && el.selectedIndex > 0)
-                {
-                    var options = el.getChildren();
-                    options.each( function(option, index)
-                    {
-                        if (el.selectedIndex == index)
-                        {
-                            option.setAttribute('selected', true);
-                        }
-                        else
-                        {
-                            option.removeAttribute('selected')
-                        }
-                    });
-                }
-                else
-                {
-                    el.setAttribute('value', el.value);
-                }
-            });
 
-            // Update things like ID and "for" attribute
-            rows[i].set('html', rows[i].get('html').replace(/_row[0-9]+_/ig, '_row' + i + '_'));
-        }
-
-        // Re-attach date pickers
-        if (options.datepickers.length > 1 || options.datepickers[0] != '')
-        {
-            for(var i=0; i<options.datepickers.length; i++)
-            {
-                var elements = [];
-
-                for (var r=0; r<rows.length; r++)
-                {
-                    var dateInput = id+'_row'+r+'_'+options.datepickers[i];
-                    document.id(dateInput).setStyle('display', 'inline-block').getNext().destroy();
-
-                    elements.include(dateInput);
-                }
-
-                var datepicker = id.replace('ctrl_', 'datepicker_')+'_'+options.datepickers[i];
-                window[datepicker].attachTo = '#'+elements.join(',#');
-                window[datepicker].options.toggleElements = '#'+elements.join(',#').replace(/ctrl_/g, 'toggle_');
-                window[datepicker].attach();
-            }
-        }
-        
+		// HOOK for other extensions like Autocompleter or Chosen        
         for(var i=0; i<MultiColumnWizard.execHOOK.length; i++) {      
             MultiColumnWizard.execHOOK[i](el, command, id);
         }      
@@ -193,37 +148,39 @@ var MultiColumnWizard =
         }
     },
 
-    updateFieldName: function(arrEl, level)
+	/**
+	 * Rewrite ID,NAME,FOR attributes
+	 * for the fields
+	 */
+    updateFields: function(arrEl, level)
     {
         arrEl.each(function(el)
         {
-            if (el.name != undefined && el.name != null && el.name != '' )
-            {
-                var name = el.name.substring(0, el.name.indexOf('['));
-
-                // More about this hack:
-                // http://stackoverflow.com/questions/2094618/changing-name-attr-of-cloned-input-element-in-jquery-doesnt-work-in-ie6-7
-                // http://matts411.com/post/setting_the_name_attribute_in_ie_dom/
-                if (Browser.ie || Browser.Engine.trident)
-                {
-                    var oldName = el.name;
-                    var newName = el.name.replace(new RegExp(name+'\[[0-9]+\]', 'ig'), name+'[' + level + ']');
-
-                    if (oldName != newName)
-                    {
-                        el.mergeAttributes(document.createElement("<INPUT name='" + newName + "'/>"), false);
-                    }
-                }
-                else
-                {
-                    el.name = el.name.replace(new RegExp(name+'\[[0-9]+\]', 'ig'), name+'[' + level + ']');
-                }
-            }
-
+			// also update the childs of this element
             if (el.getChildren().length > 0)
             {
-                MultiColumnWizard.updateFieldName(el.getChildren(), level);
+                MultiColumnWizard.updateFields(el.getChildren(), level);
             }
+            
+        	// rewrite elements name
+        	if(typeof el.get('name') == 'string')
+        	{
+        		var erg = el.get('name').match(/^([^\[]+)\[([0-9]+)\](.*)$/i);
+        		if(erg) el.set('name', erg[1]+'['+level+']'+erg[3]);
+        	}
+        	// rewrite elements id
+        	if(typeof el.get('id') == 'string')
+        	{
+        		var erg = el.get('id').match(/^(.+)_row[0-9]+_(.+)$/i);
+        		if(erg) el.set('id', erg[1]+'_row'+level+'_'+erg[2]);
+        	}
+        	// rewrite elements for
+        	if(typeof el.get('for') == 'string')
+        	{
+        		var erg = el.get('for').match(/^(.+)_row[0-9]+_(.+)$/i);
+        		if(erg) el.set('for', erg[1]+'_row'+level+'_'+erg[2]);
+        	}
+            
         });
     },
 
@@ -237,5 +194,41 @@ var MultiColumnWizard =
         {
             el.set('value', '');
         }
-    }
+    },
+    
+    
+    attachDatepicker: function(el, command, id)
+    {
+    	// only if a new element is created
+    	if(command != 'copy') return;
+    	
+		// get datepicker-fields from table-options
+		var datepickerFields = $(id).getProperty('rel').match(/datepicker\[[a-z0-9,]*\]/ig)[0].replace('datepicker[','').replace(']','').split(',');
+		var rows = $(id).getElement('tbody').getChildren();
+		
+		// reattach
+        if (datepickerFields.length > 1 || datepickerFields[0] != '')
+        {
+            for(var i=0; i<datepickerFields.length; i++)
+            {
+                var elements = [];
+
+                for (var r=0; r<rows.length; r++)
+                {
+                    var dateInput = id+'_row'+r+'_'+datepickerFields[i];
+                    document.id(dateInput).setStyle('display', 'inline-block').getNext().destroy();
+
+                    elements.include(dateInput);
+                }
+
+                var datepicker = id.replace('ctrl_', 'datepicker_')+'_'+datepickerFields[i];
+                window[datepicker].attachTo = '#'+elements.join(',#');
+                window[datepicker].options.toggleElements = '#'+elements.join(',#').replace(/ctrl_/g, 'toggle_');
+                window[datepicker].attach();
+            }
+		}
+	}		
 };
+
+// Register attachTatepicker callback
+MultiColumnWizard.execHOOK.push(MultiColumnWizard.attachDatepicker);

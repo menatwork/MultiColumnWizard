@@ -74,6 +74,7 @@ class MultiColumnWizard extends Widget
             $this->strTemplate = 'form_widget';
             $this->loadDataContainer($arrAttributes['strTable']);
         }
+        
     }
 
     /**
@@ -138,6 +139,12 @@ class MultiColumnWizard extends Widget
                 {
                     continue;
                 }
+                
+                // hack for checkboxes
+                if($arrField['inputType']=='checkbox' && isset($varInput[$i][$strKey]))
+                {
+                	$_POST[$objWidget->name] = $varInput[$i][$strKey];
+                }
 
                 $objWidget->validate();
 
@@ -198,7 +205,7 @@ class MultiColumnWizard extends Widget
         $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $strCommand = 'cmd_' . $this->strField;
-
+        
         // Change the order
         if ($this->Input->get($strCommand) && is_numeric($this->Input->get('cid')) && $this->Input->get('id') == $this->currentRecord)
         {
