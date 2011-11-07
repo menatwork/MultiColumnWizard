@@ -20,8 +20,9 @@
 	margin-top:0;
 }
 
-.multicolumnwizard .hidelabel h3 {
-	display: none;
+.multicolumnwizard .hidelabel h3, 
+.multicolumnwizard .hidelabel label {
+	display:none;
 }
 
 .multicolumnwizard label {
