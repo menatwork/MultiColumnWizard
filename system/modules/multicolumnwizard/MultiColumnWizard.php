@@ -276,13 +276,20 @@ class MultiColumnWizard extends Widget
 
         // Add label and return wizard
         $return = '
-<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">
+<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">';
+
+		if ($this->columnTemplate == '')
+        {
+			$return .= '
   <thead>
     <tr>
       ' . implode("\n      ", $arrHeaderItems) . '
       <td></td>
     </tr>
-  </thead>
+  </thead>';
+  }
+  
+  $return .='
   <tbody>';
 
         $intNumberOfRows = max(count($this->varValue), 1);
@@ -396,7 +403,7 @@ window.addEvent(\'domready\', function() {
                 }
                 else
                 {
-                    $arrItem[] = array
+                    $arrItem[$strKey] = array
                         (
                         'entry' => $strWidget,
                         'valign' => $arrField['eval']['valign'],
@@ -407,12 +414,25 @@ window.addEvent(\'domready\', function() {
 
             // new array for items so we get rid of the ['entry'] and ['valign']
             $arrReturnItems = array();
-            foreach ($arrItem as $itemKey => $itemValue)
+			
+			if ($this->columnTemplate != '')
             {
-                $arrReturnItems[$itemKey] = '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
-            }
+				$objTemplate = new BackendTemplate($this->columnTemplate);
+				$objTemplate->items = $arrItem;
+				
+				$return .= '<td>'.$objTemplate->parse().'</td>';
+			}
+			else
+			{
+				foreach ($arrItem as $itemKey => $itemValue)
+				{
+					$arrReturnItems[$itemKey] = '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
+				}
+				
+				$return .= implode('', $arrReturnItems);
+			}
 
-            $return .= implode('', $arrReturnItems);
+            
 
             $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
 
