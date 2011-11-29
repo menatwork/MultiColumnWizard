@@ -34,7 +34,7 @@ if (!defined('TL_ROOT')) die('You cannot access this file directly!');
  * @copyright  Andreas Schempp 2011, certo web & design GmbH 2011, MEN AT WORK 2011
  * @package    Controller
  */
-class MultiColumnWizard extends Widget
+class MultiColumnWizard extends Widget implements uploadable
 {
 
     /**
