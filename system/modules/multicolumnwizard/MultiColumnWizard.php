@@ -94,7 +94,7 @@ class MultiColumnWizard extends Widget implements uploadable
                  * from array[] = value
                  * to array[]['fieldname'] = value 
                  */
-                if (count($this->columnFields) == 1)
+                if ($this->flatArray)
                 {
                     $arrNew = array();
 
@@ -215,7 +215,7 @@ class MultiColumnWizard extends Widget implements uploadable
          * to array[] = value
          * so we have the same behavoir like multiple-checkbox fields
          */
-        if (count($this->columnFields) == 1)
+        if ($this->flatArray)
         {
             $arrNew = array();
 
