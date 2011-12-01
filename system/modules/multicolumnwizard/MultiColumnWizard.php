@@ -88,6 +88,23 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             case 'value':
                 $this->varValue = deserialize($varValue, true);
+
+                /**
+                 * reformat array if we have only one field 
+                 * from array[] = value
+                 * to array[]['fieldname'] = value 
+                 */
+                if (count($this->columnFields) == 1)
+                {
+                    $arrNew = array();
+
+                    foreach ($this->varValue as $val)
+                    {
+                        $arrNew[] = array(key($this->columnFields) => $val);
+                    }
+
+                    $this->varValue = $arrNew;
+                }
                 break;
 
             case 'mandatory':
@@ -192,6 +209,24 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->addError($GLOBALS['TL_LANG']['ERR']['general']);
         }
 
+        /**
+         * reformat array if we have only one field
+         * from array[]['fieldname'] = value
+         * to array[] = value
+         * so we have the same behavoir like multiple-checkbox fields
+         */
+        if (count($this->columnFields) == 1)
+        {
+            $arrNew = array();
+
+            foreach ($varInput as $val)
+            {
+                $arrNew[] = $val[key($this->columnFields)];
+            }
+
+            $varInput = $arrNew;
+        }
+
         return $varInput;
     }
 
@@ -278,18 +313,18 @@ class MultiColumnWizard extends Widget implements uploadable
         $return = '
 <table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">';
 
-		if ($this->columnTemplate == '')
+        if ($this->columnTemplate == '')
         {
-			$return .= '
+            $return .= '
   <thead>
     <tr>
       ' . implode("\n      ", $arrHeaderItems) . '
       <td></td>
     </tr>
   </thead>';
-  }
-  
-  $return .='
+        }
+
+        $return .='
   <tbody>';
 
         $intNumberOfRows = max(count($this->varValue), 1);
@@ -346,23 +381,23 @@ class MultiColumnWizard extends Widget implements uploadable
                         }
 
                         /* $datepicker = ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
-<script>
-window.addEvent(\'domready\', function() {
-window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $objWidget->id . '\', {
-  allowEmpty:true,
-  toggleElements:\'#toggle_' . $objWidget->id . '\',
-  pickerClass:\'datepicker_dashboard\',
-  format:\'' . $format . '\',
-  inputOutputFormat:\'' . $format . '\',
-  positionOffset:{x:130,y:-185}' . $time . ',
-  startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
-  days:[\'' . implode("','", $GLOBALS['TL_LANG']['DAYS']) . '\'],
-  dayShort:' . $GLOBALS['TL_LANG']['MSC']['dayShortLength'] . ',
-  months:[\'' . implode("','", $GLOBALS['TL_LANG']['MONTHS']) . '\'],
-  monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
-});
-});
-</script>'; */
+                          <script>
+                          window.addEvent(\'domready\', function() {
+                          window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $objWidget->id . '\', {
+                          allowEmpty:true,
+                          toggleElements:\'#toggle_' . $objWidget->id . '\',
+                          pickerClass:\'datepicker_dashboard\',
+                          format:\'' . $format . '\',
+                          inputOutputFormat:\'' . $format . '\',
+                          positionOffset:{x:130,y:-185}' . $time . ',
+                          startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
+                          days:[\'' . implode("','", $GLOBALS['TL_LANG']['DAYS']) . '\'],
+                          dayShort:' . $GLOBALS['TL_LANG']['MSC']['dayShortLength'] . ',
+                          months:[\'' . implode("','", $GLOBALS['TL_LANG']['MONTHS']) . '\'],
+                          monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
+                          });
+                          });
+                          </script>'; */
                         $datepicker = '<script>
 window.addEvent(\'domready\', function() {
 ' . sprintf($this->getDatePickerString(), 'ctrl_' . $objWidget->strId) . '
@@ -414,25 +449,25 @@ window.addEvent(\'domready\', function() {
 
             // new array for items so we get rid of the ['entry'] and ['valign']
             $arrReturnItems = array();
-			
-			if ($this->columnTemplate != '')
-            {
-				$objTemplate = new BackendTemplate($this->columnTemplate);
-				$objTemplate->items = $arrItem;
-				
-				$return .= '<td>'.$objTemplate->parse().'</td>';
-			}
-			else
-			{
-				foreach ($arrItem as $itemKey => $itemValue)
-				{
-					$arrReturnItems[$itemKey] = '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
-				}
-				
-				$return .= implode('', $arrReturnItems);
-			}
 
-            
+            if ($this->columnTemplate != '')
+            {
+                $objTemplate = new BackendTemplate($this->columnTemplate);
+                $objTemplate->items = $arrItem;
+
+                $return .= '<td>' . $objTemplate->parse() . '</td>';
+            }
+            else
+            {
+                foreach ($arrItem as $itemKey => $itemValue)
+                {
+                    $arrReturnItems[$itemKey] = '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
+                }
+
+                $return .= implode('', $arrReturnItems);
+            }
+
+
 
             $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
 
