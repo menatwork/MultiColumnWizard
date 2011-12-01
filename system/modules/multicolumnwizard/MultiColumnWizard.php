@@ -88,6 +88,18 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             case 'value':
                 $this->varValue = deserialize($varValue, true);
+				// reformat array if we have only one field
+				// from array[] = value
+				// to array[]['fieldname'] = value
+				if(count($this->columnFields) == 1)
+				{
+					$arrNew = array();
+					foreach($this->varValue as $val)
+					{
+						$arrNew[] = array(key($this->columnFields) => $val);
+					}
+					$this->varValue = $arrNew;
+				}
                 break;
 
             case 'mandatory':
@@ -191,6 +203,21 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             $this->addError($GLOBALS['TL_LANG']['ERR']['general']);
         }
+
+		// reformat array if we have only one field
+		// from array[]['fieldname'] = value
+		// to array[] = value
+		// so we have the same behavoir like multiple-checkbox fields
+		if(count($this->columnFields) == 1)
+		{
+			$arrNew = array();
+			foreach($varInput as $val)
+			{
+				$arrNew[] = $val[key($this->columnFields)];
+			}
+			$varInput = $arrNew;
+		}
+
 
         return $varInput;
     }
