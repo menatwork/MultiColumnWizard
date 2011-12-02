@@ -470,14 +470,15 @@ window.addEvent(\'domready\', function() {
 
 
             $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
-
-            if ($image === false) {
-                continue;
-            }
             
             // Add buttons
             foreach ($this->arrButtons as $button => $image)
             {
+            
+                if ($image === false) {
+                    continue;
+                }
+            
                 $return .= '<a ';
                 $style = '';
                 if ($button == "copy" && $this->maxCount <= $intNumberOfRows && $this->maxCount > 0)
