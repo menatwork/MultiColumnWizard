@@ -471,6 +471,10 @@ window.addEvent(\'domready\', function() {
 
             $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
 
+            if ($image === false) {
+                continue;
+            }
+            
             // Add buttons
             foreach ($this->arrButtons as $button => $image)
             {
