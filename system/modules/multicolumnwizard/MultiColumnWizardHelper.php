@@ -88,3 +88,4 @@ class MultiColumnWizardHelper extends System
 
 }
 
+?>

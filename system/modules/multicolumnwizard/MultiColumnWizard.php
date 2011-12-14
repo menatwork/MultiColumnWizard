@@ -1,5 +1,4 @@
-<?php
-if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -54,19 +53,18 @@ class MultiColumnWizard extends Widget implements uploadable
      * @var mixed
      */
     protected $varValue = array();
-	
-	/**
-	 * Widget errors to store
-	 * @var array
-	 */
-	protected $arrWidgetErrors = array();
+
+    /**
+     * Widget errors to store
+     * @var array
+     */
+    protected $arrWidgetErrors = array();
 
     /**
      * Buttons
      * @var array
      */
     protected $arrButtons = array('copy' => 'copy.gif', 'up' => 'up.gif', 'down' => 'down.gif', 'delete' => 'delete.gif');
-
 
     /**
      * Initialize the object
@@ -206,9 +204,9 @@ class MultiColumnWizard extends Widget implements uploadable
                 // Do not submit if there are errors
                 if ($objWidget->hasErrors())
                 {
-                	// store the errors
-                	$this->arrWidgetErrors[$strKey] = $objWidget->getErrors();
-					
+                    // store the errors
+                    $this->arrWidgetErrors[$strKey] = $objWidget->getErrors();
+
                     $this->blnSubmitInput = false;
                 }
             }
@@ -351,15 +349,15 @@ class MultiColumnWizard extends Widget implements uploadable
             {
                 $strWidget = '';
                 $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
-				
-				// load errors if there are any
-				if (!empty($this->arrWidgetErrors[$strKey]))
-				{
-					foreach ($this->arrWidgetErrors[$strKey] as $strErrorMsg)
-					{
-						$objWidget->addError($strErrorMsg);
-					}
-				}
+
+                // load errors if there are any
+                if (!empty($this->arrWidgetErrors[$strKey]))
+                {
+                    foreach ($this->arrWidgetErrors[$strKey] as $strErrorMsg)
+                    {
+                        $objWidget->addError($strErrorMsg);
+                    }
+                }
 
                 if ($objWidget === null)
                 {
@@ -489,15 +487,16 @@ window.addEvent(\'domready\', function() {
 
 
             $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
-            
+
             // Add buttons
             foreach ($this->arrButtons as $button => $image)
             {
-            
-                if ($image === false) {
+
+                if ($image === false)
+                {
                     continue;
                 }
-            
+
                 $return .= '<a ';
                 $style = '';
                 if ($button == "copy" && $this->maxCount <= $intNumberOfRows && $this->maxCount > 0)
