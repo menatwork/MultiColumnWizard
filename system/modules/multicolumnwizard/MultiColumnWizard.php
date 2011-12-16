@@ -32,7 +32,9 @@
 /**
  * Class MultiColumnWizard 
  *
- * @copyright  Andreas Schempp 2011, certo web & design GmbH 2011, MEN AT WORK 2011
+ * @copyright  Andreas Schempp 2011
+ * @copyright  certo web & design GmbH 2011
+ * @copyright  MEN AT WORK 2011
  * @package    Controller
  */
 class MultiColumnWizard extends Widget implements uploadable
