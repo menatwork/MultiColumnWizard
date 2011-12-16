@@ -78,6 +78,13 @@ class MultiColumnWizard extends Widget implements uploadable
      */
     protected $maxCount = 0;
 
+    /**
+     * Row specific data
+     * @var array
+     */
+    protected $arrRowSpecificData = array();
+
+    /**
      * Buttons
      * @var array
      */
@@ -393,16 +400,23 @@ class MultiColumnWizard extends Widget implements uploadable
             foreach ($this->columnFields as $strKey => $arrField)
             {
                 $strWidget = '';
-                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
-				
-				// load errors if there are any
-				if (!empty($this->arrWidgetErrors[$strKey]))
+                
+				// load row specific data (useful for example for default values in different rows)
+				if (isset($this->arrRowSpecificData[$i][$strKey]))
 				{
-					foreach ($this->arrWidgetErrors[$strKey] as $strErrorMsg)
-					{
-						$objWidget->addError($strErrorMsg);
-					}
+					$arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
 				}
+				
+                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
+
+                // load errors if there are any
+                if (!empty($this->arrWidgetErrors[$strKey]))
+                {
+                    foreach ($this->arrWidgetErrors[$strKey] as $strErrorMsg)
+                    {
+                        $objWidget->addError($strErrorMsg);
+                    }
+                }
 
                 if ($objWidget === null)
                 {
@@ -684,6 +698,15 @@ window.addEvent(\'domready\', function() {
         return $objWidget;
     }
 
-}
 
-?>
+	/**
+	 * Add specific field data to a certain field in a certain row
+	 * @param integer row index
+	 * @param string field name
+	 * @param array field data
+	 */
+	public function addDataToFieldAtIndex($intIndex, $strField, $arrData)
+	{
+		$this->arrRowSpecificData[$intIndex][$strField] = $arrData;
+	}
+}
