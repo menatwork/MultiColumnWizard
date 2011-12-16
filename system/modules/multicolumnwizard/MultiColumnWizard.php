@@ -21,7 +21,9 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Andreas Schempp 2011, certo web & design GmbH 2011, MEN AT WORK 2011
+ * @copyright  Andreas Schempp 2011
+ * @copyright  certo web & design GmbH 2011
+ * @copyright  MEN AT WORK 2011
  * @package    MultiColumnWizard 
  * @license    LGPL 
  * @filesource
