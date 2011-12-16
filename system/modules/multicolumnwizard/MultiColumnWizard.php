@@ -61,6 +61,12 @@ class MultiColumnWizard extends Widget implements uploadable
     protected $arrWidgetErrors = array();
 
     /**
+     * Callback data
+     * @var array
+     */
+    protected $arrCallback = false;
+
+    /**
      * Buttons
      * @var array
      */
@@ -122,8 +128,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     throw new Exception('Parameter "columns" has to be an array: array(\'Class\', \'Method\')!');
                 }
 
-                $this->import($varValue[0]);
-                $this->columnFields = $this->$varValue[0]->$varValue[1]($this);
+				$this->arrCallback = $varValue;
                 break;
 
             case 'buttons':
@@ -244,6 +249,13 @@ class MultiColumnWizard extends Widget implements uploadable
      */
     public function generate()
     {
+    	// load the callback data if there's any (do not do this in __set() already because then we don't have access to currentRecord)
+    	if (is_array($this->arrCallback))
+		{
+			$this->import($this->arrCallback[0]);
+			$this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
+		}
+		
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard.js';
         $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
