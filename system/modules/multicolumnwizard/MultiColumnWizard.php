@@ -67,11 +67,21 @@ class MultiColumnWizard extends Widget implements uploadable
     protected $arrCallback = false;
 
     /**
+     * Min count
+     * @var int
+     */
+    protected $minCount = 0;
+
+    /**
+     * Max count
+     * @var int
+     */
+    protected $maxCount = 0;
+
      * Buttons
      * @var array
      */
     protected $arrButtons = array('copy' => 'copy.gif', 'up' => 'up.gif', 'down' => 'down.gif', 'delete' => 'delete.gif');
-
 
     /**
      * Initialize the object
@@ -88,6 +98,7 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->loadDataContainer($arrAttributes['strTable']);
         }
     }
+
 
     /**
      * Add specific attributes
@@ -146,12 +157,21 @@ class MultiColumnWizard extends Widget implements uploadable
                     unset($this->arrButtons['down']);
                 }
                 break;
+				
+			case 'minCount':
+				$this->minCount = $varValue;
+				break;
+				
+			case 'maxCount':
+				$this->maxCount = $varValue;
+				break;
 
             default:
                 parent::__set($strKey, $varValue);
                 break;
         }
     }
+
 
     protected function validator($varInput)
     {
@@ -349,6 +369,12 @@ class MultiColumnWizard extends Widget implements uploadable
   <tbody>';
 
         $intNumberOfRows = max(count($this->varValue), 1);
+		
+		// always show the minimum number of rows if set
+		if ($this->minCount && ($intNumberOfRows < $this->minCount))
+		{
+			$intNumberOfRows = $this->minCount;
+		}
 
         // Add input fields
         for ($i = 0; $i < $intNumberOfRows; $i++)
