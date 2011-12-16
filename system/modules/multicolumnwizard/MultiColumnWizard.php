@@ -67,6 +67,24 @@ class MultiColumnWizard extends Widget implements uploadable
     protected $arrCallback = false;
 
     /**
+     * Min count
+     * @var int
+     */
+    protected $minCount = 0;
+
+    /**
+     * Max count
+     * @var int
+     */
+    protected $maxCount = 0;
+
+    /**
+     * Row specific data
+     * @var array
+     */
+    protected $arrRowSpecificData = array();
+
+    /**
      * Buttons
      * @var array
      */
@@ -128,7 +146,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     throw new Exception('Parameter "columns" has to be an array: array(\'Class\', \'Method\')!');
                 }
 
-				$this->arrCallback = $varValue;
+                $this->arrCallback = $varValue;
                 break;
 
             case 'buttons':
@@ -138,12 +156,26 @@ class MultiColumnWizard extends Widget implements uploadable
                 }
                 break;
 
+            case 'hideButtons':
+                if ($varValue === true)
+                {
+                    $this->arrButtons = array();
+                }
+
             case 'disableSorting':
                 if ($varValue == true)
                 {
                     unset($this->arrButtons['up']);
                     unset($this->arrButtons['down']);
                 }
+                break;
+
+            case 'minCount':
+                $this->minCount = $varValue;
+                break;
+
+            case 'maxCount':
+                $this->maxCount = $varValue;
                 break;
 
             default:
@@ -249,13 +281,13 @@ class MultiColumnWizard extends Widget implements uploadable
      */
     public function generate()
     {
-    	// load the callback data if there's any (do not do this in __set() already because then we don't have access to currentRecord)
-    	if (is_array($this->arrCallback))
-		{
-			$this->import($this->arrCallback[0]);
-			$this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
-		}
-		
+        // load the callback data if there's any (do not do this in __set() already because then we don't have access to currentRecord)
+        if (is_array($this->arrCallback))
+        {
+            $this->import($this->arrCallback[0]);
+            $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
+        }
+
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard.js';
         $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
@@ -349,6 +381,12 @@ class MultiColumnWizard extends Widget implements uploadable
 
         $intNumberOfRows = max(count($this->varValue), 1);
 
+        // always show the minimum number of rows if set
+        if ($this->minCount && ($intNumberOfRows < $this->minCount))
+        {
+            $intNumberOfRows = $this->minCount;
+        }
+
         // Add input fields
         for ($i = 0; $i < $intNumberOfRows; $i++)
         {
@@ -360,6 +398,13 @@ class MultiColumnWizard extends Widget implements uploadable
             foreach ($this->columnFields as $strKey => $arrField)
             {
                 $strWidget = '';
+
+                // load row specific data (useful for example for default values in different rows)
+                if (isset($this->arrRowSpecificData[$i][$strKey]))
+                {
+                    $arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
+                }
+
                 $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
 
                 // load errors if there are any
@@ -650,6 +695,17 @@ window.addEvent(\'domready\', function() {
         $objWidget->currentRecord = $this->currentRecord;
 
         return $objWidget;
+    }
+
+    /**
+     * Add specific field data to a certain field in a certain row
+     * @param integer row index
+     * @param string field name
+     * @param array field data
+     */
+    public function addDataToFieldAtIndex($intIndex, $strField, $arrData)
+    {
+        $this->arrRowSpecificData[$intIndex][$strField] = $arrData;
     }
 
 }
