@@ -149,6 +149,12 @@ class MultiColumnWizard extends Widget implements uploadable
                     $this->arrButtons = array_merge($this->arrButtons, array_intersect_key($varValue, $this->arrButtons));
                 }
                 break;
+				
+			case 'hideButtons':
+				if ($varValue === true)
+				{
+					$this->arrButtons = array();
+				}
 
             case 'disableSorting':
                 if ($varValue == true)
