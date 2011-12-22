@@ -242,7 +242,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 if ($objWidget->hasErrors())
                 {
                     // store the errors
-                    $this->arrWidgetErrors[$strKey] = $objWidget->getErrors();
+                    $this->arrWidgetErrors[$strKey][$i] = $objWidget->getErrors();
 
                     $this->blnSubmitInput = false;
                 }
@@ -408,9 +408,9 @@ class MultiColumnWizard extends Widget implements uploadable
                 $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
 
                 // load errors if there are any
-                if (!empty($this->arrWidgetErrors[$strKey]))
+                if (!empty($this->arrWidgetErrors[$strKey][$i]))
                 {
-                    foreach ($this->arrWidgetErrors[$strKey] as $strErrorMsg)
+                    foreach ($this->arrWidgetErrors[$strKey][$i] as $strErrorMsg)
                     {
                         $objWidget->addError($strErrorMsg);
                     }
