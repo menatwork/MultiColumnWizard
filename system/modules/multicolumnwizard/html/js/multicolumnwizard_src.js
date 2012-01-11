@@ -30,6 +30,9 @@ var MultiColumnWizard =
 
     'execute': function(el, command, id)
     {
+    	stopEvent = new Event(window.event);
+    	stopEvent.preventDefault();
+    	
         var table = $(id);
         var tbody = table.getFirst().getNext();
         var parent = $(el).getParent('tr');
