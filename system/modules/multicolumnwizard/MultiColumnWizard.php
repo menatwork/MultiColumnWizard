@@ -292,7 +292,7 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_src_v2.js';
         $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $strCommand = 'cmd_' . $this->strField;
@@ -367,7 +367,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
         // Add label and return wizard
         $return = '
-<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">';
+<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . ' cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">';
 
         if ($this->columnTemplate == '')
         {
@@ -547,7 +547,7 @@ window.addEvent(\'domready\', function() {
 
 
 
-            $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
+            $return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
 
             // Add buttons
             foreach ($this->arrButtons as $button => $image)
@@ -558,24 +558,24 @@ window.addEvent(\'domready\', function() {
                     continue;
                 }
 
-                $return .= '<a ';
-                $style = '';
-                if ($button == "copy" && $this->maxCount <= $intNumberOfRows && $this->maxCount > 0)
-                {
-                    $return .= 'style="display:none" ';
-                }
-                if ($button == "delete" && $this->minCount >= $intNumberOfRows && $this->minCount > 0)
-                {
-                    $return .= 'style="display:none" ';
-                }
-
-                $return .= 'href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '" onclick="MultiColumnWizard.execute(this, \'' . $button . '\',  \'ctrl_' . $this->strId . '\'); return false;">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+                $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
             }
 
             $return .= '</td></tr>';
         }
 
-        return $return . '</tbody></table>';
+		$return .= '</tbody></table>';
+		
+		$return .= '<script>
+		var MCW_' . $this->strId . ' = new MultiColumnWizard({
+			table: \'' . 'ctrl_' . $this->strId . '\',
+			maxCount: ' . $this->maxCount . ',
+			minCount: ' . $this->minCount . ',
+			uniqueFields: [] // TODO: implement
+		});
+		</script>';
+
+        return $return;
     }
 
     /**
@@ -675,6 +675,9 @@ window.addEvent(\'domready\', function() {
         {
             $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' hidelabel');
         }
+
+		// add class to enable easy updating of "name" attributes etc.
+		$arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' mcwUpdateFields');
 
         // load callback
         if (is_array($arrField['load_callback']))
