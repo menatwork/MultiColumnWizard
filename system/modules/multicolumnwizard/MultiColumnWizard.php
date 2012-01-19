@@ -716,7 +716,7 @@ window.addEvent(\'domready\', function() {
 
 
 
-        $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
+        $return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
 		
 		$return .= $this->generateButtonString();
 		
