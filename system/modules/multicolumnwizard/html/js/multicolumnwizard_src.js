@@ -24,214 +24,338 @@
  * @license     http://opensource.org/licenses/lgpl-3.0.html
  */
 
-var MultiColumnWizard =
+var MultiColumnWizard = new Class(
 {
-    execHOOK: Array(),
+	Implements: [Options],
+	options:
+	{
+		table: null,
+		maxCount: 0,
+		minCount: 0,
+		uniqueFields: []
+	},
 
-    'execute': function(el, command, id)
-    {
-    	stopEvent = new Event(window.event);
-    	stopEvent.preventDefault();
-    	
-        var table = $(id);
-        var tbody = table.getFirst().getNext();
-        var parent = $(el).getParent('tr');
-        var options = {
-            'maxCount': table.getProperty('rel').match(/maxCount\[[0-9]+\]/ig)[0].replace('maxCount[','').replace(']','').toInt(),
-            'minCount': table.getProperty('rel').match(/minCount\[[0-9]+\]/ig)[0].replace('minCount[','').replace(']','').toInt(),
-            'uniqueFields': table.getProperty('rel').match(/unique\[[a-z0-9,]*\]/ig)[0].replace('unique[','').replace(']','').split(',')
-        };
-
-        // Do not run this in the frontend, Backend class would not be available
-        if (window.Backend)
-        {
-            Backend.getScrollOffset();
-        }
-        
-        
-        // Execute the command
-        MultiColumnWizard[command](tbody,parent,options);
-
-
-		// set name attribute to a dummy to avoid duplicate names
-		tbody.getElements('input[type=radio], input[type=checkbox]').each(function(el,i){
-        	if(typeof el.get('name') == 'string')
-        		el.set('name', el.get('name')+'DUMMYNAME'+i);
-		});
+	// instance callbacks (use e.g. myMCWVar.addOperationCallback() to register a callback that is for ONE specific MCW only)
+	operationLoadCallbacks: [],
+	operationClickCallbacks: [],
+	
+	/**
+	 * Initialize the wizard
+	 * @param Object options
+	 */
+	initialize: function(options)
+	{
+		this.setOptions(options);
 		
-		// rewrite attributes 
-		tbody.getChildren().each(function(el,i){
-			MultiColumnWizard.updateFields(el.getChildren(), i)
-		});
+		// make sure we really have the table as element
+		this.options.table = document.id(this.options.table);
+
+		// Do not run this in the frontend, Backend class would not be available
+		if (window.Backend)
+		{
+			Backend.getScrollOffset();
+		}
 		
-		// kill dummy names
-		tbody.getElements('input[type=radio], input[type=checkbox]').each(function(el,i){
-        	if(typeof el.get('name') == 'string')
-        		el.set('name', el.get('name').replace('DUMMYNAME'+i,''));
+		this.updateOperations();
+	},
+	
+	
+	/**
+	 * Update operations
+	 */
+	updateOperations: function()
+	{
+		var self = this;
+		
+		// execute load callback and register click event callback
+		this.options.table.getElement('tbody').getElements('tr').each(function(el, index)
+		{
+			el.getElement('td.operations').getElements('a').each(function(operation)
+			{
+				var key = operation.get('rel');
+
+				// register static load callbacks
+				if (MultiColumnWizard.operationLoadCallbacks[key])
+				{
+					MultiColumnWizard.operationLoadCallbacks[key].each(function(callback)
+					{
+						callback.pass([operation, el], self)();
+					});
+				}
+				
+				// register instance load callbacks
+				if (self.operationLoadCallbacks[key])
+				{
+					self.operationLoadCallbacks[key].each(function(callback)
+					{
+						callback.pass([operation, el], self)();
+					});
+				}
+				
+				// remove all click events
+				operation.removeEvents('click');
+				
+				// register static click callbacks
+				if (MultiColumnWizard.operationClickCallbacks[key])
+				{
+					MultiColumnWizard.operationClickCallbacks[key].each(function(callback)
+					{
+						operation.addEvent('click', function(e)
+						{
+							e.preventDefault();
+							callback.pass([operation, el], self)();						});
+					});
+				}
+				
+				// register instance click callbacks
+				if (self.operationClickCallbacks[key])
+				{
+					self.operationClickCallbacks[key].each(function(callback)
+					{
+						operation.addEvent('click', function(e)
+						{
+							e.preventDefault();
+							callback.pass([operation, el], self)();
+							self.updateFields(index);
+						});
+					});
+				}
+			});
 		});
+	},
 
-
-		// HOOK for other extensions like Autocompleter or Chosen        
-        for(var i=0; i<MultiColumnWizard.execHOOK.length; i++) {      
-            MultiColumnWizard.execHOOK[i](el, command, id);
-        }      
-
-    },
-
-    'copy': function(tbody, parent, options)
-    {
-        var tr = new Element('tr');
-        var childs = parent.getChildren();
-
-        for (var i=0; i<childs.length; i++)
-        {
-            var next = childs[i].clone(true, true).injectInside(tr);
-            next.getFirst().value = childs[i].getFirst().value;
-        }
-
-        tr.injectAfter(parent);
-
-        if (options.maxCount <= tbody.getChildren().length && options.maxCount != 0 )
-        {
-            tbody.getElements('img[src=system/themes/default/images/copy.gif]').getParent().setStyle('display', 'none');
-        }
-
-        if (options.minCount < tbody.getChildren().length && options.minCount != 0 )
-        {
-            tbody.getElements('img[src=system/themes/default/images/delete.gif]').getParent().setStyle('display', 'inline');
-        }
-
-        if (options.uniqueFields.length > 1 || options.uniqueFields[0] != '')
-        {
-            for(var i=0; i<options.uniqueFields.length; i++)
-            {
-                var el = tr.getElements('*[name*=\['+options.uniqueFields[i]+'\]]');
-
-                if (el)
-                {
-                    MultiColumnWizard.clearElementValue(el);
-                }
-            }
-        }
-    },
-
-    'up': function(tbody, parent, options)
-    {
-        parent.getPrevious() ? parent.injectBefore(parent.getPrevious()) : parent.injectInside(tbody);
-    },
-
-    'down': function(tbody, parent, options)
-    {
-        parent.getNext() ? parent.injectAfter(parent.getNext()) : parent.injectBefore(tbody.getFirst());
-    },
-
-    'delete': function(tbody, parent, options)
-    {
-        if (tbody.getChildren().length > 1)
-        {
-            parent.destroy();
-        }
-        else
-        {
-            var childs = parent.getElements('input,select,textarea');
-            for (var i=0; i<childs.length; i++)
-            {
-                MultiColumnWizard.clearElementValue(childs[i]);
-            }
-        }
-
-        if (options.maxCount > tbody.getChildren().length )
-        {
-            tbody.getElements('img[src=system/themes/default/images/copy.gif]').getParent().setStyle('display', 'inline');
-        }
-
-        if (options.minCount >= tbody.getChildren().length )
-        {
-            tbody.getElements('img[src=system/themes/default/images/delete.gif]').getParent().setStyle('display', 'none');
-        }
-    },
 
 	/**
-	 * Rewrite ID,NAME,FOR attributes
-	 * for the fields
+	 * Update row attributes
+	 * @param int level
+	 * @param element row
+	 * @return element the updated element
 	 */
-    updateFields: function(arrEl, level)
-    {
-        arrEl.each(function(el)
-        {
-			// also update the childs of this element
-            if (el.getChildren().length > 0)
-            {
-                MultiColumnWizard.updateFields(el.getChildren(), level);
-            }
-            
-        	// rewrite elements name
-        	if(typeof el.get('name') == 'string')
-        	{
-        		var erg = el.get('name').match(/^([^\[]+)\[([0-9]+)\](.*)$/i);
-        		if(erg) el.set('name', erg[1]+'['+level+']'+erg[3]);
-        	}
-        	// rewrite elements id
-        	if(typeof el.get('id') == 'string')
-        	{
-        		var erg = el.get('id').match(/^(.+)_row[0-9]+_(.+)$/i);
-        		if(erg) el.set('id', erg[1]+'_row'+level+'_'+erg[2]);
-        	}
-        	// rewrite elements for
-        	if(typeof el.get('for') == 'string')
-        	{
-        		var erg = el.get('for').match(/^(.+)_row[0-9]+_(.+)$/i);
-        		if(erg) el.set('for', erg[1]+'_row'+level+'_'+erg[2]);
-        	}
-            
-        });
-    },
+	updateRowAttributes: function(level, row)
+	{
+		// this in this context refers to the row element
+		row.getElements('.mcwUpdateFields *[name]').each(function(el)
+		{
+			// rewrite elements name
+			if (typeOf(el.getProperty('name')) == 'string')
+			{
+				var erg = el.getProperty('name').match(/^([^\[]+)\[([0-9]+)\](.*)$/i);
+				if (erg)
+				{
+					el.setProperty('name', erg[1] + '[' + level + ']' + erg[3]);
+				}
+			}
 
-    clearElementValue: function(el)
-    {
-        if (el.get('type') == 'checkbox' || el.get('type') == 'radio')
-        {
-            el.checked = false;
-        }
-        else
-        {
-            el.set('value', '');
-        }
-    },
-    
-    
-    attachDatepicker: function(el, command, id)
-    {
-    	// only if a new element is created
-    	if(command != 'copy') return;
-    	
-		// get datepicker-fields from table-options
-		var datepickerFields = $(id).getProperty('rel').match(/datepicker\[[a-z0-9,]*\]/ig)[0].replace('datepicker[','').replace(']','').split(',');
-		var rows = $(id).getElement('tbody').getChildren();
+			// rewrite elements id
+			if (typeOf(el.getProperty('id')) == 'string')
+			{
+				var erg = el.getProperty('id').match(/^(.+)_row[0-9]+_(.+)$/i);
+				if (erg)
+				{
+					el.setProperty('id', erg[1] + '_row' + level + '_' + erg[2]);
+				}
+			}
+
+			// rewrite elements for
+			if (typeOf(el.getProperty('for')) == 'string')
+			{
+				var erg = el.getProperty('for').match(/^(.+)_row[0-9]+_(.+)$/i);
+				if (erg)
+				{
+					el.setProperty('for', erg[1] + '_row' + level + '_' + erg[2]);
+				}
+			}
+		});
 		
-		// reattach
-        if (datepickerFields.length > 1 || datepickerFields[0] != '')
-        {
-            for(var i=0; i<datepickerFields.length; i++)
-            {
-                var elements = [];
-
-                for (var r=0; r<rows.length; r++)
-                {
-                    var dateInput = id+'_row'+r+'_'+datepickerFields[i];
-                    document.id(dateInput).setStyle('display', 'inline-block').getNext().destroy();
-
-                    elements.include(dateInput);
-                }
-
-                var datepicker = id.replace('ctrl_', 'datepicker_')+'_'+datepickerFields[i];
-                window[datepicker].attachTo = '#'+elements.join(',#');
-                window[datepicker].options.toggleElements = '#'+elements.join(',#').replace(/ctrl_/g, 'toggle_');
-                window[datepicker].attach();
-            }
+		return row;
+	},
+	
+	
+	/**
+	 * Add a load callback for the instance
+	 * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+	 * @param function callback
+	 */
+	addOperationLoadCallback: function(key, func)
+	{
+		if (!this.operationLoadCallbacks[key])
+		{
+			this.operationLoadCallbacks[key] = [];
 		}
-	}		
-};
+		
+		this.operationLoadCallbacks[key].push(func);
+	},
+	
+	
+	/**
+	 * Add a click callback for the instance
+	 * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+	 * @param function callback
+	 */
+	addOperationClickCallback: function(key, func)
+	{
+		if (!this.operationClickCallbacks[key])
+		{
+			this.operationClickCallbacks[key] = [];
+		}
+		
+		this.operationClickCallbacks[key].push(func);
+	}
+});
 
-// Register attachTatepicker callback
-MultiColumnWizard.execHOOK.push(MultiColumnWizard.attachDatepicker);
+/**
+ * Extend the MultiColumnWizard with some static functions
+ */
+Object.append(MultiColumnWizard,
+{
+	// static callbacks (use e.g. MultiColumnWizard.addOperationCallback() to register a callback that is for EVERY MCW on the page)
+	operationLoadCallbacks: {},
+	operationClickCallbacks: {},
+
+	/**
+	 * Add a load callback for all the MCW's
+	 * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+	 * @param function callback
+	 */
+	addOperationLoadCallback: function(key, func)
+	{
+		if (!MultiColumnWizard.operationLoadCallbacks[key])
+		{
+			MultiColumnWizard.operationLoadCallbacks[key] = [];
+		}
+		
+		MultiColumnWizard.operationLoadCallbacks[key].push(func);
+	},
+	
+	
+	/**
+	 * Add a click callback for all the MCW's
+	 * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+	 * @param function callback
+	 */
+	addOperationClickCallback: function(key, func)
+	{
+		if (!MultiColumnWizard.operationClickCallbacks[key])
+		{
+			MultiColumnWizard.operationClickCallbacks[key] = [];
+		}
+		
+		MultiColumnWizard.operationClickCallbacks[key].push(func);
+	},
+
+	
+	/**
+	 * Operation "copy" - load
+	 * @param Element the icon element
+	 * @param Element the row
+	 */
+	copyLoad: function(el, row)
+	{
+		var rowCount = row.getSiblings().length + 1;
+		
+		// remove the copy possibility if we have already reached maxCount
+		if (this.options.maxCount > 0 && rowCount == this.options.maxCount)
+		{
+			el.destroy();
+		}
+	},
+
+
+	/**
+	 * Operation "copy" - click
+	 * @param Element the icon element
+	 * @param Element the row
+	 */
+	copyClick: function(el, row)
+	{
+		var rowCount = row.getSiblings().length + 1;
+		
+		// check maxCount for an inject
+		if (this.options.maxCount == 0 || (this.options.maxCount > 0 && rowCount < this.options.maxCount))
+		{
+			// update the row count
+			++rowCount;
+			
+			var copy = row.clone();
+			
+			// calculate -1 because the attributes start with 0, right? ;-)
+			copy = this.updateRowAttributes(rowCount-1, copy);
+			copy.inject(row, 'after');
+			this.updateOperations();
+		}
+		
+		// remove the copy possibility if we just reach maxCount now (don't need to increment rowCount here as we already did when injecting)
+		if (this.options.maxCount > 0 && rowCount == this.options.maxCount)
+		{
+			el.destroy();
+		}
+	},
+
+
+	/**
+	 * Operation "delete" - load
+	 * @param Element the icon element
+	 * @param Element the row
+	 */
+	deleteLoad: function(el, row)
+	{
+		var position = el.getAllPrevious().length - 1;
+		
+		// remove the delete possibility if necessary
+		if (this.options.minCount > 0 && position == this.options.minCount)
+		{
+			el.destroy();
+		}
+	},
+
+
+	/**
+	 * Operation "delete" - click
+	 * @param Element the icon element
+	 * @param Element the row
+	 */
+	deleteClick: function(el, row)
+	{
+		row.destroy();
+	},
+
+
+	/**
+	 * Operation "up" - click
+	 * @param Element the icon element
+	 * @param Element the row
+	 */
+	upClick: function(el, row)
+	{
+		if (row.getPrevious())
+		{
+			row.injectBefore(row.getPrevious());
+		}
+	},
+
+
+	/**
+	 * Operation "down" - click
+	 * @param Element the icon element
+	 * @param Element the row
+	 */
+	downClick: function(el, row)
+	{
+		if (row.getNext())
+		{
+			row.injectAfter(row.getNext());
+		}
+	}
+});
+
+
+/**
+ * Register default callbacks
+ */
+//MultiColumnWizard.addOperationLoadCallback('copy', MultiColumnWizard.attachDatepicker);
+MultiColumnWizard.addOperationLoadCallback('copy', MultiColumnWizard.copyLoad);
+MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
+MultiColumnWizard.addOperationLoadCallback('delete', MultiColumnWizard.deleteLoad);
+MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);
+MultiColumnWizard.addOperationClickCallback('up', MultiColumnWizard.upClick);
+MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick);

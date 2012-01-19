@@ -83,6 +83,12 @@ class MultiColumnWizard extends Widget implements uploadable
     protected $maxCount = 0;
 
     /**
+     * Tableless
+     * @var boolean
+     */
+    protected $blnTableless = false;
+
+    /**
      * Row specific data
      * @var array
      */
@@ -180,6 +186,10 @@ class MultiColumnWizard extends Widget implements uploadable
 
             case 'maxCount':
                 $this->maxCount = $varValue;
+                break;
+
+            case 'generateTableless':
+                $this->blnTableless = $varValue;
                 break;
 
             default:
@@ -355,33 +365,7 @@ class MultiColumnWizard extends Widget implements uploadable
             {
                 continue;
             }
-            elseif ($arrField['eval']['columnPos'])
-            {
-                $arrHeaderItems[$arrField['eval']['columnPos']] = '<td></td>';
-            }
-            else
-            {
-                $arrHeaderItems[] = '<td>' . ($arrField['label'][0] ? $arrField['label'][0] : $strKey) . '</td>';
-            }
         }
-
-        // Add label and return wizard
-        $return = '
-<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . ' cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">';
-
-        if ($this->columnTemplate == '')
-        {
-            $return .= '
-  <thead>
-    <tr>
-      ' . implode("\n      ", $arrHeaderItems) . '
-      <td></td>
-    </tr>
-  </thead>';
-        }
-
-        $return .='
-  <tbody>';
 
         $intNumberOfRows = max(count($this->varValue), 1);
 
@@ -396,7 +380,6 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             $arrItem = array();
             $strHidden = '';
-            $return .= '<tr>';
 
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
@@ -524,59 +507,11 @@ window.addEvent(\'domready\', function() {
                     );
                 }
             }
+		}
 
-            // new array for items so we get rid of the ['entry'] and ['valign']
-            $arrReturnItems = array();
-
-            if ($this->columnTemplate != '')
-            {
-                $objTemplate = new BackendTemplate($this->columnTemplate);
-                $objTemplate->items = $arrItem;
-
-                $return .= '<td>' . $objTemplate->parse() . '</td>';
-            }
-            else
-            {
-                foreach ($arrItem as $itemKey => $itemValue)
-                {
-                    $arrReturnItems[$itemKey] = '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
-                }
-
-                $return .= implode('', $arrReturnItems);
-            }
-
-
-
-            $return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
-
-            // Add buttons
-            foreach ($this->arrButtons as $button => $image)
-            {
-
-                if ($image === false)
-                {
-                    continue;
-                }
-
-                $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
-            }
-
-            $return .= '</td></tr>';
-        }
-
-		$return .= '</tbody></table>';
-		
-		$return .= '<script>
-		var MCW_' . $this->strId . ' = new MultiColumnWizard({
-			table: \'' . 'ctrl_' . $this->strId . '\',
-			maxCount: ' . $this->maxCount . ',
-			minCount: ' . $this->minCount . ',
-			uniqueFields: [] // TODO: implement
-		});
-		</script>';
-
-        return $return;
+		return ($this->blnTableless) ? $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItem) : $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItem);
     }
+
 
     /**
      * Initialize widget
@@ -714,7 +649,154 @@ window.addEvent(\'domready\', function() {
     {
         $this->arrRowSpecificData[$intIndex][$strField] = $arrData;
     }
+	
+	
+	/**
+	 * Generates a table formatted MCW
+	 * @param array
+	 * @param array
+	 * @param string
+	 * @param array
+	 * @return string
+	 */
+	protected function generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItem)
+	{
+		// generate header fields
+        foreach ($this->columnFields as $strKey => $arrField)
+        {
+            if ($arrField['eval']['columnPos'])
+            {
+                $arrHeaderItems[$arrField['eval']['columnPos']] = '<td></td>';
+            }
+            else
+            {
+                $arrHeaderItems[] = '<td>' . ($arrField['label'][0] ? $arrField['label'][0] : $strKey) . '</td>';
+            }
+        }
+		
+		
+        $return = '
+<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">';
 
+        if ($this->columnTemplate == '')
+        {
+            $return .= '
+  <thead>
+    <tr>
+      ' . implode("\n      ", $arrHeaderItems) . '
+      <td></td>
+    </tr>
+  </thead>';
+        }
+
+        $return .='
+  <tbody><tr>';
+		
+
+        // new array for items so we get rid of the ['entry'] and ['valign']
+        $arrReturnItems = array();
+
+        if ($this->columnTemplate != '')
+        {
+            $objTemplate = new BackendTemplate($this->columnTemplate);
+            $objTemplate->items = $arrItem;
+
+            $return .= '<td>' . $objTemplate->parse() . '</td>';
+        }
+        else
+        {
+            foreach ($arrItem as $itemKey => $itemValue)
+            {
+                $arrReturnItems[$itemKey] = '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
+            }
+
+            $return .= implode('', $arrReturnItems);
+        }
+
+
+
+        $return .= '<td class="col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
+		
+		$return .= $this->generateButtonString();
+		
+        $return .= '</td></tr>';
+		$return .= '</tbody></table>';
+		
+		$return .= '<script>
+		var MCW_' . $this->strId . ' = new MultiColumnWizard({
+			table: \'' . 'ctrl_' . $this->strId . '\',
+			maxCount: ' . $this->maxCount . ',
+			minCount: ' . $this->minCount . ',
+			uniqueFields: [] // TODO: implement
+		});
+		</script>';
+
+        return $return;	
+	}
+	
+	
+	/**
+	 * Generates a div formatted MCW
+	 * @param array
+	 * @param array
+	 * @param string
+	 * @param array
+	 * @return string
+	 */
+	protected function generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItem)
+	{
+		// generate header fields
+        foreach ($this->columnFields as $strKey => $arrField)
+        {
+			$arrHeaderItems[] = sprintf('<div class="%s">%s</div>', $strKey, ($arrField['label'][0] ? $arrField['label'][0] : $strKey));
+        }
+		
+		
+        $return = '<div' . (($this->style) ? (' style="' . $this->style . '"') : '') . ' rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
+        $return .= '<div class="header_fields">' . implode('', $arrHeaderItems) . '</div>';
+      
+		
+
+        // new array for items so we get rid of the ['entry'] and ['valign']
+        $arrReturnItems = array();
+
+		foreach ($arrItem as $itemKey => $itemValue)
+        {
+            $arrReturnItems[$itemKey] = '<div' . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</div>';
+        }
+
+		$return .= implode('', $arrReturnItems);
+
+
+
+        $return .= '<div class="col_last buttons">' . $this->generateButtonString() . '</div>';
+		
+		$return .= $strHidden;
+
+        return $return . '</div>';			
+	}
+	
+	
+	/**
+	 * Generate button string
+	 * @return string
+	 */
+	protected function generateButtonString()
+	{
+		$return = '';
+		
+        // Add buttons
+        foreach ($this->arrButtons as $button => $image)
+        {
+
+            if ($image === false)
+            {
+                continue;
+            }
+            
+            $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+		}
+
+		return $return;
+	}
 }
-
-?>
