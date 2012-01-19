@@ -334,9 +334,15 @@ Object.append(MultiColumnWizard,
 		if (previous)
 		{
 			// update the attributes so the order remains as desired
+			// we have to set it to a value that is not in the DOM first, otherwise the values will get lost!!
 			var previousPosition = previous.getAllPrevious().length;
-			previous = this.updateRowAttributes(previousPosition+1, previous);
+			
+			// this is the dummy setting (guess no one will have more than 99999 entries ;-))
+			previous = this.updateRowAttributes(99999, previous);
+			
+			// now set the correct values again
 			row = this.updateRowAttributes(previousPosition, row);
+			previous = this.updateRowAttributes(previousPosition+1, previous);
 
 			row.injectBefore(previous);
 		}
@@ -354,9 +360,15 @@ Object.append(MultiColumnWizard,
 		if (next)
 		{
 			// update the attributes so the order remains as desired
+			// we have to set it to a value that is not in the DOM first, otherwise the values will get lost!!
 			var rowPosition = row.getAllPrevious().length;
-			row = this.updateRowAttributes(rowPosition+1, row);
+			
+			// this is the dummy setting (guess no one will have more than 99999 entries ;-))
+			row = this.updateRowAttributes(99999, row);
+			
+			// now set the correct values again
 			next = this.updateRowAttributes(rowPosition, next);
+			row = this.updateRowAttributes(rowPosition+1, row);
 
 			row.injectAfter(next);
 		}
