@@ -283,7 +283,7 @@ Object.append(MultiColumnWizard,
 			
 			// calculate -1 because the attributes start with 0, right? ;-)
 			copy = this.updateRowAttributes(rowCount-1, copy);
-			copy.inject(row, 'after');
+			copy.injectAfter(row);
 			this.updateOperations();
 		}
 		
@@ -330,9 +330,15 @@ Object.append(MultiColumnWizard,
 	 */
 	upClick: function(el, row)
 	{
-		if (row.getPrevious())
+		var previous = row.getPrevious();
+		if (previous)
 		{
-			row.injectBefore(row.getPrevious());
+			// update the attributes so the order remains as desired
+			var previousPosition = previous.getAllPrevious().length;
+			previous = this.updateRowAttributes(previousPosition+1, previous);
+			row = this.updateRowAttributes(previousPosition, row);
+
+			row.injectBefore(previous);
 		}
 	},
 
@@ -344,9 +350,15 @@ Object.append(MultiColumnWizard,
 	 */
 	downClick: function(el, row)
 	{
-		if (row.getNext())
+		var next = row.getNext();
+		if (next)
 		{
-			row.injectAfter(row.getNext());
+			// update the attributes so the order remains as desired
+			var rowPosition = row.getAllPrevious().length;
+			row = this.updateRowAttributes(rowPosition+1, row);
+			next = this.updateRowAttributes(rowPosition, next);
+
+			row.injectAfter(next);
 		}
 	}
 });
