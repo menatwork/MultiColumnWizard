@@ -375,11 +375,12 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             $intNumberOfRows = $this->minCount;
         }
+		
+		$arrItems = array();
 
         // Add input fields
         for ($i = 0; $i < $intNumberOfRows; $i++)
         {
-            $arrItem = array();
             $strHidden = '';
 
             // Walk every column
@@ -494,13 +495,13 @@ window.addEvent(\'domready\', function() {
                 // Build array of items
                 if ($arrField['eval']['columnPos'] != '')
                 {
-                    $arrItem[$objWidget->columnPos]['entry'] .= $strWidget;
-                    $arrItem[$objWidget->columnPos]['valign'] = $arrField['eval']['valign'];
-                    $arrItem[$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
+                    $arrItems[$i][$objWidget->columnPos]['entry'] .= $strWidget;
+                    $arrItems[$i][$objWidget->columnPos]['valign'] = $arrField['eval']['valign'];
+                    $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
                 }
                 else
                 {
-                    $arrItem[$strKey] = array
+                    $arrItems[$i][$strKey] = array
                         (
                         'entry' => $strWidget,
                         'valign' => $arrField['eval']['valign'],
@@ -510,7 +511,9 @@ window.addEvent(\'domready\', function() {
             }
 		}
 
-		return ($this->blnTableless) ? $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItem) : $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItem);
+		print_r(array_values($arrItem));
+
+		return ($this->blnTableless) ? $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems) : $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
     }
 
 
@@ -660,7 +663,7 @@ window.addEvent(\'domready\', function() {
 	 * @param array
 	 * @return string
 	 */
-	protected function generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItem)
+	protected function generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems)
 	{
 		// generate header fields
         foreach ($this->columnFields as $strKey => $arrField)
@@ -691,36 +694,23 @@ window.addEvent(\'domready\', function() {
         }
 
         $return .='
-  <tbody><tr>';
-		
+  <tbody>';
 
-        // new array for items so we get rid of the ['entry'] and ['valign']
-        $arrReturnItems = array();
-
-        if ($this->columnTemplate != '')
+		foreach ($arrItems as $k => $arrValue)
         {
-            $objTemplate = new BackendTemplate($this->columnTemplate);
-            $objTemplate->items = $arrItem;
-
-            $return .= '<td>' . $objTemplate->parse() . '</td>';
-        }
-        else
-        {
-            foreach ($arrItem as $itemKey => $itemValue)
-            {
-                $arrReturnItems[$itemKey] = '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
-            }
-
-            $return .= implode('', $arrReturnItems);
+        	$return .= '<tr>';
+        	foreach ($arrValue as $itemKey => $itemValue)
+			{
+            	$return .= '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
+			}
+			
+			// insert buttons at the very end
+			$return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
+			$return .= $this->generateButtonString();
+			$return .= '</td>';	
+			$return .= '</tr>';
         }
 
-
-
-        $return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
-		
-		$return .= $this->generateButtonString();
-		
-        $return .= '</td></tr>';
 		$return .= '</tbody></table>';
 		
 		$return .= '<script>
@@ -744,7 +734,7 @@ window.addEvent(\'domready\', function() {
 	 * @param array
 	 * @return string
 	 */
-	protected function generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItem)
+	protected function generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems)
 	{
 		// generate header fields
         foreach ($this->columnFields as $strKey => $arrField)
