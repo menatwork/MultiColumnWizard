@@ -103,7 +103,8 @@ var MultiColumnWizard = new Class(
 						operation.addEvent('click', function(e)
 						{
 							e.preventDefault();
-							callback.pass([operation, el], self)();						});
+							callback.pass([operation, el], self)();
+						});
 					});
 				}
 				
@@ -133,7 +134,6 @@ var MultiColumnWizard = new Class(
 	 */
 	updateRowAttributes: function(level, row)
 	{
-		// this in this context refers to the row element
 		row.getElements('.mcwUpdateFields *[name]').each(function(el)
 		{
 			// rewrite elements name
@@ -155,7 +155,10 @@ var MultiColumnWizard = new Class(
 					el.setProperty('id', erg[1] + '_row' + level + '_' + erg[2]);
 				}
 			}
+		});
 
+		row.getElements('.mcwUpdateFields label').each(function(el)
+		{
 			// rewrite elements for
 			if (typeOf(el.getProperty('for')) == 'string')
 			{
