@@ -511,7 +511,6 @@ window.addEvent(\'domready\', function() {
             }
 		}
 
-		print_r(array_values($arrItem));
 
 		return ($this->blnTableless) ? $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems) : $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
     }
