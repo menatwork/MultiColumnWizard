@@ -107,6 +107,14 @@ var MultiColumnWizard = new Class(
 						});
 					});
 				}
+				if(key == 'copy')
+				{
+					operation.addEvent('click', function(e)
+					{
+						e.preventDefault();
+						self.updateOperations.pass([operation, el], self)();
+					});
+				}
 				
 				// register instance click callbacks
 				if (self.operationClickCallbacks[key])
@@ -279,12 +287,10 @@ Object.append(MultiColumnWizard,
 			// update the row count
 			++rowCount;
 			
-			var copy = row.clone();
-			
-			// calculate -1 because the attributes start with 0, right? ;-)
+			var copy = row.clone(true,true);
+
 			copy = this.updateRowAttributes(rowCount-1, copy);
 			copy.injectAfter(row);
-			this.updateOperations();
 		}
 		
 		// remove the copy possibility if we just reach maxCount now (don't need to increment rowCount here as we already did when injecting)
