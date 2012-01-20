@@ -107,6 +107,14 @@ var MultiColumnWizard = new Class(
 						});
 					});
 				}
+				if(key == 'copy')
+				{
+					operation.addEvent('click', function(e)
+					{
+						e.preventDefault();
+						self.updateOperations.pass([operation, el], self)();
+					});
+				}
 				
 				// register instance click callbacks
 				if (self.operationClickCallbacks[key])
