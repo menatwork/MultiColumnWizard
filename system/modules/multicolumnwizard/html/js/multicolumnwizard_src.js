@@ -107,14 +107,6 @@ var MultiColumnWizard = new Class(
 						});
 					});
 				}
-				if(key == 'copy')
-				{
-					operation.addEvent('click', function(e)
-					{
-						e.preventDefault();
-						self.updateOperations.pass([operation, el], self)();
-					});
-				}
 				
 				// register instance click callbacks
 				if (self.operationClickCallbacks[key])
@@ -194,7 +186,7 @@ var MultiColumnWizard = new Class(
 			this.operationLoadCallbacks[key] = [];
 		}
 		
-		this.operationLoadCallbacks[key].push(func);
+		this.operationLoadCallbacks[key].include(func);
 	},
 	
 	
@@ -210,7 +202,7 @@ var MultiColumnWizard = new Class(
 			this.operationClickCallbacks[key] = [];
 		}
 		
-		this.operationClickCallbacks[key].push(func);
+		this.operationClickCallbacks[key].include(func);
 	}
 });
 
@@ -235,7 +227,7 @@ Object.append(MultiColumnWizard,
 			MultiColumnWizard.operationLoadCallbacks[key] = [];
 		}
 		
-		MultiColumnWizard.operationLoadCallbacks[key].push(func);
+		MultiColumnWizard.operationLoadCallbacks[key].include(func);
 	},
 	
 	
@@ -251,7 +243,7 @@ Object.append(MultiColumnWizard,
 			MultiColumnWizard.operationClickCallbacks[key] = [];
 		}
 		
-		MultiColumnWizard.operationClickCallbacks[key].push(func);
+		MultiColumnWizard.operationClickCallbacks[key].include(func);
 	},
 
 	
@@ -291,6 +283,8 @@ Object.append(MultiColumnWizard,
 
 			copy = this.updateRowAttributes(rowCount-1, copy);
 			copy.injectAfter(row);
+			
+			this.addOperationClickCallback('click', this.updateOperations);
 		}
 		
 		// remove the copy possibility if we just reach maxCount now (don't need to increment rowCount here as we already did when injecting)
