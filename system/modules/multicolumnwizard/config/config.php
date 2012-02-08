@@ -28,5 +28,4 @@
  */
 
 $GLOBALS['BE_FFL']['multiColumnWizard'] = 'MultiColumnWizard';
- 
-?>
+$GLOBALS['TL_FFL']['multiColumnWizard'] = 'MultiColumnWizard';
