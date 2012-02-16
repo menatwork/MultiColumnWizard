@@ -73,7 +73,7 @@ var MultiColumnWizard = new Class(
 			el.getElement('td.operations').getElements('a').each(function(operation)
 			{
 				var key = operation.get('rel');
-
+                                
 				// register static load callbacks
 				if (MultiColumnWizard.operationLoadCallbacks[key])
 				{
@@ -134,7 +134,8 @@ var MultiColumnWizard = new Class(
 	 */
 	updateRowAttributes: function(level, row)
 	{
-		row.getElements('.mcwUpdateFields *[name]').each(function(el)
+            
+		row.getElements('.mcwUpdateFields *').each(function(el)
 		{
 			// rewrite elements name
 			if (typeOf(el.getProperty('name')) == 'string')
@@ -142,6 +143,7 @@ var MultiColumnWizard = new Class(
 				var erg = el.getProperty('name').match(/^([^\[]+)\[([0-9]+)\](.*)$/i);
 				if (erg)
 				{
+                                    
 					el.setProperty('name', erg[1] + '[' + level + ']' + erg[3]);
 				}
 			}
@@ -149,10 +151,30 @@ var MultiColumnWizard = new Class(
 			// rewrite elements id
 			if (typeOf(el.getProperty('id')) == 'string')
 			{
+                                
 				var erg = el.getProperty('id').match(/^(.+)_row[0-9]+_(.+)$/i);
 				if (erg)
 				{
 					el.setProperty('id', erg[1] + '_row' + level + '_' + erg[2]);
+                                        
+                                        //make input field visible again, if some js made set display:none
+                                        if (el.nodeName == 'INPUT' && el.getProperty('style').search('none;') > 0) el.setProperty('style','display: inline;');
+				}
+			}
+                        else
+                        {
+                                //eliminate input fields without an id -> this iput field was created by JS (i hope so :))
+                                if (el.nodeName == 'INPUT') el.destroy();
+                        }
+                        
+                        // rewrite elements onclick (e.g. pagePicker)
+			if (typeOf(el.getProperty('onclick')) == 'string')
+			{
+				var erg = el.getProperty('onclick').match(/^(.+)_row[0-9]+_(.+)$/i);
+				if (erg)
+				{
+                                   
+					el.setProperty('onclick', erg[1] + '_row' + level + '_' + erg[2]);
 				}
 			}
 		});
@@ -165,10 +187,32 @@ var MultiColumnWizard = new Class(
 				var erg = el.getProperty('for').match(/^(.+)_row[0-9]+_(.+)$/i);
 				if (erg)
 				{
+                                    
 					el.setProperty('for', erg[1] + '_row' + level + '_' + erg[2]);
 				}
 			}
 		});
+                
+                // modify inline scripts
+                row.getElements('.mcwUpdateFields script').each(function(el)
+                {
+                    //ToDO: refactor this part. For some reason replace will only find the first token of _row[0-9]+_
+                    var newScript = '';
+                    var script = el.get('html').toString();
+                    var length = 0;
+                    var start = script.search(/_row[0-9]+_/i);
+                    while(start > 0)
+                    {
+
+                        length = script.match(/(_row[0-9]+)+_/i)[0].length; 
+                        newScript =  newScript + script.substr(0, start) + '_row' + level + '_';
+                        script = script.substr(start + length);
+                        start = script.search(/_row[0-9]+_/i);
+                    }
+
+                    el.set('html', newScript+script);
+
+                });
 		
 		return row;
 	},
@@ -257,10 +301,12 @@ Object.append(MultiColumnWizard,
 		var rowCount = row.getSiblings().length + 1;
 		
 		// remove the copy possibility if we have already reached maxCount
-		if (this.options.maxCount > 0 && rowCount == this.options.maxCount)
+		if (this.options.maxCount > 0 && rowCount >= this.options.maxCount)
 		{
-			el.destroy();
-		}
+                    el.setStyle('display', 'none');
+		}else{
+                    el.setStyle('display', 'inline');
+                }
 	},
 
 
@@ -271,6 +317,7 @@ Object.append(MultiColumnWizard,
 	 */
 	copyClick: function(el, row)
 	{
+            
 		var rowCount = row.getSiblings().length + 1;
 		
 		// check maxCount for an inject
@@ -283,14 +330,21 @@ Object.append(MultiColumnWizard,
 
 			copy = this.updateRowAttributes(rowCount-1, copy);
 			copy.injectAfter(row);
-			
-			this.addOperationClickCallback('click', this.updateOperations);
+                        //exec script
+                        if (copy.getElements('script').length > 0)
+                        {
+                            copy.getElements('script').each(function(script){
+                              $exec(script.get('html')); 
+                            });
+                        }
+			this.addOperationClickCallback('click', this.updateOperations());
 		}
 		
 		// remove the copy possibility if we just reach maxCount now (don't need to increment rowCount here as we already did when injecting)
 		if (this.options.maxCount > 0 && rowCount == this.options.maxCount)
-		{
-			el.destroy();
+		{     
+                    row.getSiblings().getElements('a[rel="copy"]').each(function(e){e.setStyle('display', 'none')});
+                    el.setStyle('display', 'none');
 		}
 	},
 
@@ -302,13 +356,17 @@ Object.append(MultiColumnWizard,
 	 */
 	deleteLoad: function(el, row)
 	{
-		var position = el.getAllPrevious().length - 1;
-		
+		var rowCount = row.getSiblings().length + 1;
+                
 		// remove the delete possibility if necessary
-		if (this.options.minCount > 0 && position == this.options.minCount)
+		if (this.options.minCount > 0 && rowCount <= this.options.minCount)
 		{
-			el.destroy();
+                    el.setStyle('display', 'none');
 		}
+                else
+                {
+                    el.setStyle('display', 'inline');
+                }
 	},
 
 
@@ -318,9 +376,23 @@ Object.append(MultiColumnWizard,
 	 * @param Element the row
 	 */
 	deleteClick: function(el, row)
-	{
-		row.destroy();
-	},
+        {
+            //get all following rows
+            var rows = row.getAllNext();
+            //extract the current level
+            level = row.getElements('.mcwUpdateFields *[name]')[0].getProperty('id').match(/_row[0-9]+_/i)[0].match(/[0-9]+/i)[0];
+            //destroy current row
+            row.destroy();
+
+            var that = this;
+            //update index of following rows
+            rows.each(function(row){
+                that.updateRowAttributes(level++, row);
+            });
+            
+            this.addOperationClickCallback('click', this.updateOperations());
+
+        },
 
 
 	/**

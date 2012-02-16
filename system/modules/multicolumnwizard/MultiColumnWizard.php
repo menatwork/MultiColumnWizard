@@ -306,12 +306,13 @@ class MultiColumnWizard extends Widget implements uploadable
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_src.js';
         $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
-        $strCommand = 'cmd_' . $this->strField;
+        $this->strCommand = 'cmd_' . $this->strField;
 
         // Change the order
-        if ($this->Input->get($strCommand) && is_numeric($this->Input->get('cid')) && $this->Input->get('id') == $this->currentRecord)
+        if ($this->Input->get($this->strCommand) && is_numeric($this->Input->get('cid')) && $this->Input->get('id') == $this->currentRecord)
         {
-            switch ($this->Input->get($strCommand))
+
+            switch ($this->Input->get($this->strCommand))
             {
                 case 'copy':
                     $this->varValue = array_duplicate($this->varValue, $this->Input->get('cid'));
@@ -341,7 +342,7 @@ class MultiColumnWizard extends Widget implements uploadable
             }
 
             // Reload the page
-            $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($strCommand, '/') . '=[^&]*/i', '', $this->Environment->request)));
+            $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', $this->Environment->request)));
         }
 
         $arrUnique = array();
@@ -437,13 +438,13 @@ class MultiColumnWizard extends Widget implements uploadable
                             case 'time':
                                 $time = ",\n      timePickerOnly:true";
                                 break;
-
+                                
                             default:
                                 $time = '';
                                 break;
                         }
 
-                        /* $datepicker = ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
+                         $datepicker = ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
                           <script>
                           window.addEvent(\'domready\', function() {
                           window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $objWidget->id . '\', {
@@ -460,12 +461,12 @@ class MultiColumnWizard extends Widget implements uploadable
                           monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
                           });
                           });
-                          </script>'; */
-                        $datepicker = '<script>
+                          </script>'; 
+                       /* $datepicker = '<script>
 window.addEvent(\'domready\', function() {
 ' . sprintf($this->getDatePickerString(), 'ctrl_' . $objWidget->strId) . '
 });
-</script>';
+</script>';*/
                     }
 
                     // Add custom wizard
@@ -664,6 +665,7 @@ window.addEvent(\'domready\', function() {
 	 */
 	protected function generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems)
 	{
+
 		// generate header fields
         foreach ($this->columnFields as $strKey => $arrField)
         {
@@ -705,7 +707,7 @@ window.addEvent(\'domready\', function() {
 			
 			// insert buttons at the very end
 			$return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
-			$return .= $this->generateButtonString();
+			$return .= $this->generateButtonString($k);
 			$return .= '</td>';	
 			$return .= '</tr>';
         }
@@ -759,7 +761,7 @@ window.addEvent(\'domready\', function() {
 
 
 
-        $return .= '<div class="col_last buttons">' . $this->generateButtonString() . '</div>';
+        $return .= '<div class="col_last buttons">' . $this->generateButtonString($strKey) . '</div>';
 		
 		$return .= $strHidden;
 
@@ -771,22 +773,22 @@ window.addEvent(\'domready\', function() {
 	 * Generate button string
 	 * @return string
 	 */
-	protected function generateButtonString()
+	protected function generateButtonString($level = 0)
 	{
-		$return = '';
-		
-        // Add buttons
-        foreach ($this->arrButtons as $button => $image)
-        {
+            $return = '';
 
-            if ($image === false)
+            // Add buttons
+            foreach ($this->arrButtons as $button => $image)
             {
-                continue;
-            }
-            
-            $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $strCommand . '=' . $button . '&cid=' . $i . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
-		}
 
-		return $return;
-	}
+                if ($image === false)
+                {
+                    continue;
+                }
+
+                $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+            }
+
+            return $return;
+        }   
 }
