@@ -1,4 +1,5 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -27,6 +28,7 @@
  * @package    MultiColumnWizard 
  * @license    LGPL 
  * @filesource
+ * @info       tab is set to 4 whitespaces
  */
 
 /**
@@ -104,7 +106,7 @@ class MultiColumnWizard extends Widget implements uploadable
      * Initialize the object
      * @param array
      */
-    public function __construct($arrAttributes=false)
+    public function __construct($arrAttributes = false)
     {
         parent::__construct($arrAttributes);
         $this->import('Database');
@@ -302,8 +304,8 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-		// TODO: minify this and change path
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_src.js';
+        // TODO: minify this and change path
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '_src.js';
         $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;
@@ -376,8 +378,8 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             $intNumberOfRows = $this->minCount;
         }
-		
-		$arrItems = array();
+
+        $arrItems = array();
 
         // Add input fields
         for ($i = 0; $i < $intNumberOfRows; $i++)
@@ -438,15 +440,15 @@ class MultiColumnWizard extends Widget implements uploadable
                             case 'time':
                                 $time = ",\n      timePickerOnly:true";
                                 break;
-                                
+
                             default:
                                 $time = '';
                                 break;
                         }
 
-                         $datepicker = ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
+                        $datepicker = ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
                           <script>
-                          window.addEvent(\'domready\', function() {
+
                           window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $objWidget->id . '\', {
                           allowEmpty:true,
                           toggleElements:\'#toggle_' . $objWidget->id . '\',
@@ -460,13 +462,16 @@ class MultiColumnWizard extends Widget implements uploadable
                           months:[\'' . implode("','", $GLOBALS['TL_LANG']['MONTHS']) . '\'],
                           monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
                           });
+
+                          </script>';
+
+                        $datepicker = $this->getMcWDatePickerString($objWidget->id, $strKey, $rgxp);
+
+                        /* $datepicker = '<script>
+                          window.addEvent(\'domready\', function() {
+                          ' . sprintf($this->getDatePickerString(), 'ctrl_' . $objWidget->strId) . '
                           });
-                          </script>'; 
-                       /* $datepicker = '<script>
-window.addEvent(\'domready\', function() {
-' . sprintf($this->getDatePickerString(), 'ctrl_' . $objWidget->strId) . '
-});
-</script>';*/
+                          </script>'; */
                     }
 
                     // Add custom wizard
@@ -510,12 +515,85 @@ window.addEvent(\'domready\', function() {
                     );
                 }
             }
-		}
+        }
 
 
-		return ($this->blnTableless) ? $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems) : $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+        return ($this->blnTableless) ? $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems) : $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
     }
 
+    protected function getMcWDatePickerString($strId, $strKey, $rgxp)
+    {
+        if (version_compare(VERSION, '2.11', '<'))
+        {
+            $format = $GLOBALS['TL_CONFIG'][$rgxp . 'Format'];
+            switch ($rgxp)
+            {
+                case 'datim':
+                    $time = ",\n      timePicker:true";
+                    break;
+
+                case 'time':
+                    $time = ",\n      timePickerOnly:true";
+                    break;
+
+                default:
+                    $time = '';
+                    break;
+            }
+
+            return ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;">
+                          <script>
+                        window.addEvent("domready", function() {
+                          window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $strId . '\', {
+                          allowEmpty:true,
+                          toggleElements:\'#toggle_' . $strId . '\',
+                          pickerClass:\'datepicker_dashboard\',
+                          format:\'' . $format . '\',
+                          inputOutputFormat:\'' . $format . '\',
+                          positionOffset:{x:130,y:-185}' . $time . ',
+                          startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
+                          days:[\'' . implode("','", $GLOBALS['TL_LANG']['DAYS']) . '\'],
+                          dayShort:' . $GLOBALS['TL_LANG']['MSC']['dayShortLength'] . ',
+                          months:[\'' . implode("','", $GLOBALS['TL_LANG']['MONTHS']) . '\'],
+                          monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
+                          });
+                        });
+                          </script>';
+        }
+        else
+        {
+            $format = Date::formatToJs($GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+            switch ($rgxp)
+            {
+                case 'datim':
+                    $time = ",\n      timePicker:true";
+                    break;
+
+                case 'time':
+                    $time = ",\n      pickOnly:\"time\"";
+                    break;
+
+                default:
+                    $time = '';
+                    break;
+            }
+            return ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px">
+                        <script>
+                        window.addEvent("domready", function() {
+                            new Picker.Date($$("#ctrl_' . $strId . '"), {
+                            draggable:false,
+                            toggle:$$("#toggle_' . $strId . '"),
+                            format:"' . $format . '",
+                            positionOffset:{x:-197,y:-182}' . $time . ',
+                            pickerClass:"datepicker_dashboard",
+                            useFadeInOut:!Browser.ie,
+                            startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
+                            titleFormat:"' . $GLOBALS['TL_LANG']['MSC']['titleFormat'] . '"
+                            });
+                        });
+                        </script>';
+        }
+    }
 
     /**
      * Initialize widget
@@ -615,8 +693,8 @@ window.addEvent(\'domready\', function() {
             $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' hidelabel');
         }
 
-		// add class to enable easy updating of "name" attributes etc.
-		$arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' mcwUpdateFields');
+        // add class to enable easy updating of "name" attributes etc.
+        $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' mcwUpdateFields');
 
         // load callback
         if (is_array($arrField['load_callback']))
@@ -653,22 +731,22 @@ window.addEvent(\'domready\', function() {
     {
         $this->arrRowSpecificData[$intIndex][$strField] = $arrData;
     }
-	
-	
-	/**
-	 * Generates a table formatted MCW
-	 * @param array
-	 * @param array
-	 * @param string
-	 * @param array
-	 * @return string
-	 */
-	protected function generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems)
-	{
 
-		// generate header fields
+    /**
+     * Generates a table formatted MCW
+     * @param array
+     * @param array
+     * @param string
+     * @param array
+     * @return string
+     */
+    protected function generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems)
+    {
+
+        // generate header fields
         foreach ($this->columnFields as $strKey => $arrField)
         {
+
             if ($arrField['eval']['columnPos'])
             {
                 $arrHeaderItems[$arrField['eval']['columnPos']] = '<td></td>';
@@ -678,8 +756,8 @@ window.addEvent(\'domready\', function() {
                 $arrHeaderItems[] = '<td>' . ($arrField['label'][0] ? $arrField['label'][0] : $strKey) . '</td>';
             }
         }
-		
-		
+
+
         $return = '
 <table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">';
 
@@ -697,24 +775,24 @@ window.addEvent(\'domready\', function() {
         $return .='
   <tbody>';
 
-		foreach ($arrItems as $k => $arrValue)
+        foreach ($arrItems as $k => $arrValue)
         {
-        	$return .= '<tr>';
-        	foreach ($arrValue as $itemKey => $itemValue)
-			{
-            	$return .= '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
-			}
-			
-			// insert buttons at the very end
-			$return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
-			$return .= $this->generateButtonString($k);
-			$return .= '</td>';	
-			$return .= '</tr>';
+            $return .= '<tr>';
+            foreach ($arrValue as $itemKey => $itemValue)
+            {
+                $return .= '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
+            }
+
+            // insert buttons at the very end
+            $return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
+            $return .= $this->generateButtonString($k);
+            $return .= '</td>';
+            $return .= '</tr>';
         }
 
-		$return .= '</tbody></table>';
-		
-		$return .= '<script>
+        $return .= '</tbody></table>';
+
+        $return .= '<script>
 		var MCW_' . $this->strId . ' = new MultiColumnWizard({
 			table: \'' . 'ctrl_' . $this->strId . '\',
 			maxCount: ' . $this->maxCount . ',
@@ -723,72 +801,71 @@ window.addEvent(\'domready\', function() {
 		});
 		</script>';
 
-        return $return;	
-	}
-	
-	
-	/**
-	 * Generates a div formatted MCW
-	 * @param array
-	 * @param array
-	 * @param string
-	 * @param array
-	 * @return string
-	 */
-	protected function generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems)
-	{
-		// generate header fields
+        return $return;
+    }
+
+    /**
+     * Generates a div formatted MCW
+     * @param array
+     * @param array
+     * @param string
+     * @param array
+     * @return string
+     */
+    protected function generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems)
+    {
+        // generate header fields
         foreach ($this->columnFields as $strKey => $arrField)
         {
-			$arrHeaderItems[] = sprintf('<div class="%s">%s</div>', $strKey, ($arrField['label'][0] ? $arrField['label'][0] : $strKey));
+            $arrHeaderItems[] = sprintf('<div class="%s">%s</div>', $strKey, ($arrField['label'][0] ? $arrField['label'][0] : $strKey));
         }
-		
-		
+
+
         $return = '<div' . (($this->style) ? (' style="' . $this->style . '"') : '') . ' rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
         $return .= '<div class="header_fields">' . implode('', $arrHeaderItems) . '</div>';
-      
-		
+
+
 
         // new array for items so we get rid of the ['entry'] and ['valign']
         $arrReturnItems = array();
 
-		foreach ($arrItem as $itemKey => $itemValue)
+        foreach ($arrItem as $itemKey => $itemValue)
         {
             $arrReturnItems[$itemKey] = '<div' . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</div>';
         }
 
-		$return .= implode('', $arrReturnItems);
+        $return .= implode('', $arrReturnItems);
 
 
 
         $return .= '<div class="col_last buttons">' . $this->generateButtonString($strKey) . '</div>';
-		
-		$return .= $strHidden;
 
-        return $return . '</div>';			
-	}
-	
-	
-	/**
-	 * Generate button string
-	 * @return string
-	 */
-	protected function generateButtonString($level = 0)
-	{
-            $return = '';
+        $return .= $strHidden;
 
-            // Add buttons
-            foreach ($this->arrButtons as $button => $image)
+        return $return . '</div>';
+    }
+
+    /**
+     * Generate button string
+     * @return string
+     */
+    protected function generateButtonString($level = 0)
+    {
+        $return = '';
+
+        // Add buttons
+        foreach ($this->arrButtons as $button => $image)
+        {
+
+            if ($image === false)
             {
-
-                if ($image === false)
-                {
-                    continue;
-                }
-
-                $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+                continue;
             }
 
-            return $return;
-        }   
+            $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . specialchars($GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button]) . '">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+        }
+
+        return $return;
+    }
+
 }
