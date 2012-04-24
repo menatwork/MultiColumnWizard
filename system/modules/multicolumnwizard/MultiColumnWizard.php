@@ -612,7 +612,7 @@ class MultiColumnWizard extends Widget implements uploadable
         $strContaoPrefix = 'contao/';
         
         // YACE support for leo unglaub :)
-        if (defined(YACE)) $strContaoPrefix = '';           
+        if (defined('YACE')) $strContaoPrefix = '';           
         
         // Toggle line wrap (textarea)
         if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '')
