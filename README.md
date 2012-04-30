@@ -2,6 +2,8 @@ Usage with columnFields
 =============
 
 <pre><code>
+<?php 
+
 $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
 (
     'label'         => &$GLOBALS['TL_LANG']['tl_theme']['templateSelection'],
@@ -37,12 +39,16 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
             )
         )
 );
+
+?>
 </code></pre>
 
 Usage with callback
 =============
 
 <pre><code>
+<?php 
+
 $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = array
 (
     'label'         => &$GLOBALS['TL_LANG']['tl_table']['anything'],
@@ -54,6 +60,8 @@ $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = array
         'columnsCallback'       => array('Class', 'Method')
         )
 );
+
+?>
 </code></pre>
 
 More information
