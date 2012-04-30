@@ -204,6 +204,8 @@ class MultiColumnWizard extends Widget implements uploadable
     {
         for ($i = 0; $i < count($varInput); $i++)
         {
+            $this->activeRow = $i;
+
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
             {
@@ -384,6 +386,7 @@ class MultiColumnWizard extends Widget implements uploadable
         // Add input fields
         for ($i = 0; $i < $intNumberOfRows; $i++)
         {
+            $this->activeRow = $i;
             $strHidden = '';
 
             // Walk every column

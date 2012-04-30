@@ -18,4 +18,4 @@
  * Author       Andreas Schempp <andreas@schempp.ch>
  * Link		http://www.iserv.ch/
  * License    	GNU/LGPL
- */
+ */ 
