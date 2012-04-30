@@ -468,23 +468,30 @@ Object.append(MultiColumnWizard,
 	 */
     deleteClick: function(el, row)
     {
-        //get all following rows
-        var rows = row.getAllNext();
-        //extract the current level
-        level = row.getAllPrevious().length;
-            
-        //destroy current row
-        row.destroy();
 
-        var that = this;
-        //update index of following rows
-        rows.each(function(row){
-            that.updateRowAttributes(level++, row);
-        });
-            
-        //this.addOperationClickCallback('click', this.updateOperations);
-        this.updateOperations();
+        if (row.getSiblings().length > 0){
+            //get all following rows
+            var rows = row.getAllNext();
+            //extract the current level
+            level = row.getAllPrevious().length;
 
+            //destroy current row
+            row.destroy();
+
+            var that = this;
+            //update index of following rows
+            rows.each(function(row){
+                
+                that.updateRowAttributes(level++, row);
+                
+            });
+        }else{
+           row.getElements('input,select,textarea').each(function(el){
+
+               MultiColumnWizard.clearElementValue(el);
+               
+           });
+        }
     },
 
 
@@ -515,10 +522,10 @@ Object.append(MultiColumnWizard,
 
 
     /**
-	 * Operation "down" - click
-	 * @param Element the icon element
-	 * @param Element the row
-	 */
+     * Operation "down" - click
+     * @param Element the icon element
+     * @param Element the row
+     */
     downClick: function(el, row)
     {
         var next = row.getNext();
@@ -537,15 +544,28 @@ Object.append(MultiColumnWizard,
 
             row.injectAfter(next);
         }
-    }
+    },
+    
+    /**
+    * @param Element the element which should be cleared
+    */
+    clearElementValue: function(el)
+    {
+        if (el.get('type') == 'checkbox' || el.get('type') == 'radio')
+        {
+            el.checked = false;
+        }
+        else
+        {
+            el.set('value', '');
+        }
+    }    
 });
 
 
 /**
  * Register default callbacks
  */
-//MultiColumnWizard.addOperationLoadCallback('copy', MultiColumnWizard.attachDatepicker);
-//MultiColumnWizard.addOperationClickCallback('copy', function(){alert('a'); });
 MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
 MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
 MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteUpdate);
