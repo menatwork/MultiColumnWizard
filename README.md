@@ -1,7 +1,7 @@
 Usage with columnFields
 =======================
 
-<pre><code>
+```php
 <?php
 
 $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
@@ -41,14 +41,14 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
 );
 
 ?>
-</code></pre>
+```
 
 
 Usage with callback
 ===================
 
-<pre><code>
-<?php 
+```php
+<?php
 
 $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = array
 (
@@ -63,7 +63,7 @@ $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = array
 );
 
 ?>
-</code></pre>
+```
 
 
 More information
