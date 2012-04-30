@@ -1,5 +1,4 @@
-<?php
-if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -306,8 +305,7 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-        // TODO: minify this and change path
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '_src.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '.js';
         $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;

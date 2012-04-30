@@ -572,4 +572,3 @@ MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteU
 MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);
 MultiColumnWizard.addOperationClickCallback('up', MultiColumnWizard.upClick);
 MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick);
-
