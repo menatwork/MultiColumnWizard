@@ -1,2 +1,11 @@
+# OS
+.DS_Store
+Thumbs.db
 
-system/modules/multicolumnwizard/html/.DS_Store
+# IDEs 
+.buildpath
+.project
+.settings/
+.build/
+.idea/
+nbproject/

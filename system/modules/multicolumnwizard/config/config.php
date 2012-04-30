@@ -21,12 +21,11 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011, certo web & design GmbH 2011 
+ * @copyright  MEN AT WORK 2012, certo web & design GmbH 2012 
  * @package    MultiColumnWizard 
  * @license    LGPL 
  * @filesource
  */
 
 $GLOBALS['BE_FFL']['multiColumnWizard'] = 'MultiColumnWizard';
- 
-?>
+$GLOBALS['TL_FFL']['multiColumnWizard'] = 'MultiColumnWizard';
