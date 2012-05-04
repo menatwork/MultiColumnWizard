@@ -286,8 +286,9 @@ Object.append(MultiColumnWizard,
             copy.injectAfter(row);
 			
             this.addOperationClickCallback('click', this.updateOperations);
+			this.updateOperations();
         }
-		
+
         // remove the copy possibility if we just reach maxCount now (don't need to increment rowCount here as we already did when injecting)
         if (this.options.maxCount > 0 && rowCount == this.options.maxCount)
         {
