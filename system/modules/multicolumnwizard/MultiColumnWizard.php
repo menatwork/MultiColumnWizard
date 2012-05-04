@@ -202,6 +202,41 @@ class MultiColumnWizard extends Widget implements uploadable
     }
 
 
+	public function __get($strKey)
+	{
+		switch ($strKey)
+  		{
+      		case 'value':
+				/**
+				 * reformat array if we have only one field
+				 * from array[]['fieldname'] = value
+				 * to array[] = value
+				 * so we have the same behavoir like multiple-checkbox fields
+				 */
+				if ($this->flatArray)
+				{
+					$arrNew = array();
+
+					foreach ($this->varValue as $val)
+					{
+						$arrNew[] = $val[key($this->columnFields)];
+					}
+
+					return $arrNew;
+				}
+				else
+				{
+					return parent::__get($strKey);
+				}
+				break;
+
+			default:
+      			return parent::__get($strKey);
+      			break;
+		}
+	}
+
+
     protected function validator($varInput)
     {
         for ($i = 0; $i < count($varInput); $i++)
@@ -272,24 +307,6 @@ class MultiColumnWizard extends Widget implements uploadable
         if (!$this->blnSubmitInput)
         {
             $this->addError($GLOBALS['TL_LANG']['ERR']['general']);
-        }
-
-        /**
-         * reformat array if we have only one field
-         * from array[]['fieldname'] = value
-         * to array[] = value
-         * so we have the same behavoir like multiple-checkbox fields
-         */
-        if ($this->flatArray)
-        {
-            $arrNew = array();
-
-            foreach ($varInput as $val)
-            {
-                $arrNew[] = $val[key($this->columnFields)];
-            }
-
-            $varInput = $arrNew;
         }
 
         return $varInput;
