@@ -823,10 +823,10 @@ class MultiColumnWizard extends Widget implements uploadable
         $return .= '</tbody></table>';
 
         $return .= '<script>
-		var MCW_' . $this->strId . ' = new MultiColumnWizard({
-			table: \'' . 'ctrl_' . $this->strId . '\',
-			maxCount: ' . $this->maxCount . ',
-			minCount: ' . $this->minCount . ',
+		window["MCW_" + ' . json_encode($this->strId) . '] = new MultiColumnWizard({
+			table: "ctrl_" + ' . json_encode($this->strId) . ',
+			maxCount: ' . intval($this->maxCount) . ',
+			minCount: ' . intval($this->minCount) . ',
 			uniqueFields: [] // TODO: implement
 		});
 		</script>';
