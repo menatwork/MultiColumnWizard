@@ -360,8 +360,26 @@ class MultiColumnWizard extends Widget implements uploadable
             }
             else
             {
-                $this->Database->prepare("UPDATE " . $this->strTable . " SET " . $this->strField . "=? WHERE id=?")
-                        ->execute(serialize($this->varValue), $this->currentRecord);
+                if(is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback']))
+                {
+                    $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
+                    require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
+
+                    $dc = new $dataContainer($this->strTable);
+                    $dc->field = $objWidget->id;
+                    $dc->inputName = $objWidget->id;                    
+                    
+                    foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] AS $callback)
+                    {
+                            $this->import($callback[0]);
+                            $this->$callback[0]->$callback[1](serialize($this->varValue), $dc);
+                    }
+                }
+                else
+                {
+                    $this->Database->prepare("UPDATE " . $this->strTable . " SET " . $this->strField . "=? WHERE id=?")
+                            ->execute(serialize($this->varValue), $this->currentRecord);
+                }                
             }
 
             // Reload the page
