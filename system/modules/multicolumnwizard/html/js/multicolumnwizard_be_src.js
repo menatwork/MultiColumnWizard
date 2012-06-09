@@ -59,14 +59,18 @@ var MultiColumnWizard = new Class(
         }
                 
         var self = this;
-		
-        // execute load callback and register click event callback
-        this.options.table.getElement('tbody').getElements('tr').each(function(el, index)
-        {
-            el.getElement('td.operations').getElements('a').each(function(operation)
-            {
+
+
+
+
+
+
+        this.options.table.getElement('tbody').getChildren('tr').each(function(el, index){
+
+
+            el.getChildren('td.operations a').each(function(operation) {
                 var key = operation.get('rel');
-                                
+
                 // call static load callbacks
                 if (MultiColumnWizard.operationLoadCallbacks[key])
                 {
@@ -75,7 +79,7 @@ var MultiColumnWizard = new Class(
                         callback.pass([operation, el], self)();
                     });
                 }
-				
+
                 // call instance load callbacks
                 if (self.operationLoadCallbacks[key])
                 {
@@ -86,22 +90,31 @@ var MultiColumnWizard = new Class(
                 }
             });
         });
-		
         this.updateOperations();
     },
-	
-	
+
+
     /**
 	 * Update operations
 	 */
     updateOperations: function()
     {
         var self = this;
-                
+
         // execute load callback and register click event callback
-        this.options.table.getElement('tbody').getElements('tr').each(function(el, index)
+        this.options.table.getElement('tbody').getChildren('tr').each(function(el, index)
         {
-            el.getElement('td.operations').getElements('a').each(function(operation)
+            if(!el.getChildren('td.operations img.movehandler')[0]) {
+                var newMoveBtn = new Element('img.movehandler', {
+                    src: 'system/modules/multicolumnwizard/html/img/move.png',
+                    styles: {
+                        'cursor': 'move'
+                    }
+                });
+                newMoveBtn.inject(el.getChildren('td.operations')[0], 'bottom');
+            }
+
+            el.getChildren('td.operations a').each(function(operation)
             {
                 var key = operation.get('rel');
 				
@@ -163,6 +176,9 @@ var MultiColumnWizard = new Class(
                 
 
             });
+        });
+        var sortingMcwEl = new Sortables(this.options.table.getElement('tbody'), {
+            handle: 'img.movehandler'
         });
     },
 
