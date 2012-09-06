@@ -878,7 +878,7 @@ class MultiColumnWizard extends Widget implements uploadable
         // new array for items so we get rid of the ['entry'] and ['valign']
         $arrReturnItems = array();
 
-        foreach ($arrItem as $itemKey => $itemValue)
+        foreach ($arrItems as $itemKey => $itemValue)
         {
             $arrReturnItems[$itemKey] = '<div' . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</div>';
         }
