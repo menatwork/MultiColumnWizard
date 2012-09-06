@@ -912,7 +912,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 continue;
             }
 
-            $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . ucfirst(specialchars($button)) . '">' . $this->generateImage($image, $GLOBALS['TL_LANG'][$this->strTable]['wz_' . $button], 'class="tl_listwizard_img"') . '</a> ';
+            $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . ucfirst(specialchars($button)) . '">' . $this->generateImage($image, ucfirst(specialchars($button)), 'class="tl_listwizard_img"') . '</a> ';
         }
 
         return $return;
