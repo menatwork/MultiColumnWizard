@@ -61,7 +61,13 @@ var MultiColumnWizard = new Class(
         var self = this;
 
 
+
+
+
+
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index){
+
+
             el.getChildren('td.operations a').each(function(operation) {
                 var key = operation.get('rel');
 
@@ -98,6 +104,16 @@ var MultiColumnWizard = new Class(
         // execute load callback and register click event callback
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index)
         {
+            if(!el.getChildren('td.operations img.movehandler')[0]) {
+                var newMoveBtn = new Element('img.movehandler', {
+                    src: 'system/modules/multicolumnwizard/html/img/move.png',
+                    styles: {
+                        'cursor': 'move'
+                    }
+                });
+                newMoveBtn.inject(el.getChildren('td.operations')[0], 'bottom');
+            }
+
             el.getChildren('td.operations a').each(function(operation)
             {
                 var key = operation.get('rel');
@@ -160,6 +176,9 @@ var MultiColumnWizard = new Class(
                 
 
             });
+        });
+        var sortingMcwEl = new Sortables(this.options.table.getElement('tbody'), {
+            handle: 'img.movehandler'
         });
     },
 
