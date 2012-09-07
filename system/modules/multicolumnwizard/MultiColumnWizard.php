@@ -801,7 +801,10 @@ class MultiColumnWizard extends Widget implements uploadable
             }
             else
             {
-                $arrHeaderItems[] = '<td>' . ($arrField['label'][0] ? $arrField['label'][0] : $strKey) . '</td>';
+                $arrHeaderItems[] = '<td>';
+                $arrHeaderItems[] .= ($arrField['label'][0] ? $arrField['label'][0] : $strKey);
+                $arrHeaderItems[] .= (($arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
+                $arrHeaderItems[] .= '</td>';
             }
         }
 
