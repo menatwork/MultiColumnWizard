@@ -557,8 +557,25 @@ class MultiColumnWizard extends Widget implements uploadable
             }
         }
 
+		$strOutput = '';
 
-        return ($this->blnTableless) ? $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems) : $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+        if  ($this->blnTableless) 
+		{
+			$strOutput = $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+		}
+		else
+		{	
+			if ($this->columnTemplate != '')
+			{
+				$strOutput = $this->generateTemplateOutput($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+			}
+			else
+			{
+				$strOutput = $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+			}
+		}
+		
+		return $strOutput;
     }
 
     protected function getMcWDatePickerString($strId, $strKey, $rgxp)
@@ -854,6 +871,21 @@ class MultiColumnWizard extends Widget implements uploadable
 
         return $return;
     }
+	
+	protected function generateTemplateOutput($arrUnique, $arrDatepicker, $strHidden, $arrItems)
+    {
+		$objTemplate = new BackendTemplate($this->columnTemplate);
+		$objTemplate->items = $arrItems;
+		
+		$arrButtons = array();
+		foreach ($arrItems as $k => $arrValue)
+        {
+			$arrButtons[$k] = $this->generateButtonString($k);
+		}
+		$objTemplate->buttons = $arrButtons;
+		
+		return $objTemplate->parse();
+	}
 
 
     /**
