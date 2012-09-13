@@ -99,8 +99,7 @@ class MultiColumnWizard extends Widget implements uploadable
      * Buttons
      * @var array
      */
-    protected $arrButtons = array('copy' => 'copy.gif', 'up' => 'up.gif', 'down' => 'down.gif', 'delete' => 'delete.gif');
-
+    protected $arrButtons = array('copy'   => 'copy.gif', 'up'     => 'up.gif', 'down'   => 'down.gif', 'delete' => 'delete.gif');
 
     /**
      * Initialize the object
@@ -117,7 +116,6 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->loadDataContainer($arrAttributes['strTable']);
         }
     }
-
 
     /**
      * Add specific attributes
@@ -201,41 +199,39 @@ class MultiColumnWizard extends Widget implements uploadable
         }
     }
 
+    public function __get($strKey)
+    {
+        switch ($strKey)
+        {
+            case 'value':
+                /**
+                 * reformat array if we have only one field
+                 * from array[]['fieldname'] = value
+                 * to array[] = value
+                 * so we have the same behavoir like multiple-checkbox fields
+                 */
+                if ($this->flatArray)
+                {
+                    $arrNew = array();
 
-	public function __get($strKey)
-	{
-		switch ($strKey)
-  		{
-      		case 'value':
-				/**
-				 * reformat array if we have only one field
-				 * from array[]['fieldname'] = value
-				 * to array[] = value
-				 * so we have the same behavoir like multiple-checkbox fields
-				 */
-				if ($this->flatArray)
-				{
-					$arrNew = array();
+                    foreach ($this->varValue as $val)
+                    {
+                        $arrNew[] = $val[key($this->columnFields)];
+                    }
 
-					foreach ($this->varValue as $val)
-					{
-						$arrNew[] = $val[key($this->columnFields)];
-					}
+                    return $arrNew;
+                }
+                else
+                {
+                    return parent::__get($strKey);
+                }
+                break;
 
-					return $arrNew;
-				}
-				else
-				{
-					return parent::__get($strKey);
-				}
-				break;
-
-			default:
-      			return parent::__get($strKey);
-      			break;
-		}
-	}
-
+            default:
+                return parent::__get($strKey);
+                break;
+        }
+    }
 
     protected function validator($varInput)
     {
@@ -268,7 +264,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 $rgxp = $arrField['eval']['rgxp'];
                 if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
                 {
-                    $objDate = new Date($varValue, $GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+                    $objDate  = new Date($varValue, $GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
                     $varValue = $objDate->tstamp;
                 }
 
@@ -312,7 +308,6 @@ class MultiColumnWizard extends Widget implements uploadable
         return $varInput;
     }
 
-
     /**
      * Generate the widget and return it as string
      * @return string
@@ -327,7 +322,7 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '.js';
-        $GLOBALS['TL_CSS'][] = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
+        $GLOBALS['TL_CSS'][]        = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;
 
@@ -360,26 +355,26 @@ class MultiColumnWizard extends Widget implements uploadable
             }
             else
             {
-                if(is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback']))
+                if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback']))
                 {
                     $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
                     require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
 
-                    $dc = new $dataContainer($this->strTable);
-                    $dc->field = $objWidget->id;
-                    $dc->inputName = $objWidget->id;                    
-                    
+                    $dc            = new $dataContainer($this->strTable);
+                    $dc->field     = $objWidget->id;
+                    $dc->inputName = $objWidget->id;
+
                     foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] AS $callback)
                     {
-                            $this->import($callback[0]);
-                            $this->$callback[0]->$callback[1](serialize($this->varValue), $dc);
+                        $this->import($callback[0]);
+                        $this->$callback[0]->$callback[1](serialize($this->varValue), $dc);
                     }
                 }
                 else
                 {
                     $this->Database->prepare("UPDATE " . $this->strTable . " SET " . $this->strField . "=? WHERE id=?")
                             ->execute(serialize($this->varValue), $this->currentRecord);
-                }                
+                }
             }
 
             // Reload the page
@@ -388,6 +383,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
         $arrUnique = array();
         $arrDatepicker = array();
+        $arrTinyMCE = array();
         $arrHeaderItems = array();
 
         foreach ($this->columnFields as $strKey => $arrField)
@@ -402,6 +398,12 @@ class MultiColumnWizard extends Widget implements uploadable
             if ($arrField['eval']['datepicker'])
             {
                 $arrDatepicker[] = $strKey;
+            }
+            
+            // Store tiny mce fields
+            if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
+            {
+                $arrTinyMCE[] = $strKey;
             }
 
             if ($arrField['inputType'] == 'hidden')
@@ -424,7 +426,7 @@ class MultiColumnWizard extends Widget implements uploadable
         for ($i = 0; $i < $intNumberOfRows; $i++)
         {
             $this->activeRow = $i;
-            $strHidden = '';
+            $strHidden       = '';
 
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
@@ -464,11 +466,12 @@ class MultiColumnWizard extends Widget implements uploadable
                 else
                 {
                     $datepicker = '';
+                    $tinyMce    = '';
 
                     // Datepicker
                     if ($arrField['eval']['datepicker'])
                     {
-                        $rgxp = $arrField['eval']['rgxp'];
+                        $rgxp   = $arrField['eval']['rgxp'];
                         $format = $GLOBALS['TL_CONFIG'][$rgxp . 'Format'];
 
                         switch ($rgxp)
@@ -514,6 +517,13 @@ class MultiColumnWizard extends Widget implements uploadable
                           </script>'; */
                     }
 
+                    // Tiny MCE
+                    if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
+                    {                        
+                        $tinyMce          = $this->getMcWTinyMCEString($objWidget->id);
+                        $arrField['eval']['tl_class'] .= ' tinymce';
+                    }
+
                     // Add custom wizard
                     if (is_array($arrField['wizard']))
                     {
@@ -522,8 +532,8 @@ class MultiColumnWizard extends Widget implements uploadable
                         $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
                         require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
 
-                        $dc = new $dataContainer($this->strTable);
-                        $dc->field = $objWidget->id;
+                        $dc            = new $dataContainer($this->strTable);
+                        $dc->field     = $objWidget->id;
                         $dc->inputName = $objWidget->id;
 
                         foreach ($arrField['wizard'] as $callback)
@@ -534,48 +544,48 @@ class MultiColumnWizard extends Widget implements uploadable
 
                         $objWidget->wizard = $wizard;
                     }
-
-                    $strWidget = $objWidget->parse() . $datepicker;
+                    
+                    $strWidget = $objWidget->parse() . $datepicker . $tinyMce;                    
                 }
 
                 // Build array of items
                 if ($arrField['eval']['columnPos'] != '')
                 {
                     $arrItems[$i][$objWidget->columnPos]['entry'] .= $strWidget;
-                    $arrItems[$i][$objWidget->columnPos]['valign'] = $arrField['eval']['valign'];
+                    $arrItems[$i][$objWidget->columnPos]['valign']   = $arrField['eval']['valign'];
                     $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
                 }
                 else
                 {
                     $arrItems[$i][$strKey] = array
                         (
-                        'entry' => $strWidget,
-                        'valign' => $arrField['eval']['valign'],
+                        'entry'    => $strWidget,
+                        'valign'   => $arrField['eval']['valign'],
                         'tl_class' => $arrField['eval']['tl_class'],
                     );
                 }
             }
         }
 
-		$strOutput = '';
+        $strOutput = '';
 
-        if  ($this->blnTableless) 
-		{
-			$strOutput = $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems);
-		}
-		else
-		{	
-			if ($this->columnTemplate != '')
-			{
-				$strOutput = $this->generateTemplateOutput($arrUnique, $arrDatepicker, $strHidden, $arrItems);
-			}
-			else
-			{
-				$strOutput = $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
-			}
-		}
-		
-		return $strOutput;
+        if ($this->blnTableless)
+        {
+            $strOutput = $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+        }
+        else
+        {
+            if ($this->columnTemplate != '')
+            {
+                $strOutput = $this->generateTemplateOutput($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+            }
+            else
+            {
+                $strOutput = $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+            }
+        }
+
+        return $strOutput;
     }
 
     protected function getMcWDatePickerString($strId, $strKey, $rgxp)
@@ -653,6 +663,13 @@ class MultiColumnWizard extends Widget implements uploadable
         }
     }
 
+    protected function getMcWTinyMCEString($strId)
+    {
+        return "<script>
+            tinyMCE.execCommand('mceAddControl', false, 'ctrl_" . $strId . "');
+            $('ctrl_" . $strId . "').erase('required');
+                </script>";
+    }
 
     /**
      * Initialize widget
@@ -667,12 +684,13 @@ class MultiColumnWizard extends Widget implements uploadable
      */
     protected function initializeWidget(&$arrField, $intRow, $strKey, $varValue)
     {
-        $xlabel = '';
+        $xlabel          = '';
         $strContaoPrefix = 'contao/';
-        
+
         // YACE support for leo unglaub :)
-        if (defined('YACE')) $strContaoPrefix = '';           
-        
+        if (defined('YACE'))
+            $strContaoPrefix = '';
+
         // Toggle line wrap (textarea)
         if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '')
         {
@@ -682,7 +700,7 @@ class MultiColumnWizard extends Widget implements uploadable
         // Add the help wizard
         if ($arrField['eval']['helpwizard'])
         {
-            $xlabel .= ' <a href="'.$strContaoPrefix.'help.php?table=' . $this->strTable . '&amp;field=' . $this->strName . '_' . $strKey . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" rel="lightbox[help 610 80%]">' . $this->generateImage('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom;"') . '</a>';
+            $xlabel .= ' <a href="' . $strContaoPrefix . 'help.php?table=' . $this->strTable . '&amp;field=' . $this->strName . '_' . $strKey . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" rel="lightbox[help 610 80%]">' . $this->generateImage('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom;"') . '</a>';
         }
 
         // Add the popup file manager
@@ -695,7 +713,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 $path = '?node=' . $arrField['eval']['path'];
             }
 
-            $xlabel .= ' <a href="'.$strContaoPrefix.'files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" rel="lightbox[files 765 80%]">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
+            $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" rel="lightbox[files 765 80%]">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
         }
 
         // Add the table import wizard
@@ -769,21 +787,20 @@ class MultiColumnWizard extends Widget implements uploadable
             }
         }
 
-        $arrField['name'] = $this->strName . '[' . $intRow . '][' . $strKey . ']';
-        $arrField['id'] = $this->strId . '_row' . $intRow . '_' . $strKey;
-        $arrField['value'] = ($varValue !== '') ? $varValue : $arrField['default'];
+        $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
+        $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
+        $arrField['value']             = ($varValue !== '') ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
 
         $objWidget = new $strClass($this->prepareForWidget($arrField, $arrField['name'], $arrField['value'], null, $this->strTable));
 
-        $objWidget->strId = $arrField['id'];
-        $objWidget->storeValues = true;
-        $objWidget->xlabel = $xlabel;
+        $objWidget->strId         = $arrField['id'];
+        $objWidget->storeValues   = true;
+        $objWidget->xlabel        = $xlabel;
         $objWidget->currentRecord = $this->currentRecord;
 
         return $objWidget;
     }
-
 
     /**
      * Add specific field data to a certain field in a certain row
@@ -795,7 +812,6 @@ class MultiColumnWizard extends Widget implements uploadable
     {
         $this->arrRowSpecificData[$intIndex][$strField] = $arrData;
     }
-
 
     /**
      * Generates a table formatted MCW
@@ -871,22 +887,21 @@ class MultiColumnWizard extends Widget implements uploadable
 
         return $return;
     }
-	
-	protected function generateTemplateOutput($arrUnique, $arrDatepicker, $strHidden, $arrItems)
-    {
-		$objTemplate = new BackendTemplate($this->columnTemplate);
-		$objTemplate->items = $arrItems;
-		
-		$arrButtons = array();
-		foreach ($arrItems as $k => $arrValue)
-        {
-			$arrButtons[$k] = $this->generateButtonString($k);
-		}
-		$objTemplate->buttons = $arrButtons;
-		
-		return $objTemplate->parse();
-	}
 
+    protected function generateTemplateOutput($arrUnique, $arrDatepicker, $strHidden, $arrItems)
+    {
+        $objTemplate        = new BackendTemplate($this->columnTemplate);
+        $objTemplate->items = $arrItems;
+
+        $arrButtons = array();
+        foreach ($arrItems as $k => $arrValue)
+        {
+            $arrButtons[$k]       = $this->generateButtonString($k);
+        }
+        $objTemplate->buttons = $arrButtons;
+
+        return $objTemplate->parse();
+    }
 
     /**
      * Generates a div formatted MCW
@@ -929,7 +944,6 @@ class MultiColumnWizard extends Widget implements uploadable
         return $return . '</div>';
     }
 
-
     /**
      * Generate button string
      * @return string
@@ -952,5 +966,6 @@ class MultiColumnWizard extends Widget implements uploadable
 
         return $return;
     }
+
 }
 

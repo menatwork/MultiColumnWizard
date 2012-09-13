@@ -59,14 +59,8 @@ var MultiColumnWizard = new Class(
         }
                 
         var self = this;
-
-
-
-
-
-
+        
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index){
-
 
             el.getChildren('td.operations a').each(function(operation) {
                 var key = operation.get('rel');
@@ -104,15 +98,15 @@ var MultiColumnWizard = new Class(
         // execute load callback and register click event callback
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index)
         {
-            if(!el.getChildren('td.operations img.movehandler')[0]) {
-                var newMoveBtn = new Element('img.movehandler', {
-                    src: 'system/modules/multicolumnwizard/html/img/move.png',
-                    styles: {
-                        'cursor': 'move'
-                    }
-                });
-                newMoveBtn.inject(el.getChildren('td.operations')[0], 'bottom');
-            }
+            //            if(!el.getChildren('td.operations img.movehandler')[0]) {
+            //                var newMoveBtn = new Element('img.movehandler', {
+            //                    src: 'system/modules/multicolumnwizard/html/img/move.png',
+            //                    styles: {
+            //                        'cursor': 'move'
+            //                    }
+            //                });
+            //                newMoveBtn.inject(el.getChildren('td.operations')[0], 'bottom');
+            //            }
 
             el.getChildren('td.operations a').each(function(operation)
             {
@@ -177,9 +171,10 @@ var MultiColumnWizard = new Class(
 
             });
         });
-        var sortingMcwEl = new Sortables(this.options.table.getElement('tbody'), {
-            handle: 'img.movehandler'
-        });
+        
+    //        var sortingMcwEl = new Sortables(this.options.table.getElement('tbody'), {
+    //            handle: 'img.movehandler'
+    //        });
     },
 
 
@@ -337,6 +332,97 @@ var MultiColumnWizard = new Class(
         }
 		
         this.operationClickCallbacks[key].include(func);
+    },
+    
+    killAllTinyMCE: function(el, row)
+    {
+        var parent = row.getParent('.multicolumnwizard'); 
+        
+        // skip if no tinymce class was found
+        if(parent.getElements('.tinymce').length == 0)
+        {
+            return;
+        }
+        
+        var mcwName = parent.get('id');                
+        var myRegex = new RegExp(mcwName);
+        var tinyMCEEditors = new Array();
+        var counter = 0;
+        
+        // get a list with tinymces
+        tinyMCE.editors.each(function(item, index){
+            if(item.editorId.match(myRegex) != null)
+            { 
+                tinyMCEEditors[counter] = item.editorId;
+                counter++;
+            }
+        });
+        
+        // clear tinymces
+        tinyMCEEditors.each(function(item, index){            
+            try {
+                var editor = tinyMCE.get(item);                
+                $(editor.editorId).set('text', editor.getContent()); 
+                editor.remove();
+            } catch (e) {
+                console.log(e)
+            }   
+        });
+        
+        // search for dmg tinymces
+        parent.getElements('span.mceEditor').each(function(item, index){            
+            console.log(item.getSiblings('script'));
+            item.dispose(); 
+        }); 
+        
+        // search for scripttags tinymces
+        parent.getElements('.tinymce').each(function(item, index){            
+            item.getElements('script').each(function(item, index){
+                item.dispose();
+            });   
+        }); 
+    },
+    
+    reinitTinyMCE: function(el, row, isParent)
+    {
+        var parent = null;
+        
+        if(isParent != true)
+        {
+            parent = row.getParent('.multicolumnwizard');    
+        }
+        else
+        {
+            parent = row;   
+        }
+        
+        // skip if no tinymce class was found
+        if(parent.getElements('.tinymce').length == 0)
+        {
+            return;
+        }
+        
+        var varTinys = parent.getElements('.tinymce textarea');
+        
+        varTinys.each(function(item, index){ 
+            tinyMCE.execCommand('mceAddControl', false, item.get('id'));
+            tinyMCE.get(item.get('id')).show();
+            
+            $(item.get('id')).erase('required');
+            $(tinyMCE.get(item.get('id')).editorContainer).getElements('iframe')[0].set('title','MultiColumnWizard - TinyMCE');
+        });
+    },
+    
+    reinitStylect: function()
+    {
+        if( Stylect != null )
+        {
+            $$('.styled_select').each(function(item, index){
+                item.dispose();
+            });
+            
+            Stylect.convertSelects();
+        }
     }
 });
 
@@ -414,7 +500,7 @@ Object.append(MultiColumnWizard,
             el.setStyle('display', 'inline');
         }
     },
-
+    
 
     /**
 	 * Operation "copy" - click
@@ -423,15 +509,15 @@ Object.append(MultiColumnWizard,
 	 */
     copyClick: function(el, row)
     {
-            
+        this.killAllTinyMCE(el, row);
+        
         var rowCount = row.getSiblings().length + 1;
-		
+                
         // check maxCount for an inject
         if (this.options.maxCount == 0 || (this.options.maxCount > 0 && rowCount < this.options.maxCount))
         {
-
-            var copy = row.clone(true,true);
-                        
+            var copy = row.clone(true,true); 
+                       
             //get the current level of the row
             level = row.getAllPrevious().length;
                         
@@ -453,6 +539,9 @@ Object.append(MultiColumnWizard,
                 that.updateRowAttributes(++level, row);
             });
         }
+        
+        this.reinitTinyMCE(el, row, false);
+        this.reinitStylect();
     },
 
 
@@ -484,6 +573,8 @@ Object.append(MultiColumnWizard,
 	 */
     deleteClick: function(el, row)
     {
+        this.killAllTinyMCE(el, row);   
+        var parent = row.getParent('.multicolumnwizard'); 
 
         if (row.getSiblings().length > 0){
             //get all following rows
@@ -502,12 +593,14 @@ Object.append(MultiColumnWizard,
                 
             });
         }else{
-           row.getElements('input,select,textarea').each(function(el){
+            row.getElements('input,select,textarea').each(function(el){
 
-               MultiColumnWizard.clearElementValue(el);
+                MultiColumnWizard.clearElementValue(el);
                
-           });
+            });
         }
+        
+        this.reinitTinyMCE(el, parent, true);
     },
 
 
@@ -518,6 +611,8 @@ Object.append(MultiColumnWizard,
 	 */
     upClick: function(el, row)
     {
+        this.killAllTinyMCE(el, row);
+        
         var previous = row.getPrevious();
         if (previous)
         {
@@ -534,6 +629,8 @@ Object.append(MultiColumnWizard,
 
             row.injectBefore(previous);
         }
+        
+        this.reinitTinyMCE(el, row, false);
     },
 
 
@@ -544,6 +641,8 @@ Object.append(MultiColumnWizard,
      */
     downClick: function(el, row)
     {
+        this.killAllTinyMCE(el, row);
+        
         var next = row.getNext();
         if (next)
         {
@@ -560,6 +659,8 @@ Object.append(MultiColumnWizard,
 
             row.injectAfter(next);
         }
+        
+        this.reinitTinyMCE(el, row, false);
     },
     
     /**
