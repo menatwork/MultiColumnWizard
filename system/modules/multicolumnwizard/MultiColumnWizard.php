@@ -403,6 +403,12 @@ class MultiColumnWizard extends Widget implements uploadable
             // Store tiny mce fields
             if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
             {
+                $GLOBALS['TL_RTE']['tinyMCE'][$this->strField . '_' . $strKey] = array(
+                    'id'   => $this->strField . '_' . $strKey,
+                    'file' => 'tinyMCE',
+                    'type' => null
+                );
+
                 $arrTinyMCE[] = $strKey;
             }
 
@@ -519,8 +525,8 @@ class MultiColumnWizard extends Widget implements uploadable
 
                     // Tiny MCE
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
-                    {                        
-                        $tinyMce          = $this->getMcWTinyMCEString($objWidget->id);
+                    {
+                        $tinyMce = $this->getMcWTinyMCEString($objWidget->id);
                         $arrField['eval']['tl_class'] .= ' tinymce';
                     }
 
@@ -544,8 +550,8 @@ class MultiColumnWizard extends Widget implements uploadable
 
                         $objWidget->wizard = $wizard;
                     }
-                    
-                    $strWidget = $objWidget->parse() . $datepicker . $tinyMce;                    
+
+                    $strWidget = $objWidget->parse() . $datepicker . $tinyMce;
                 }
 
                 // Build array of items
