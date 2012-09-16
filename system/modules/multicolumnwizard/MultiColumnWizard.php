@@ -186,7 +186,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 break;
 
             case 'dragAndDrop':
-                $this->arrButtons['move'] = 'move.gif';
+                $this->arrButtons['move'] = 'system/modules/multicolumnwizard/html/img/move.png';
                 break;
 
             case 'maxCount':
@@ -970,7 +970,6 @@ class MultiColumnWizard extends Widget implements uploadable
             {
                 continue;
             }
-
             $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''] . '">' . $this->generateImage($image, $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''], 'class="tl_listwizard_img"') . '</a> ';
         }
 
