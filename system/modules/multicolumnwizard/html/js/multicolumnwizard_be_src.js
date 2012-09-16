@@ -87,7 +87,6 @@ var MultiColumnWizard = new Class(
         this.updateOperations();
     },
 
-
     /**
 	 * Update operations
 	 */
@@ -98,23 +97,16 @@ var MultiColumnWizard = new Class(
         // execute load callback and register click event callback
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index)
         {
-            //            if(!el.getChildren('td.operations img.movehandler')[0]) {
-            //                var newMoveBtn = new Element('img.movehandler', {
-            //                    src: 'system/modules/multicolumnwizard/html/img/move.png',
-            //                    styles: {
-            //                        'cursor': 'move'
-            //                    }
-            //                });
-            //                newMoveBtn.inject(el.getChildren('td.operations')[0], 'bottom');
-            //            }
-
             el.getChildren('td.operations a').each(function(operation)
             {
                 var key = operation.get('rel');
+
 				
                 // remove all click events
                 operation.removeEvents('click');
-				
+                if(key ==='move') {
+                    self.dragAndDrop(el, operation);
+                }
                 // register static click callbacks
                 if (MultiColumnWizard.operationClickCallbacks[key])
                 {
@@ -286,8 +278,26 @@ var MultiColumnWizard = new Class(
 		
         return row;
     },
-	
-	
+
+    /**
+     * Add a load callback for the instance
+     * @param element table row
+     * @param element move button
+     */
+    dragAndDrop: function(tr, link) {
+        new Sortables(tr.getParent('table').getElement('tbody'), {
+            handle: link,
+            onComplete: function() {
+                tr.getParent('table').getElement('tbody').getChildren('tr').each(function(el, i) {
+                    //Must be substract down 1 because the loop iterator begins with 1
+                    var level = i--;
+                    this.updateRowAttributes(level, el);
+                }, this);
+
+            }.bind(this)
+        });
+    },
+
     /**
 	 * Add a load callback for the instance
 	 * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)

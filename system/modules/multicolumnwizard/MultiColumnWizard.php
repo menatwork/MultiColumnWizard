@@ -185,6 +185,10 @@ class MultiColumnWizard extends Widget implements uploadable
                 $this->minCount = $varValue;
                 break;
 
+            case 'dragAndDrop':
+                $this->arrButtons['move'] = 'system/modules/multicolumnwizard/html/img/move.png';
+                break;
+
             case 'maxCount':
                 $this->maxCount = $varValue;
                 break;
@@ -321,7 +325,7 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '_src.js';
         $GLOBALS['TL_CSS'][]        = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;
@@ -966,7 +970,6 @@ class MultiColumnWizard extends Widget implements uploadable
             {
                 continue;
             }
-
             $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''] . '">' . $this->generateImage($image, $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''], 'class="tl_listwizard_img"') . '</a> ';
         }
 
