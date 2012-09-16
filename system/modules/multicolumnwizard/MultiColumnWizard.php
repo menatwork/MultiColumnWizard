@@ -185,6 +185,10 @@ class MultiColumnWizard extends Widget implements uploadable
                 $this->minCount = $varValue;
                 break;
 
+            case 'dragAndDrop':
+                $this->arrButtons['move'] = 'move.gif';
+                break;
+
             case 'maxCount':
                 $this->maxCount = $varValue;
                 break;
@@ -321,7 +325,7 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '_src.js';
         $GLOBALS['TL_CSS'][]        = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;
