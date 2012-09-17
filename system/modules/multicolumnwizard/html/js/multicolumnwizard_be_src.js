@@ -280,13 +280,13 @@ var MultiColumnWizard = new Class(
     },
 
     /**
-     * Add a load callback for the instance
+     * Adding Sortable Mode for Drag and drop
      * @param element table row
      * @param element move button
      */
     dragAndDrop: function(tr, link) {
         new Sortables(tr.getParent('table').getElement('tbody'), {
-            handle: link,
+            handle: 'a[rel=move]',
             onComplete: function() {
                 tr.getParent('table').getElement('tbody').getChildren('tr').each(function(el, i) {
                     //Must be substract down 1 because the loop iterator begins with 1
