@@ -186,7 +186,9 @@ class MultiColumnWizard extends Widget implements uploadable
                 break;
 
             case 'dragAndDrop':
-                $this->arrButtons['move'] = 'system/modules/multicolumnwizard/html/img/move.png';
+                if ($varValue === true) {
+                	$this->arrButtons['move'] = 'system/modules/multicolumnwizard/html/img/move.png';
+                }
                 break;
 
             case 'maxCount':
