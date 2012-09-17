@@ -1,45 +1,51 @@
-.multicolumnwizard {
-	margin-top:5px;
-}
+/* Copyright (c) MEN AT WORK 2012 :: LGPL license */
 
-.multicolumnwizard h3 {
-	padding:0;
-	overflow:hidden;
-}
+  .multicolumnwizard {
+    margin-top:5px;
+  }
 
-.multicolumnwizard .tl_textarea {
-	width:auto;
-	height:auto;
-}
+  .multicolumnwizard h3 {
+    padding:0;
+    overflow:hidden;
+  }
 
-.multicolumnwizard .tl_select, .multicolumnwizard .tl_mselect {
-	width:auto;
-}
+  .multicolumnwizard .tl_textarea {
+    width:auto;
+    height:auto;
+  }
 
-.multicolumnwizard .tl_checkbox_single_container {
-	margin-top:0;
-}
+  .multicolumnwizard .tl_select, .multicolumnwizard .tl_mselect {
+    width:auto;
+  }
 
-.multicolumnwizard .hidelabel h3, 
-.multicolumnwizard .hidelabel label {
-	display:none;
-}
+  .multicolumnwizard .tl_checkbox_single_container {
+    margin-top:0;
+  }
 
-.multicolumnwizard label {
-	font-weight:normal;
-	float:left;
-}
+  .multicolumnwizard .hidelabel h3, 
+  .multicolumnwizard .hidelabel label {
+    display:none;
+  }
 
-.multicolumnwizard input.tl_checkbox {
-	float:left;
-}
+  .multicolumnwizard label {
+    font-weight:normal;
+    float:left;
+  }
 
-.multicolumnwizard td.col_last {
-	padding-right:0;
-}
+  .multicolumnwizard input.tl_checkbox {
+    float:left;
+  }
 
-.multicolumnwizard .w50 {
-	float:none;
-	width:auto;
-	height:auto;
-}
+  .multicolumnwizard td.col_last {
+    padding-right:0;
+  }
+
+  .multicolumnwizard a[rel="move"] {
+    cursor:move;
+  }
+
+  .multicolumnwizard .w50 {
+    float:none;
+    width:auto;
+    height:auto;
+  }
