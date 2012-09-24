@@ -427,17 +427,20 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
         $arrItems = array();
+        $arrHiddenHeader = array();
 
         // Add input fields
         for ($i = 0; $i < $intNumberOfRows; $i++)
         {
             $this->activeRow = $i;
             $strHidden       = '';
+            $blnHiddenBody = false;
 
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
             {
                 $strWidget = '';
+                $blnHiddenBody = false;
 
                 // load row specific data (useful for example for default values in different rows)
                 if (isset($this->arrRowSpecificData[$i][$strKey]))
@@ -468,6 +471,20 @@ class MultiColumnWizard extends Widget implements uploadable
                 {
                     $strHidden .= $objWidget->generate();
                     continue;
+                }
+                elseif ($arrField['eval']['hideBody'] == true || $arrField['eval']['hideHead'] == true)
+                {
+                    if ($arrField['eval']['hideHead'] == true)
+                    {
+                        $arrHiddenHeader[$strKey] = true;
+                    }
+
+                    if ($arrField['eval']['hideBody'] == true)
+                    {
+                        $blnHiddenBody = true;
+                    }
+                    
+                    $strWidget     = $objWidget->parse();
                 }
                 else
                 {
@@ -550,16 +567,17 @@ class MultiColumnWizard extends Widget implements uploadable
 
                         $objWidget->wizard = $wizard;
                     }
-
+                    
                     $strWidget = $objWidget->parse() . $datepicker . $tinyMce;
                 }
-
+                                
                 // Build array of items
                 if ($arrField['eval']['columnPos'] != '')
                 {
                     $arrItems[$i][$objWidget->columnPos]['entry'] .= $strWidget;
                     $arrItems[$i][$objWidget->columnPos]['valign']   = $arrField['eval']['valign'];
                     $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
+                    $arrItems[$i][$objWidget->columnPos]['hide'] = $blnHiddenBody;
                 }
                 else
                 {
@@ -568,26 +586,27 @@ class MultiColumnWizard extends Widget implements uploadable
                         'entry'    => $strWidget,
                         'valign'   => $arrField['eval']['valign'],
                         'tl_class' => $arrField['eval']['tl_class'],
+                        'hide'     => $blnHiddenBody
                     );
                 }
             }
         }
 
         $strOutput = '';
-
+       
         if ($this->blnTableless)
         {
-            $strOutput = $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+            $strOutput = $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems, $arrHiddenHeader);
         }
         else
         {
             if ($this->columnTemplate != '')
             {
-                $strOutput = $this->generateTemplateOutput($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+                $strOutput = $this->generateTemplateOutput($arrUnique, $arrDatepicker, $strHidden, $arrItems, $arrHiddenHeader);
             }
             else
             {
-                $strOutput = $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems);
+                $strOutput = $this->generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems, $arrHiddenHeader);
             }
         }
 
@@ -827,7 +846,7 @@ class MultiColumnWizard extends Widget implements uploadable
      * @param array
      * @return string
      */
-    protected function generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems)
+    protected function generateTable($arrUnique, $arrDatepicker, $strHidden, $arrItems, $arrHiddenHeader = array())
     {
 
         // generate header fields
@@ -836,11 +855,11 @@ class MultiColumnWizard extends Widget implements uploadable
 
             if ($arrField['eval']['columnPos'])
             {
-                $arrHeaderItems[$arrField['eval']['columnPos']] = '<td></td>';
+                $arrHeaderItems[$arrField['eval']['columnPos']] = (key_exists($strKey, $arrHiddenHeader)) ? '<td class="invisible">' : '<td>' . '</td>';
             }
             else
-            {
-                $arrHeaderItems[] = '<td>';
+            {                
+                $arrHeaderItems[] = (key_exists($strKey, $arrHiddenHeader)) ? '<td class="invisible">' : '<td>';
                 $arrHeaderItems[] .= (is_array($arrField['label'])) ? $arrField['label'][0] : ($arrField['label'] != null ? $arrField['label'] : $strKey);
                 $arrHeaderItems[] .= ((is_array($arrField['label']) && $arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
                 $arrHeaderItems[] .= '</td>';
@@ -870,6 +889,11 @@ class MultiColumnWizard extends Widget implements uploadable
             $return .= '<tr>';
             foreach ($arrValue as $itemKey => $itemValue)
             {
+                if($itemValue['hide'] == true)
+                {
+                    $itemValue['tl_class'] .= ' invisible';
+                }
+                
                 $return .= '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
             }
 
@@ -917,11 +941,16 @@ class MultiColumnWizard extends Widget implements uploadable
      * @param array
      * @return string
      */
-    protected function generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems)
+    protected function generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems, $arrHiddenHeader = array())
     {
         // generate header fields
         foreach ($this->columnFields as $strKey => $arrField)
         {
+            if(key_exists($strKey, $arrHiddenHeader))
+            {
+              $strKey = $strKey . ' invisible';   
+            }
+            
             $arrHeaderItems[] = sprintf('<div class="%s">%s</div>', $strKey, ($arrField['label'][0] ? $arrField['label'][0] : $strKey));
         }
 
@@ -936,6 +965,11 @@ class MultiColumnWizard extends Widget implements uploadable
 
         foreach ($arrItems as $itemKey => $itemValue)
         {
+            if($itemValue['hide'])
+            {
+                $itemValue['tl_class'] .= ' invisible';
+            }
+            
             $arrReturnItems[$itemKey] = '<div' . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</div>';
         }
 
