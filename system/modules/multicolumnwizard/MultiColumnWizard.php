@@ -349,11 +349,16 @@ class MultiColumnWizard extends Widget implements uploadable
                     break;
             }
 
+            // Save in File
             if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'File')
             {
                 $this->Config->update(sprintf("\$GLOBALS['TL_CONFIG']['%s']", $this->strField), serialize($this->varValue));
+
+                // Reload the page
+                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', $this->Environment->request)));
             }
-            else
+            // Save in table
+            else if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'Table')
             {
                 if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback']))
                 {
@@ -375,10 +380,15 @@ class MultiColumnWizard extends Widget implements uploadable
                     $this->Database->prepare("UPDATE " . $this->strTable . " SET " . $this->strField . "=? WHERE id=?")
                             ->execute(serialize($this->varValue), $this->currentRecord);
                 }
-            }
 
-            // Reload the page
-            $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', $this->Environment->request)));
+                // Reload the page
+                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', $this->Environment->request)));
+            }
+            // Unknow
+            else
+            {
+               // What to do here?
+            }
         }
 
         $arrUnique = array();
@@ -434,12 +444,12 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             $this->activeRow = $i;
             $strHidden       = '';
-            $blnHiddenBody = false;
+            $blnHiddenBody   = false;
 
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
             {
-                $strWidget = '';
+                $strWidget     = '';
                 $blnHiddenBody = false;
 
                 // load row specific data (useful for example for default values in different rows)
@@ -484,7 +494,7 @@ class MultiColumnWizard extends Widget implements uploadable
                         $blnHiddenBody = true;
                     }
                     
-                    $strWidget     = $objWidget->parse();
+                    $strWidget = $objWidget->parse();
                 }
                 else
                 {
@@ -577,7 +587,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     $arrItems[$i][$objWidget->columnPos]['entry'] .= $strWidget;
                     $arrItems[$i][$objWidget->columnPos]['valign']   = $arrField['eval']['valign'];
                     $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
-                    $arrItems[$i][$objWidget->columnPos]['hide'] = $blnHiddenBody;
+                    $arrItems[$i][$objWidget->columnPos]['hide']     = $blnHiddenBody;
                 }
                 else
                 {
@@ -593,7 +603,7 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
         $strOutput = '';
-       
+
         if ($this->blnTableless)
         {
             $strOutput = $this->generateDiv($arrUnique, $arrDatepicker, $strHidden, $arrItems, $arrHiddenHeader);
@@ -889,7 +899,7 @@ class MultiColumnWizard extends Widget implements uploadable
             $return .= '<tr>';
             foreach ($arrValue as $itemKey => $itemValue)
             {
-                if($itemValue['hide'] == true)
+                if ($itemValue['hide'] == true)
                 {
                     $itemValue['tl_class'] .= ' invisible';
                 }
@@ -946,9 +956,9 @@ class MultiColumnWizard extends Widget implements uploadable
         // generate header fields
         foreach ($this->columnFields as $strKey => $arrField)
         {
-            if(key_exists($strKey, $arrHiddenHeader))
+            if (key_exists($strKey, $arrHiddenHeader))
             {
-              $strKey = $strKey . ' invisible';   
+                $strKey = $strKey . ' invisible';
             }
             
             $arrHeaderItems[] = sprintf('<div class="%s">%s</div>', $strKey, ($arrField['label'][0] ? $arrField['label'][0] : $strKey));
@@ -965,7 +975,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
         foreach ($arrItems as $itemKey => $itemValue)
         {
-            if($itemValue['hide'])
+            if ($itemValue['hide'])
             {
                 $itemValue['tl_class'] .= ' invisible';
             }
