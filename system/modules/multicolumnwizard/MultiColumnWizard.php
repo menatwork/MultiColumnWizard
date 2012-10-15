@@ -235,6 +235,8 @@ class MultiColumnWizard extends Widget implements uploadable
 
     protected function validator($varInput)
     {
+    	$blnHasError = false;
+
         for ($i = 0; $i < count($varInput); $i++)
         {
             $this->activeRow = $i;
@@ -295,13 +297,14 @@ class MultiColumnWizard extends Widget implements uploadable
                     // store the errors
                     $this->arrWidgetErrors[$strKey][$i] = $objWidget->getErrors();
 
-                    $this->blnSubmitInput = false;
+                    $blnHasError = true;
                 }
             }
         }
 
-        if (!$this->blnSubmitInput)
+        if ($blnHasError)
         {
+        	$this->blnSubmitInput = false;
             $this->addError($GLOBALS['TL_LANG']['ERR']['general']);
         }
 
