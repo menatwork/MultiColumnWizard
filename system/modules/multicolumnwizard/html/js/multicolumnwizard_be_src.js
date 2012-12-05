@@ -318,12 +318,13 @@ var MultiColumnWizard = new Class(
 
 /**
  * Operation "copy"
+ * @param The original event
  * @param The operation key
  * @param Element the icon element
  * @param Element the row
  * @param MCW instance
  */
-window.addEvent('mcw_button_click', function(key, operation, row, inst)
+window.addEvent('mcw_button_click', function(e, key, operation, row, inst)
 {
 	if (key != 'copy')
 		return;
@@ -382,12 +383,13 @@ window.addEvent('mcw_button_click', function(key, operation, row, inst)
 
 /**
  * Operation "delete" - click
+ * @param The original event
  * @param The operation key
  * @param Element the icon element
  * @param Element the row
  * @param MCW instance
  */
-window.addEvent('mcw_button_click', function(key, operation, row, inst)
+window.addEvent('mcw_button_click', function(e, key, operation, row, inst)
 {
 	if (key != 'delete')
 		return;
@@ -438,12 +440,13 @@ window.addEvent('mcw_button_click', function(key, operation, row, inst)
 
 /**
  * Operation "up" - click
+ * @param The original event
  * @param The operation key
  * @param Element the icon element
  * @param Element the row
  * @param MCW instance
  */
-window.addEvent('mcw_button_click', function(key, operation, row, inst)
+window.addEvent('mcw_button_click', function(e, key, operation, row, inst)
 {
 	if (key != 'up')
 		return;
@@ -473,12 +476,13 @@ window.addEvent('mcw_button_click', function(key, operation, row, inst)
 
 /**
  * Operation "down" - click
+ * @param The original event
  * @param The operation key
  * @param Element the icon element
  * @param Element the row
  * @param MCW instance
  */
-window.addEvent('mcw_button_click', function(key, operation, row, inst)
+window.addEvent('mcw_button_click', function(e, key, operation, row, inst)
 {
 	if (key != 'down')
 		return;
