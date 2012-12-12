@@ -525,7 +525,7 @@ class MultiColumnWizard extends Widget implements uploadable
                                 break;
                         }
 
-                        $datepicker = ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
+                        $datepicker = ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
                           <script>
 
                           window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $objWidget->id . '\', {
@@ -646,7 +646,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     break;
             }
 
-            return ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;">
+            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;">
                           <script>
                         window.addEvent("domready", function() {
                           window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $strId . '\', {
@@ -683,7 +683,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     break;
             }
 
-            return ' <img src="plugins/datepicker/icon.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px">
+            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px">
                         <script>
                         window.addEvent("domready", function() {
                             new Picker.Date($$("#ctrl_' . $strId . '"), {
