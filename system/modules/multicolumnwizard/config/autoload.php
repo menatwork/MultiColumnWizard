@@ -17,4 +17,5 @@
 ClassLoader::addClasses(array
 (
 	'MultiColumnWizard' => 'system/modules/multicolumnwizard/MultiColumnWizard.php',
+	'MultiColumnWizardHelper' => 'system/modules/multicolumnwizard/MultiColumnWizardHelper.php',
 ));
