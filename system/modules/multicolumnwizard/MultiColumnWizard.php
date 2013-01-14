@@ -752,6 +752,8 @@ class MultiColumnWizard extends Widget implements uploadable
             }
 
             $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" rel="lightbox[files 765 80%]">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
+
+            $arrField['strField'] = $this->strField . '__' . $strKey;
         }
 
         // Add the table import wizard
