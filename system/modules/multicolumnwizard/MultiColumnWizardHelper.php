@@ -45,10 +45,10 @@ class MultiColumnWizardHelper extends Backend
         {
             list($strField, $strColumn) = explode('__', $this->Input->get('field'));
 
-            if ($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['inputType'] == 'MultiColumnWizard') {
+            if ($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard') {
 
-                $GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['eval'] = &$GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['eval']['columnFields'][$strColumn]['eval'];
-                $this->Environment->setGet('field', $strField);
+                $GLOBALS['TL_DCA'][$strTable]['fields'][$strField] = &$GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['eval']['columnFields'][$strColumn];
+                $this->Input->setGet('field', $strField);
             }
         }
     }
