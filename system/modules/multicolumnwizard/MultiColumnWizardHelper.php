@@ -47,7 +47,7 @@ class MultiColumnWizardHelper extends Backend
 
             if ($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard') {
 
-                $GLOBALS['TL_DCA'][$strTable]['fields'][$strField] = &$GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['eval']['columnFields'][$strColumn];
+                $GLOBALS['TL_DCA'][$strTable]['fields'][$strField] = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['eval']['columnFields'][$strColumn];
                 $this->Input->setGet('field', $strField);
             }
         }
