@@ -832,7 +832,7 @@ class MultiColumnWizard extends Widget implements uploadable
         $arrField['value']             = ($varValue !== '') ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
 
-        $objWidget = new $strClass($this->prepareForWidget($arrField, $arrField['name'], $arrField['value'], null, $this->strTable));
+        $objWidget = new $strClass($this->prepareForWidget($arrField, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable));
 
         $objWidget->strId         = $arrField['id'];
         $objWidget->storeValues   = true;
