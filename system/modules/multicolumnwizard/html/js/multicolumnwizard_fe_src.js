@@ -283,7 +283,7 @@ Object.append(MultiColumnWizard,
             var copy = row.clone(true,true);
 
             copy = this.updateRowAttributes(rowCount-1, copy);
-            copy.injectAfter(row);
+            copy.inject(row, 'after');
 			
             this.addOperationClickCallback('click', this.updateOperations);
         }
@@ -345,7 +345,7 @@ Object.append(MultiColumnWizard,
             row = this.updateRowAttributes(previousPosition, row);
             previous = this.updateRowAttributes(previousPosition+1, previous);
 
-            row.injectBefore(previous);
+            row.inject(previous, 'before');
         }
     },
 
@@ -371,7 +371,7 @@ Object.append(MultiColumnWizard,
             next = this.updateRowAttributes(rowPosition, next);
             row = this.updateRowAttributes(rowPosition+1, row);
 
-            row.injectAfter(next);
+            row.inject(next, 'after');
         }
     }
 });
