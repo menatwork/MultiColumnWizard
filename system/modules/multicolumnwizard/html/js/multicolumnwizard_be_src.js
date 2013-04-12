@@ -689,3 +689,37 @@ MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteU
 MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);
 MultiColumnWizard.addOperationClickCallback('up', MultiColumnWizard.upClick);
 MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick);
+
+/**
+ * Patch Contao Core to support file & page tree
+ */
+Backend.openModalSelectorOriginal = Backend.openModalSelector;
+Backend.openModalSelector = function(options) {
+    Backend.openModalSelectorOriginal(options);
+
+    var frm = null;
+    var tProtect = 60;
+    var id = new URI(options.url).getData('field')+'_parent';
+    var timer = setInterval(function() {
+        tProtect -= 1;
+        var frms = window.frames;
+    	for (var i=0; i<frms.length; i++) {
+    		if (frms[i].name == 'simple-modal-iframe') {
+    			frm = frms[i];
+    			break;
+    		}
+    	}
+
+    	if (frm && frm.document.getElementById(id)) {
+        	frm.document.getElementById(id).set('id', options.id+'_parent');
+        	clearInterval(timer);
+        	return;
+        }
+
+        // Try for 30 seconds
+        if (tProtect <= 0) {
+            clearInterval(timer);
+        }
+    }, 500);
+}
+

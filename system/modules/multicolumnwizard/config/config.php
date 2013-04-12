@@ -29,3 +29,9 @@
 
 $GLOBALS['BE_FFL']['multiColumnWizard'] = 'MultiColumnWizard';
 $GLOBALS['TL_FFL']['multiColumnWizard'] = 'MultiColumnWizard';
+
+
+/**
+ * Hooks
+ */
+$GLOBALS['TL_HOOKS']['loadDataContainer'][] = array('MultiColumnWizardHelper', 'supportModalSelector');

@@ -762,6 +762,8 @@ class MultiColumnWizard extends Widget implements uploadable
             }
 
             $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" rel="lightbox[files 765 80%]">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
+
+            $arrField['strField'] = $this->strField . '__' . $strKey;
         }
 
         // Add the table import wizard
@@ -841,7 +843,7 @@ class MultiColumnWizard extends Widget implements uploadable
         $arrField['value']             = ($varValue !== '') ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
 
-        $objWidget = new $strClass($this->prepareForWidget($arrField, $arrField['name'], $arrField['value'], null, $this->strTable));
+        $objWidget = new $strClass($this->prepareForWidget($arrField, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable));
 
         $objWidget->strId         = $arrField['id'];
         $objWidget->storeValues   = true;
