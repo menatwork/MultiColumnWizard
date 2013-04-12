@@ -415,7 +415,7 @@ var MultiColumnWizard = new Class(
     
     reinitStylect: function()
     {
-        if( Stylect != null )
+        if(window.Stylect)
         {
             $$('.styled_select').each(function(item, index){
                 item.dispose();
