@@ -241,6 +241,11 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             $this->activeRow = $i;
 
+            if (!$this->columnFields)
+            {
+                continue;
+            }
+
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
             {
