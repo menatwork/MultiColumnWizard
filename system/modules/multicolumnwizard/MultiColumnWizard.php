@@ -2,32 +2,13 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2011 Leo Feyer
  *
- * Formerly known as TYPOlight Open Source CMS.
- *
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * PHP version 5
  * @copyright  Andreas Schempp 2011
  * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2011
+ * @copyright  MEN AT WORK 2013
  * @package    MultiColumnWizard
  * @license    LGPL
  * @filesource
- * @info       tab is set to 4 whitespaces
  */
 
 /**
@@ -35,8 +16,8 @@
  *
  * @copyright  Andreas Schempp 2011
  * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2011
- * @package    Controller
+ * @copyright  MEN AT WORK 2013
+ * @package    MultiColumnWizard
  */
 class MultiColumnWizard extends Widget implements uploadable
 {
@@ -235,7 +216,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
     protected function validator($varInput)
     {
-    	$blnHasError = false;
+        $blnHasError = false;
 
         for ($i = 0; $i < count($varInput); $i++)
         {
@@ -309,7 +290,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
         if ($blnHasError)
         {
-        	$this->blnSubmitInput = false;
+            $this->blnSubmitInput = false;
             $this->addError($GLOBALS['TL_LANG']['ERR']['general']);
         }
 
@@ -331,11 +312,11 @@ class MultiColumnWizard extends Widget implements uploadable
 
         // use BE script in FE for now
         $GLOBALS['TL_JAVASCRIPT'][] = $GLOBALS['TL_CONFIG']['debugMode']
-			? 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be_src.js'
-			: 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
+            ? 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be_src.js'
+            : 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
         $GLOBALS['TL_CSS'][]        = $GLOBALS['TL_CONFIG']['debugMode']
-			? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
-			: 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
+            ? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
+            : 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;
 
@@ -377,10 +358,10 @@ class MultiColumnWizard extends Widget implements uploadable
                 {
                     $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
                     if (version_compare(VERSION, '3.0', '>=')) {
-						require_once(sprintf('%s/system/modules/core/drivers/%s.php', TL_ROOT, $dataContainer));
-					}else{
-						require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
-					}
+                        require_once(sprintf('%s/system/modules/core/drivers/%s.php', TL_ROOT, $dataContainer));
+                    }else{
+                        require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
+                    }
 
                     $dc            = new $dataContainer($this->strTable);
                     $dc->field     = $objWidget->id;
@@ -733,11 +714,11 @@ class MultiColumnWizard extends Widget implements uploadable
      *
      * Based on DataContainer::row() from Contao 2.10.1
      *
-     * @param	array
-     * @param	int
-     * @param	string
-     * @param	mixed
-     * @return	Widget|null
+     * @param   array
+     * @param   int
+     * @param   string
+     * @param   mixed
+     * @return  Widget|null
      */
     protected function initializeWidget(&$arrField, $intRow, $strKey, $varValue)
     {
@@ -942,13 +923,13 @@ class MultiColumnWizard extends Widget implements uploadable
         $return .= '</tbody></table>';
 
         $return .= '<script>
-		window["MCW_" + ' . json_encode($this->strId) . '] = new MultiColumnWizard({
-			table: "ctrl_" + ' . json_encode($this->strId) . ',
-			maxCount: ' . intval($this->maxCount) . ',
-			minCount: ' . intval($this->minCount) . ',
-			uniqueFields: [] // TODO: implement
-		});
-		</script>';
+        window["MCW_" + ' . json_encode($this->strId) . '] = new MultiColumnWizard({
+            table: "ctrl_" + ' . json_encode($this->strId) . ',
+            maxCount: ' . intval($this->maxCount) . ',
+            minCount: ' . intval($this->minCount) . ',
+            uniqueFields: [] // TODO: implement
+        });
+        </script>';
 
         return $return;
     }
@@ -1043,4 +1024,3 @@ class MultiColumnWizard extends Widget implements uploadable
     }
 
 }
-
