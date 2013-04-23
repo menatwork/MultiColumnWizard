@@ -523,7 +523,7 @@ Object.append(MultiColumnWizard,
                         
             //update the row attributes
             copy = this.updateRowAttributes(++level, copy);
-            copy.injectAfter(row);
+            copy.inject(row, 'after');
                         
             //exec script
             if (copy.getElements('script').length > 0)
@@ -627,7 +627,7 @@ Object.append(MultiColumnWizard,
             row = this.updateRowAttributes(previousPosition, row);
             previous = this.updateRowAttributes(previousPosition+1, previous);
 
-            row.injectBefore(previous);
+            row.inject(previous, 'before');
         }
         
         this.reinitTinyMCE(el, row, false);
@@ -657,7 +657,7 @@ Object.append(MultiColumnWizard,
             next = this.updateRowAttributes(rowPosition, next);
             row = this.updateRowAttributes(rowPosition+1, row);
 
-            row.injectAfter(next);
+            row.inject(next, 'after');
         }
         
         this.reinitTinyMCE(el, row, false);
