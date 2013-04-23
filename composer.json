@@ -1,0 +1,40 @@
+{
+	"name": "menatwork/contao-multicolumnwizard",
+	"description":"MultiColumWizard for Contao OpenSource CMS",
+	"keywords":["contao", "widget", "wizard"],
+	"type": "contao-module",
+	"homepage":"https://github.com/menatwork/MultiColumnWizard",
+	"license":"LGPL-3.0+",
+	"authors":[
+		{
+			"name":"Andreas Isaak",
+			"role":"Developer"
+		},
+		{
+			"name":"Tristan Lins",
+			"email":"tristan.lins@bit3.de",
+			"homepage":"http://bit3.de",
+			"role":"Developer"
+		}
+	],
+	"support":{
+		"issues":"https://github.com/menatwork/MultiColumnWizard/issues",
+		"wiki":"http://de.contaowiki.org/MultiColumnWizard",
+		"irc":"irc://irc.freenode.org/contao.dev",
+		"source":"https://github.com/menatwork/MultiColumnWizard"
+	},
+	"require": {
+		"contao/core": ">=2.10,<4",
+		"contao-community-alliance/composer-installer": "dev-master"
+	},
+	"replace": {
+		"contao-legacy/multicolumnwizard": "*"
+	},
+	"extra": {
+		"contao": {
+			"symlinks": {
+				"system/modules/multicolumnwizard": "system/modules/multicolumnwizard"
+			}
+		}
+	}
+}

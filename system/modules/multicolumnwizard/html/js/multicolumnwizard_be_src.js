@@ -415,7 +415,7 @@ var MultiColumnWizard = new Class(
     
     reinitStylect: function()
     {
-        if( Stylect != null )
+        if(window.Stylect)
         {
             $$('.styled_select').each(function(item, index){
                 item.dispose();
@@ -523,7 +523,7 @@ Object.append(MultiColumnWizard,
                         
             //update the row attributes
             copy = this.updateRowAttributes(++level, copy);
-            copy.injectAfter(row);
+            copy.inject(row, 'after');
                         
             //exec script
             if (copy.getElements('script').length > 0)
@@ -627,7 +627,7 @@ Object.append(MultiColumnWizard,
             row = this.updateRowAttributes(previousPosition, row);
             previous = this.updateRowAttributes(previousPosition+1, previous);
 
-            row.injectBefore(previous);
+            row.inject(previous, 'before');
         }
         
         this.reinitTinyMCE(el, row, false);
@@ -657,7 +657,7 @@ Object.append(MultiColumnWizard,
             next = this.updateRowAttributes(rowPosition, next);
             row = this.updateRowAttributes(rowPosition+1, row);
 
-            row.injectAfter(next);
+            row.inject(next, 'after');
         }
         
         this.reinitTinyMCE(el, row, false);
@@ -689,3 +689,37 @@ MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteU
 MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);
 MultiColumnWizard.addOperationClickCallback('up', MultiColumnWizard.upClick);
 MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick);
+
+/**
+ * Patch Contao Core to support file & page tree
+ */
+Backend.openModalSelectorOriginal = Backend.openModalSelector;
+Backend.openModalSelector = function(options) {
+    Backend.openModalSelectorOriginal(options);
+
+    var frm = null;
+    var tProtect = 60;
+    var id = new URI(options.url).getData('field')+'_parent';
+    var timer = setInterval(function() {
+        tProtect -= 1;
+        var frms = window.frames;
+    	for (var i=0; i<frms.length; i++) {
+    		if (frms[i].name == 'simple-modal-iframe') {
+    			frm = frms[i];
+    			break;
+    		}
+    	}
+
+    	if (frm && frm.document.getElementById(id)) {
+        	frm.document.getElementById(id).set('id', options.id+'_parent');
+        	clearInterval(timer);
+        	return;
+        }
+
+        // Try for 30 seconds
+        if (tProtect <= 0) {
+            clearInterval(timer);
+        }
+    }, 500);
+}
+
