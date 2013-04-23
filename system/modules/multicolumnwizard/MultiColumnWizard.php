@@ -329,10 +329,13 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-//         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '.js';
         // use BE script in FE for now
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
-        $GLOBALS['TL_CSS'][]        = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
+        $GLOBALS['TL_JAVASCRIPT'][] = $GLOBALS['TL_CONFIG']['debugMode']
+			? 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be_src.js'
+			: 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
+        $GLOBALS['TL_CSS'][]        = $GLOBALS['TL_CONFIG']['debugMode']
+			? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
+			: 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;
 
