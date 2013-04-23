@@ -373,12 +373,11 @@ class MultiColumnWizard extends Widget implements uploadable
                 if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback']))
                 {
                     $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-                    if (version_compare(TL_VERSION, '3.0', '>='))
-                        {
-                            require_once(sprintf('%s/system/modules/core/drivers/%s.php', TL_ROOT, $dataContainer));
-                        }else{
-                            require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
-                        }
+                    if (version_compare(VERSION, '3.0', '>=')) {
+						require_once(sprintf('%s/system/modules/core/drivers/%s.php', TL_ROOT, $dataContainer));
+					}else{
+						require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
+					}
 
                     $dc            = new $dataContainer($this->strTable);
                     $dc->field     = $objWidget->id;
@@ -578,7 +577,7 @@ class MultiColumnWizard extends Widget implements uploadable
                         $wizard = '';
 
                         $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-                        if (version_compare(TL_VERSION, '3.0', '>='))
+                        if (version_compare(VERSION, '3.0', '>='))
                         {
                             require_once(sprintf('%s/system/modules/core/drivers/%s.php', TL_ROOT, $dataContainer));
                         }else{
