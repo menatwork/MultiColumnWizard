@@ -1,50 +1,60 @@
+/**
+ * Contao Open Source CMS
+ *
+ * @copyright   MEN AT WORK 2013
+ * @package     MultiColumnWizard
+ * @license     GNU/LGPL
+ * @info        tab is set to 4 whitespaces
+ */
+
 .multicolumnwizard {
-	margin-top: 5px;
+    margin-top: 5px;
 }
 
 .multicolumnwizard h3 {
-	padding: 0;
-	overflow: hidden;
+    padding: 0;
+    overflow: hidden;
 }
 
 .multicolumnwizard .tl_textarea {
-	width: auto;
-	height: auto;
+    width: auto;
+    height: auto;
 }
 
-.multicolumnwizard .tl_select, .multicolumnwizard .tl_mselect {
-	width: auto;
+.multicolumnwizard .tl_select, 
+.multicolumnwizard .tl_mselect {
+    width: auto;
 }
 
 .multicolumnwizard .tl_checkbox_single_container {
-	margin-top: 0;
+    margin-top: 0;
 }
 
 .multicolumnwizard .hidelabel h3,
 .multicolumnwizard .hidelabel label {
-	display: none;
+    display: none;
 }
 
 .multicolumnwizard label {
-	font-weight: normal;
-	float: left;
+    font-weight: normal;
+    float: left;
 }
 
 .multicolumnwizard input.tl_checkbox {
-	float: left;
+    float: left;
 }
 
 .multicolumnwizard td.col_last {
-	padding-right: 0;
+    padding-right: 0;
 }
 
 .multicolumnwizard .w50 {
-	float: none;
-	width: auto;
-	height: auto;
+    float: none;
+    width: auto;
+    height: auto;
 }
 
 .multicolumnwizard .tl_checkbox_container label {
-	margin: 0;
-	padding-left: 5px;
+    margin: 0;
+    padding-left: 5px;
 }
