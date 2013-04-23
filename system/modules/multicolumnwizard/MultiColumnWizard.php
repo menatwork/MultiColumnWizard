@@ -10,12 +10,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
@@ -24,14 +24,14 @@
  * @copyright  Andreas Schempp 2011
  * @copyright  certo web & design GmbH 2011
  * @copyright  MEN AT WORK 2011
- * @package    MultiColumnWizard 
- * @license    LGPL 
+ * @package    MultiColumnWizard
+ * @license    LGPL
  * @filesource
  * @info       tab is set to 4 whitespaces
  */
 
 /**
- * Class MultiColumnWizard 
+ * Class MultiColumnWizard
  *
  * @copyright  Andreas Schempp 2011
  * @copyright  certo web & design GmbH 2011
@@ -130,9 +130,9 @@ class MultiColumnWizard extends Widget implements uploadable
                 $this->varValue = deserialize($varValue, true);
 
                 /**
-                 * reformat array if we have only one field 
+                 * reformat array if we have only one field
                  * from array[] = value
-                 * to array[]['fieldname'] = value 
+                 * to array[]['fieldname'] = value
                  */
                 if ($this->flatArray)
                 {
@@ -329,7 +329,9 @@ class MultiColumnWizard extends Widget implements uploadable
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '.js';
+//         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_' . strtolower(TL_MODE) . '.js';
+        // use BE script in FE for now
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
         $GLOBALS['TL_CSS'][]        = 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;
@@ -422,7 +424,7 @@ class MultiColumnWizard extends Widget implements uploadable
             {
                 $arrDatepicker[] = $strKey;
             }
-            
+
             // Store tiny mce fields
             if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
             {
@@ -506,7 +508,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     {
                         $blnHiddenBody = true;
                     }
-                    
+
                     $strWidget = $objWidget->parse();
                 }
                 else
@@ -595,10 +597,10 @@ class MultiColumnWizard extends Widget implements uploadable
 
                         $objWidget->wizard = $wizard;
                     }
-                    
+
                     $strWidget = $objWidget->parse() . $datepicker . $tinyMce;
                 }
-                                
+
                 // Build array of items
                 if ($arrField['eval']['columnPos'] != '')
                 {
@@ -887,7 +889,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 $arrHeaderItems[$arrField['eval']['columnPos']] = (key_exists($strKey, $arrHiddenHeader)) ? '<td class="invisible">' : '<td>' . '</td>';
             }
             else
-            {                
+            {
                 $arrHeaderItems[] = (key_exists($strKey, $arrHiddenHeader)) ? '<td class="invisible">' : '<td>';
                 $arrHeaderItems[] .= (is_array($arrField['label'])) ? $arrField['label'][0] : ($arrField['label'] != null ? $arrField['label'] : $strKey);
                 $arrHeaderItems[] .= ((is_array($arrField['label']) && $arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
@@ -922,7 +924,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 {
                     $itemValue['tl_class'] .= ' invisible';
                 }
-                
+
                 $return .= '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
             }
 
@@ -979,7 +981,7 @@ class MultiColumnWizard extends Widget implements uploadable
             {
                 $strKey = $strKey . ' invisible';
             }
-            
+
             $arrHeaderItems[] = sprintf('<div class="%s">%s</div>', $strKey, ($arrField['label'][0] ? $arrField['label'][0] : $strKey));
         }
 
@@ -998,7 +1000,7 @@ class MultiColumnWizard extends Widget implements uploadable
             {
                 $itemValue['tl_class'] .= ' invisible';
             }
-            
+
             $arrReturnItems[$itemKey] = '<div' . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</div>';
         }
 
