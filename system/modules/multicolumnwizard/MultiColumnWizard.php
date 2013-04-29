@@ -817,6 +817,12 @@ class MultiColumnWizard extends Widget implements uploadable
         // add class to enable easy updating of "name" attributes etc.
         $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' mcwUpdateFields');
 
+        // if we have a row class, add that one aswell.
+        if (isset($arrField['eval']['rowClasses'][$intRow]))
+        {
+            $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' ' . $arrField['eval']['rowClasses'][$intRow]);
+        }
+
         // load callback
         if (is_array($arrField['load_callback']))
         {
