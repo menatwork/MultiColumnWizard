@@ -7,9 +7,26 @@
 	"license":"LGPL-3.0+",
 	"authors":[
 		{
-            "name":"Andreas Isaak",
-            "email":"isaak@men-at-work.de",
-            "homepage":"http://www.men-at-work.de",
+			"name":"Andreas Isaak",
+			"email":"info@andreas-isaak.de",
+			"homepage":"http://www.andreas-isaak.de",
+			"role":"Developer"
+		},
+		{
+			"name":"David Maack",
+			"email":"thraile@arcor.de",
+			"role":"Developer"
+		},
+		{
+			"name":"Andreas Schempp",
+			"email":"andreas.schempp@terminal42.ch",
+			"homepage":"http://www.terminal42.ch",
+			"role":"Developer"
+		},
+		{
+			"name":"Yanick Witschi",
+			"email":"yanick.witschi@terminal42.ch",
+			"homepage":"http://www.terminal42.ch",
 			"role":"Developer"
 		},
 		{
