@@ -556,7 +556,8 @@ Object.append(MultiColumnWizard,
             level = row.getAllPrevious().length;
 
             //destroy current row
-            row.destroy();
+            row.dispose();
+            row.destroy.delay(10, row); // destroy delayed, to ensure all remaining event handlers are called
 
             var that = this;
             //update index of following rows
