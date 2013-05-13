@@ -288,6 +288,18 @@ class MultiColumnWizard extends Widget implements uploadable
             }
         }
 
+        if ($this->minCount > 0 && count($varInput) < $this->minCount)
+        {
+            $this->blnSubmitInput = false;
+            $this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['mcwMinCount'], $this->minCount));
+        }
+
+        if ($this->maxCount > 0 && count($varInput) > $this->maxCount)
+        {
+            $this->blnSubmitInput = false;
+            $this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['mcwMaxCount'], $this->maxCount));
+        }
+
         if ($blnHasError)
         {
             $this->blnSubmitInput = false;
