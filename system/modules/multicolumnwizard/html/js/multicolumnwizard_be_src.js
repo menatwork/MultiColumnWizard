@@ -168,6 +168,8 @@ var MultiColumnWizard = new Class(
      */
     updateRowAttributes: function(level, row)
     {
+        var firstRun = true;
+        var intSubLevels = 0;
 
         row.getElements('.mcwUpdateFields *').each(function(el)
         {
@@ -188,11 +190,44 @@ var MultiColumnWizard = new Class(
             // rewrite elements name
             if (typeOf(el.getProperty('name')) == 'string')
             {
-                var erg = el.getProperty('name').match(/^([^\[]+)\[([0-9]+)\](.*)$/i);
-                if (erg)
-                {
-                    el.setProperty('name', erg[1] + '[' + level + ']' + erg[3]);
-                }
+                var matches = el.getProperty('name').match(/([^[\]]+)/g);
+                var lastIndex = null;
+                var newName = '';
+
+                matches.each(function(element, index) {
+                    if (!isNaN(parseFloat(element)) && isFinite(element))
+                    {
+                        lastIndex = index;
+                    }
+                });
+
+                matches.each(function(element, index) {
+                    if (index === 0)
+                    {
+                        newName += element;
+                    }
+                    // First element
+                    else if (index === lastIndex && firstRun)
+                    {
+                        newName += '[' + level + ']';
+                    }
+                    // All other elements
+                    else if (index === (lastIndex - 2) && !firstRun)
+                    {
+                        newName += '[' + level + ']';
+                    }
+                    else if (index === lastIndex && firstRun)
+                    {
+                        newName += '[' + intSubLevels++ + ']';
+                    }
+                    else
+                    {
+                        newName += '[' + element + ']';
+                    }
+                });
+
+                el.setProperty('name', newName);
+                firstRun = false;
             }
 
             // rewrite elements id or delete input fields without an id
