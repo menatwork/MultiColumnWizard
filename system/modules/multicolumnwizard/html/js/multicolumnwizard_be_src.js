@@ -502,7 +502,7 @@ Object.append(MultiColumnWizard,
             if (copy.getElements('script').length > 0)
             {
                 copy.getElements('script').each(function(script){
-                    $exec(script.get('html')); 
+                    Browser.exec(script.get('html')); 
                 });
             }
 
