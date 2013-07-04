@@ -168,7 +168,8 @@ var MultiColumnWizard = new Class(
      */
     updateRowAttributes: function(level, row)
     {
-        var firstRun = true;
+        var firstLevel = true;
+        var intInnerMCW = 0;
         var intSubLevels = 0;
 
         row.getElements('.mcwUpdateFields *').each(function(el)
@@ -180,6 +181,21 @@ var MultiColumnWizard = new Class(
              *  - rewrite the attributes name, id, onlick, for
              *  - rewrite inline SCRIPT-tags
              */
+
+            // Check if we have a mcw in mcw
+            if (el.hasClass('tl_modulewizard multicolumnwizard')) {
+                firstLevel = false;
+                intInnerMCW++;
+                el.addClass('mcw_inner_' + intInnerMCW);
+            }
+
+            // Check if we have left one mcw
+            if (intInnerMCW !== 0 && !el.hasClass('tl_modulewizard multicolumnwizard') && el.getParent('.mcw_inner_' + intInnerMCW) === null) {
+                intInnerMCW--;
+                if (intInnerMCW === 0) {
+                    firstLevel = true;
+                }
+            }
 
             //remove choosen elements
             if (el.hasClass('chzn-container')){
@@ -207,16 +223,16 @@ var MultiColumnWizard = new Class(
                         newName += element;
                     }
                     // First element
-                    else if (index === lastIndex && firstRun)
+                    else if (index === lastIndex && firstLevel)
                     {
                         newName += '[' + level + ']';
                     }
                     // All other elements
-                    else if (index === (lastIndex - 2) && !firstRun)
+                    else if (index === (lastIndex - 2) && !firstLevel)
                     {
                         newName += '[' + level + ']';
                     }
-                    else if (index === lastIndex && firstRun)
+                    else if (index === lastIndex && !firstLevel)
                     {
                         newName += '[' + intSubLevels++ + ']';
                     }
@@ -227,7 +243,6 @@ var MultiColumnWizard = new Class(
                 });
 
                 el.setProperty('name', newName);
-                firstRun = false;
             }
 
             // rewrite elements id or delete input fields without an id
