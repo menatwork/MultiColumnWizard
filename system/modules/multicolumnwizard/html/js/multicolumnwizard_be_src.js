@@ -171,6 +171,8 @@ var MultiColumnWizard = new Class(
         var firstLevel = true;
         var intInnerMCW = 0;
         var intSubLevels = 0;
+        var innerMCWCols = 0;
+        var innerMCWColCount = 0;
 
         row.getElements('.mcwUpdateFields *').each(function(el)
         {
@@ -187,6 +189,7 @@ var MultiColumnWizard = new Class(
                 firstLevel = false;
                 intInnerMCW++;
                 el.addClass('mcw_inner_' + intInnerMCW);
+                innerMCWCols = el.getElement('tbody').getElement('tr').getElements('td.mcwUpdateFields').length;
             }
 
             // Check if we have left one mcw
@@ -234,7 +237,8 @@ var MultiColumnWizard = new Class(
                     }
                     else if (index === lastIndex && !firstLevel)
                     {
-                        newName += '[' + intSubLevels++ + ']';
+                        newName += '[' + intSubLevels + ']';
+                        intSubLevels = (innerMCWCols % innerMCWColCount++ ==0) ? ++intSubLevels : intSubLevels;
                     }
                     else
                     {
@@ -394,7 +398,6 @@ var MultiColumnWizard = new Class(
 
         // search for dmg tinymces
         parent.getElements('span.mceEditor').each(function(item, index){
-            console.log(item.getSiblings('script'));
             item.dispose(); 
         }); 
         
