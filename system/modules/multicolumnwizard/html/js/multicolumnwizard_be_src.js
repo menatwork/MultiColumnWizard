@@ -190,6 +190,7 @@ var MultiColumnWizard = new Class(
                 intInnerMCW++;
                 el.addClass('mcw_inner_' + intInnerMCW);
                 innerMCWCols = el.getElement('tbody').getElement('tr').getElements('td.mcwUpdateFields').length;
+                innerMCWColCount = 1;
             }
 
             // Check if we have left one mcw
@@ -238,7 +239,8 @@ var MultiColumnWizard = new Class(
                     else if (index === lastIndex && !firstLevel)
                     {
                         newName += '[' + intSubLevels + ']';
-                        intSubLevels = (innerMCWCols % innerMCWColCount++ ==0) ? ++intSubLevels : intSubLevels;
+                        intSubLevels = ((innerMCWColCount >0) && (innerMCWColCount % innerMCWCols) ==0) ? ++intSubLevels : intSubLevels;
+                        innerMCWColCount++
                     }
                     else
                     {
