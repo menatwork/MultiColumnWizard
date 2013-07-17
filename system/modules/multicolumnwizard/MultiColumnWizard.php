@@ -754,7 +754,7 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
         // Add the popup file manager
-        if ($arrField['inputType'] == 'fileTree')
+        if ($arrField['inputType'] == 'fileTree' || $arrField['inputType'] == 'pageTree')
         {
             $path = '';
 
