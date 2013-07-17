@@ -35,5 +35,5 @@ $GLOBALS['TL_FFL']['multiColumnWizard'] = 'MultiColumnWizard';
  * Hooks
  */
 $GLOBALS['TL_HOOKS']['loadDataContainer'][] = array('MultiColumnWizardHelper', 'supportModalSelector');
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = array('MultiColumnWizardHelper', 'changegAjaxPostActions');
+$GLOBALS['TL_HOOKS']['initializeSystem'][] = array('MultiColumnWizardHelper', 'changeAjaxPostActions');
 $GLOBALS['TL_HOOKS']['executePostActions'][] = array('MultiColumnWizardHelper', 'executePostActions');

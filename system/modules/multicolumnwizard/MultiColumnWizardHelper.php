@@ -35,7 +35,7 @@ class MultiColumnWizardHelper extends Backend
     /**
      * 
      */
-    public function changegAjaxPostActions()
+    public function changeAjaxPostActions()
     {
         if(version_compare(VERSION,'3.1', '>=')){
             if (Environment::get('isAjaxRequest'))
