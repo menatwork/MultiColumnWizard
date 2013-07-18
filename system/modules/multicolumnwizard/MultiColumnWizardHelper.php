@@ -17,7 +17,7 @@
  * @copyright  terminal42 gmbh 2013
  * @package    MultiColumnWizard
  */
-class MultiColumnWizardHelper extends Backend
+class MultiColumnWizardHelper extends System
 {
 
     public function supportModalSelector($strTable)
@@ -105,7 +105,7 @@ class MultiColumnWizardHelper extends Backend
                 $varValue = serialize($varValue);
             }
             
-            $arrAttribs['id'] = $strFieldName;
+            $arrAttribs['id'] = \Input::post('name');
             $arrAttribs['name'] = $strFieldName;
             $arrAttribs['value'] = $varValue;
             $arrAttribs['strTable'] = $dc->table;
