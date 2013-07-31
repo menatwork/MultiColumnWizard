@@ -753,3 +753,4 @@ MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick)
         }, 500);
     };
 })(window.Backend);
+window.fireEvent("mcwLoaded");

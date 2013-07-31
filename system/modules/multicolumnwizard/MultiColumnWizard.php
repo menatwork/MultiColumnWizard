@@ -946,11 +946,13 @@ class MultiColumnWizard extends Widget implements uploadable
         $return .= '</tbody></table>';
 
         $return .= '<script>
-        window["MCW_" + ' . json_encode($this->strId) . '] = new MultiColumnWizard({
-            table: "ctrl_" + ' . json_encode($this->strId) . ',
-            maxCount: ' . intval($this->maxCount) . ',
-            minCount: ' . intval($this->minCount) . ',
-            uniqueFields: [] // TODO: implement
+        window.addEvent("mcwLoaded",function(){
+            window["MCW_" + ' . json_encode($this->strId) . '] = new MultiColumnWizard({
+                table: "ctrl_" + ' . json_encode($this->strId) . ',
+                maxCount: ' . intval($this->maxCount) . ',
+                minCount: ' . intval($this->minCount) . ',
+                uniqueFields: [] // TODO: implement
+            });
         });
         </script>';
 
