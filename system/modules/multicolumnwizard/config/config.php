@@ -37,3 +37,13 @@ $GLOBALS['TL_FFL']['multiColumnWizard'] = 'MultiColumnWizard';
 $GLOBALS['TL_HOOKS']['loadDataContainer'][] = array('MultiColumnWizardHelper', 'supportModalSelector');
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('MultiColumnWizardHelper', 'changeAjaxPostActions');
 $GLOBALS['TL_HOOKS']['executePostActions'][] = array('MultiColumnWizardHelper', 'executePostActions');
+
+if (TL_MODE == 'BE')
+{
+    $GLOBALS['TL_JAVASCRIPT']['mcw'] = $GLOBALS['TL_CONFIG']['debugMode']
+            ? 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be_src.js'
+            : 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
+    $GLOBALS['TL_CSS']['mcw']        = $GLOBALS['TL_CONFIG']['debugMode']
+            ? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
+            : 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
+}

@@ -323,10 +323,10 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
         // use BE script in FE for now
-        $GLOBALS['TL_JAVASCRIPT'][] = $GLOBALS['TL_CONFIG']['debugMode']
+        $GLOBALS['TL_JAVASCRIPT']['mcw'] = $GLOBALS['TL_CONFIG']['debugMode']
             ? 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be_src.js'
             : 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
-        $GLOBALS['TL_CSS'][]        = $GLOBALS['TL_CONFIG']['debugMode']
+        $GLOBALS['TL_CSS']['mcw']        = $GLOBALS['TL_CONFIG']['debugMode']
             ? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
             : 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
 
