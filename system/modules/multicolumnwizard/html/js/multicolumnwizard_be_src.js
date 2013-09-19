@@ -753,6 +753,3 @@ MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick)
         }, 500);
     };
 })(window.Backend);
-window.addEvent('domready', function() {
-    window.fireEvent("mcwLoaded");
-});
