@@ -144,7 +144,7 @@ class MultiColumnWizard extends Widget implements uploadable
             case 'buttons':
                 if (is_array($varValue))
                 {
-                    $this->arrButtons = $varValue;
+                    $this->arrButtons = array_merge($this->arrButtons, $varValue);
                 }
                 break;
 
