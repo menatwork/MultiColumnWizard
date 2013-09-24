@@ -7,14 +7,15 @@
 	"license":"LGPL-3.0+",
 	"authors":[
 		{
-			"name":"Andreas Isaak",
-			"email":"info@andreas-isaak.de",
-			"homepage":"http://www.andreas-isaak.de",
-			"role":"Developer"
+			"name": "Andreas Isaak",
+			"email": "contao@men-at-work.de",
+			"homepage": "http://www.men-at-work.de",
+			"role":"Project leader"
 		},
 		{
 			"name":"David Maack",
-			"email":"thraile@arcor.de",
+			"email": "contao@men-at-work.de",
+			"homepage": "http://www.men-at-work.de",
 			"role":"Developer"
 		},
 		{
