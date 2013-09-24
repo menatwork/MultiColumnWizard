@@ -47,6 +47,9 @@
 		"contao/core": ">=2.10,<4",
 		"contao-community-alliance/composer-installer": "*"
 	},
+	"autoload":{
+		"classmap":["system/"]
+	},
 	"replace": {
 		"contao-legacy/multicolumnwizard": "*"
 	},
