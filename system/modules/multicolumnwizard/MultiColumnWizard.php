@@ -848,6 +848,14 @@ class MultiColumnWizard extends Widget implements uploadable
             }
         }
 
+        // Convert date formats into timestamps (check the eval setting first -> #3063)
+        $rgxp = $arrField['eval']['rgxp'];
+        if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
+        {
+            $objDate  = new Date($varValue, $GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+            $varValue = $objDate->tstamp;
+        }
+
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
