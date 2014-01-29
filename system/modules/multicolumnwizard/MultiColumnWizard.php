@@ -582,6 +582,7 @@ class MultiColumnWizard extends Widget implements uploadable
                         $dc            = new $dataContainer($this->strTable);
                         $dc->field     = $objWidget->id;
                         $dc->inputName = $objWidget->id;
+                        $dc->value     = $objWidget->value;
 
                         foreach ($arrField['wizard'] as $callback)
                         {
