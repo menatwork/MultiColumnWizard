@@ -96,9 +96,17 @@ class MultiColumnWizardHelper extends System
                 // Automatically add resources to the DBAFS
                 if ($strKey == 'fileTree')
                 {
+                    if(version_compare(VERSION,'3.1', '>=') && version_compare(VERSION,'3.2', '<'))
+                    {
+                        $fileId = 'id';
+                    }
+                    if(version_compare(VERSION,'3.2', '>='))
+                    {
+                        $fileId = 'uuid';
+                    }
                     foreach ($varValue as $k=>$v)
                     {
-                        $varValue[$k] = \Dbafs::addResource($v)->id;
+                        $varValue[$k] = \Dbafs::addResource($v)->$fileId;
                     }
                 }
 
