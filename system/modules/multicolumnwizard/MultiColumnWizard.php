@@ -862,11 +862,12 @@ class MultiColumnWizard extends Widget implements uploadable
         $arrField['value']             = ($varValue !== '') ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
 
+        $arrData = $this->handleDcGeneral($arrField, $strKey);
         if(version_compare(VERSION,'3.1', '<')){
-            $objWidget = new $strClass($this->prepareForWidget($arrField, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable));
+            $objWidget = new $strClass($this->prepareForWidget($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable));
         }
         else{
-            $objWidget = new $strClass(\MultiColumnWizard::getAttributesFromDca($arrField, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
+            $objWidget = new $strClass(\MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
         }
 
         $objWidget->strId         = $arrField['id'];
@@ -875,6 +876,56 @@ class MultiColumnWizard extends Widget implements uploadable
         $objWidget->currentRecord = $this->currentRecord;
 
         return $objWidget;
+    }
+
+    /**
+     * Check if DcGeneral version 2+ is calling us and if so, handle GetPropertyOptionsEvent accordingly.
+     *
+     * @param array  $arrData  The field configuration array
+     * @param string $strName  The field name in the form
+     *
+     * @return array The processed field configuration array.
+     */
+    public function handleDcGeneral($arrData, $strName)
+    {
+        // DcGeneral 2.0 compatibility check.
+        if (get_class($this->objDca) === 'DcGeneral\Contao\Compatibility\DcCompat')
+        {
+            // If options-callback registered, call that one first as otherwise \Widget::getAttributesFromDca will kill
+            // our options.
+            if (is_array($arrData['options_callback']))
+            {
+                $arrCallback = $arrData['options_callback'];
+                $arrData['options'] = static::importStatic($arrCallback[0])->$arrCallback[1]($this);
+                unset($arrData['options_callback']);
+            }
+            elseif (is_callable($arrData['options_callback']))
+            {
+                $arrData['options'] = $arrData['options_callback']($this);
+                unset($arrData['options_callback']);
+            }
+
+            $environment = $this->objDca->getEnvironment();
+            /* @var \DcGeneral\EnvironmentInterface $environment */
+            $event   = new \DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent($environment, $this->objDca->getModel());
+            $event->setPropertyName($strName);
+            $event->setOptions($arrData['options']);
+            $environment->getEventPropagator()->propagate(
+                $event::NAME,
+                $event,
+                array(
+                    $environment->getDataDefinition()->getName(),
+                    $strName
+                )
+            );
+
+            if ($event->getOptions() !== $arrData['options'])
+            {
+                $arrData['options'] = $event->getOptions();
+            }
+        }
+
+        return $arrData;
     }
 
     /**
