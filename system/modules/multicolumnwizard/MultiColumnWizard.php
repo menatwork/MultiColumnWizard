@@ -889,7 +889,7 @@ class MultiColumnWizard extends Widget implements uploadable
     public function handleDcGeneral($arrData, $strName)
     {
         // DcGeneral 2.0 compatibility check.
-        if (get_class($this->objDca) === 'DcGeneral\Contao\Compatibility\DcCompat')
+        if (is_subclass_of($this->objDca, 'ContaoCommunityAlliance\DcGeneral\DC_General'))
         {
             // If options-callback registered, call that one first as otherwise \Widget::getAttributesFromDca will kill
             // our options.
@@ -906,8 +906,8 @@ class MultiColumnWizard extends Widget implements uploadable
             }
 
             $environment = $this->objDca->getEnvironment();
-            /* @var \DcGeneral\EnvironmentInterface $environment */
-            $event   = new \DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent($environment, $this->objDca->getModel());
+            /* @var \ContaoCommunityAlliance\DcGeneral\EnvironmentInterface $environment */
+            $event   = new \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent($environment, $this->objDca->getModel());
             $event->setPropertyName($strName);
             $event->setOptions($arrData['options']);
             $environment->getEventPropagator()->propagate(
