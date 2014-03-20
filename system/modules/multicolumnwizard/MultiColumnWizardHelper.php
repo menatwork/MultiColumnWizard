@@ -20,6 +20,11 @@
 class MultiColumnWizardHelper extends System
 {
 
+    public function addVersionToClass(&$objTemplate)
+    {
+        $objTemplate->ua .= ' version_' . VERSION . ' build_' . BUILD;
+    }
+
     public function supportModalSelector($strTable)
     {
         if (strpos($this->Environment->script, 'contao/file.php') !== false)

@@ -443,13 +443,17 @@ var MultiColumnWizard = new Class(
     
     reinitStylect: function()
     {
+        var build = $('top').get('class').match(/build_\d+/g);
+        build = build[0];
+        build = build.replace('build_', '').toInt();
         if(window.Stylect)
         {
-            $$('.styled_select').each(function(item, index){
-                item.dispose();
-            });
-            
-            Stylect.convertSelects();
+            if (!($('top').hasClass('version_3.2') && build > 3)) {
+                $$('.styled_select').each(function(item, index){
+                    item.dispose();
+                });
+                Stylect.convertSelects();
+            }
         }
     }
 });

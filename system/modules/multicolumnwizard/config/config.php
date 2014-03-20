@@ -45,4 +45,5 @@ if (TL_MODE == 'BE')
     $GLOBALS['TL_CSS']['mcw']        = $GLOBALS['TL_CONFIG']['debugMode']
             ? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
             : 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
+    $GLOBALS['TL_HOOKS']['parseTemplate'][] = array('MultiColumnWizardHelper', 'addVersionToClass');
 }
