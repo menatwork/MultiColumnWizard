@@ -448,7 +448,7 @@ var MultiColumnWizard = new Class(
         build = build.replace('build_', '').toInt();
         if(window.Stylect)
         {
-            if (!($('top').hasClass('version_3.2') && build > 3)) {
+            if (!($('top').hasClass('version_3-2') && build > 3)) {
                 $$('.styled_select').each(function(item, index){
                     item.dispose();
                 });

@@ -22,7 +22,7 @@ class MultiColumnWizardHelper extends System
 
     public function addVersionToClass(&$objTemplate)
     {
-        $objTemplate->ua .= ' version_' . VERSION . ' build_' . BUILD;
+        $objTemplate->ua .= ' version_' . str_replace('.', '-', VERSION) . ' build_' . str_replace('.', '-', BUILD);
     }
 
     public function supportModalSelector($strTable)
