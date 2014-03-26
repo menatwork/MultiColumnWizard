@@ -283,7 +283,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     // store the errors
                     $this->arrWidgetErrors[$strKey][$i] = $objWidget->getErrors();
 
-                    $blnHasError = true;
+                    $blnHasError = \Input::post('SUBMIT_TYPE') != 'auto';
                 }
             }
         }
