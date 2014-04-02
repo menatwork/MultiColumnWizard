@@ -889,7 +889,7 @@ class MultiColumnWizard extends Widget implements uploadable
     public function handleDcGeneral($arrData, $strName)
     {
         // DcGeneral 2.0 compatibility check.
-        if (is_subclass_of($this->objDca, 'ContaoCommunityAlliance\DcGeneral\DC_General'))
+        if (is_subclass_of($this->objDca, 'ContaoCommunityAlliance\DcGeneral\EnvironmentAwareInterface'))
         {
             // If options-callback registered, call that one first as otherwise \Widget::getAttributesFromDca will kill
             // our options.
