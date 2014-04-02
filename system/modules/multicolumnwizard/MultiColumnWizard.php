@@ -881,8 +881,8 @@ class MultiColumnWizard extends Widget implements uploadable
     /**
      * Check if DcGeneral version 2+ is calling us and if so, handle GetPropertyOptionsEvent accordingly.
      *
-     * @param array  $arrData  The field configuration array
-     * @param string $strName  The field name in the form
+     * @param array  $arrData The field configuration array
+     * @param string $strName The field name in the form
      *
      * @return array The processed field configuration array.
      */
@@ -915,6 +915,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 $event,
                 array(
                     $environment->getDataDefinition()->getName(),
+                    $this->strName,
                     $strName
                 )
             );
