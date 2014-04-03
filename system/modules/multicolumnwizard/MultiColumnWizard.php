@@ -881,15 +881,15 @@ class MultiColumnWizard extends Widget implements uploadable
     /**
      * Check if DcGeneral version 2+ is calling us and if so, handle GetPropertyOptionsEvent accordingly.
      *
-     * @param array  $arrData  The field configuration array
-     * @param string $strName  The field name in the form
+     * @param array  $arrData The field configuration array
+     * @param string $strName The field name in the form
      *
      * @return array The processed field configuration array.
      */
     public function handleDcGeneral($arrData, $strName)
     {
         // DcGeneral 2.0 compatibility check.
-        if (get_class($this->objDca) === 'DcGeneral\Contao\Compatibility\DcCompat')
+        if (is_subclass_of($this->objDca, 'ContaoCommunityAlliance\DcGeneral\EnvironmentAwareInterface'))
         {
             // If options-callback registered, call that one first as otherwise \Widget::getAttributesFromDca will kill
             // our options.
@@ -906,8 +906,8 @@ class MultiColumnWizard extends Widget implements uploadable
             }
 
             $environment = $this->objDca->getEnvironment();
-            /* @var \DcGeneral\EnvironmentInterface $environment */
-            $event   = new \DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent($environment, $this->objDca->getModel());
+            /* @var \ContaoCommunityAlliance\DcGeneral\EnvironmentInterface $environment */
+            $event   = new \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent($environment, $this->objDca->getModel());
             $event->setPropertyName($strName);
             $event->setOptions($arrData['options']);
             $environment->getEventPropagator()->propagate(
@@ -915,6 +915,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 $event,
                 array(
                     $environment->getDataDefinition()->getName(),
+                    $this->strName,
                     $strName
                 )
             );
