@@ -185,7 +185,7 @@ var MultiColumnWizard = new Class(
              */
 
             // Check if we have a mcw in mcw
-            if (el.hasClass('tl_modulewizard multicolumnwizard')) {
+            if (el.hasClass('tl_modulewizard') && el.hasClass('multicolumnwizard')) {
                 firstLevel = false;
                 intInnerMCW++;
                 el.addClass('mcw_inner_' + intInnerMCW);
@@ -194,7 +194,7 @@ var MultiColumnWizard = new Class(
             }
 
             // Check if we have left one mcw
-            if (intInnerMCW !== 0 && !el.hasClass('tl_modulewizard multicolumnwizard') && el.getParent('.mcw_inner_' + intInnerMCW) === null) {
+            if (intInnerMCW !== 0 && (!el.hasClass('tl_modulewizard') || !el.hasClass('multicolumnwizard')) && el.getParent('.mcw_inner_' + intInnerMCW) === null) {
                 intInnerMCW--;
                 if (intInnerMCW === 0) {
                     firstLevel = true;
