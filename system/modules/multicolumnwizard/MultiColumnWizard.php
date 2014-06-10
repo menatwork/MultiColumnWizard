@@ -461,6 +461,11 @@ class MultiColumnWizard extends Widget implements uploadable
                 $strWidget     = '';
                 $blnHiddenBody = false;
 
+                if ($arrField['eval']['hideHead'] == true)
+                {
+                    $arrHiddenHeader[$strKey] = true;
+                }
+
                 // load row specific data (useful for example for default values in different rows)
                 if (isset($this->arrRowSpecificData[$i][$strKey]))
                 {
@@ -493,11 +498,6 @@ class MultiColumnWizard extends Widget implements uploadable
                 }
                 elseif ($arrField['eval']['hideBody'] == true || $arrField['eval']['hideHead'] == true)
                 {
-                    if ($arrField['eval']['hideHead'] == true)
-                    {
-                        $arrHiddenHeader[$strKey] = true;
-                    }
-
                     if ($arrField['eval']['hideBody'] == true)
                     {
                         $blnHiddenBody = true;
