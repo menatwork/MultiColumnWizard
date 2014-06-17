@@ -19,6 +19,13 @@
  */
 class MultiColumnWizardHelper extends System
 {
+    /**
+     * Just here to make the constructor public.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     public function addVersionToClass(&$objTemplate)
     {
