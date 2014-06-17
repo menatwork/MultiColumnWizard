@@ -58,6 +58,9 @@
 			"symlinks": {
 				"system/modules/multicolumnwizard": "system/modules/multicolumnwizard"
 			}
+		},
+		"branch-alias": {
+			"dev-dev": "3.2.x-dev"
 		}
 	}
 }
