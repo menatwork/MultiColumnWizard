@@ -60,9 +60,10 @@ class MultiColumnWizardHelper extends System
                         $strRef = $this->Session->get('filePickerRef');
                         $strRef = substr($strRef, stripos($strRef, 'field=')+6);
                         $arrRef = explode('&', $strRef);
-                        $strField = $arrRef[0];
+                        $arrRefField = explode('__', $arrRef[0]);
+                        $arrField = preg_split('/_row[0-9]*_/i', \Input::post('name'));
                         //change action if modal selector was found
-                        if (stripos($strField, '__'))
+                        if (count($arrRefField) > 1 && $arrRefField === $arrField)
                             Input::setPost('action', Input::post('action').'_mcw');
                         break;
                 }
