@@ -454,13 +454,17 @@ class MultiColumnWizard extends Widget implements uploadable
         {
             $this->activeRow = $i;
             $strHidden       = '';
-            $blnHiddenBody   = false;
 
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
             {
                 $strWidget     = '';
                 $blnHiddenBody = false;
+
+                if ($arrField['eval']['hideHead'] == true)
+                {
+                    $arrHiddenHeader[$strKey] = true;
+                }
 
                 // load row specific data (useful for example for default values in different rows)
                 if (isset($this->arrRowSpecificData[$i][$strKey]))
@@ -494,11 +498,6 @@ class MultiColumnWizard extends Widget implements uploadable
                 }
                 elseif ($arrField['eval']['hideBody'] == true || $arrField['eval']['hideHead'] == true)
                 {
-                    if ($arrField['eval']['hideHead'] == true)
-                    {
-                        $arrHiddenHeader[$strKey] = true;
-                    }
-
                     if ($arrField['eval']['hideBody'] == true)
                     {
                         $blnHiddenBody = true;
@@ -958,14 +957,18 @@ class MultiColumnWizard extends Widget implements uploadable
 
             if ($arrField['eval']['columnPos'])
             {
-                $arrHeaderItems[$arrField['eval']['columnPos']] = (key_exists($strKey, $arrHiddenHeader)) ? '<td class="invisible">' : '<td>' . '</td>';
+                $arrHeaderItems[$arrField['eval']['columnPos']] = '<td></td>';
             }
             else
             {
-                $arrHeaderItems[] = (key_exists($strKey, $arrHiddenHeader)) ? '<td class="invisible">' : '<td>';
-                $arrHeaderItems[] .= (is_array($arrField['label'])) ? $arrField['label'][0] : ($arrField['label'] != null ? $arrField['label'] : $strKey);
-                $arrHeaderItems[] .= ((is_array($arrField['label']) && $arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
-                $arrHeaderItems[] .= '</td>';
+                $strHeaderItem = '<td>';
+
+                $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="invisible">' : '';
+                $strHeaderItem .= (is_array($arrField['label'])) ? $arrField['label'][0] : ($arrField['label'] != null ? $arrField['label'] : $strKey);
+                $strHeaderItem .= ((is_array($arrField['label']) && $arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
+                $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
+
+                $arrHeaderItems[] = $strHeaderItem . '</td>';
             }
         }
 
