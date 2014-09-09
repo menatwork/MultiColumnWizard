@@ -450,6 +450,7 @@ var MultiColumnWizard = new Class(
         {
             if (!($('top').hasClass('version_3-2') && build > 3)) {
                 $$('.styled_select').each(function(item, index){
+                    item.getNext().eliminate('div');
                     item.dispose();
                 });
                 Stylect.convertSelects();
