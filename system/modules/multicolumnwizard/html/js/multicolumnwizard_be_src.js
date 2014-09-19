@@ -40,8 +40,6 @@ var MultiColumnWizard = new Class(
             Backend.getScrollOffset();
         }
 
-        this.contaoVersion = this.getContaoVersion();
-
         var self = this;
         
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index){
@@ -451,6 +449,7 @@ var MultiColumnWizard = new Class(
         var version = /version_(\d)\-(\d)+/g.exec(classes);
         var build = /build_(\d)+/g.exec(classes);
 
+        // should we cache this?
         return {
             major: parseInt(version[1], 10),
             minor: parseInt(version[2], 10),
@@ -458,18 +457,27 @@ var MultiColumnWizard = new Class(
         };
     },
 
+    versionIsGreaterThen: function(compare)
+    {
+        var version = this.getContaoVersion();
+        var pieces = compare
+            .split('.')
+            .map(function(val) { return parseInt(val, 10); });
+
+        return (version.major > pieces[0]
+            || (version.major === pieces[0] && version.minor > pieces[1])
+            || (version.major === pieces[0] && version.minor === pieces[1] && version.build > pieces[2]));
+    },
+
     reinitStylect: function()
     {
-        var version = this.contaoVersion;
-
-        if(window.Stylect)
+        if(window.Stylect && !this.versionIsGreaterThen('3.2.3'))
         {
-            if (!(version.major > 3 || (version.major === 3 && version.minor >= 2 && version.build > 3))) {
-                $$('.styled_select').each(function(item, index){
-                    item.dispose();
-                });
-                Stylect.convertSelects();
-            }
+            // must this really infect all selects on the page??
+            $$('.styled_select').each(function(item, index){
+                item.dispose();
+            });
+            Stylect.convertSelects();
         }
     }
 });
