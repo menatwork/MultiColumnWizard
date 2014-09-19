@@ -40,6 +40,8 @@ var MultiColumnWizard = new Class(
             Backend.getScrollOffset();
         }
 
+        this.contaoVersion = this.getContaoVersion();
+
         var self = this;
         
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index){
@@ -440,15 +442,29 @@ var MultiColumnWizard = new Class(
             $(tinyMCE.get(item.get('id')).editorContainer).getElements('iframe')[0].set('title','MultiColumnWizard - TinyMCE');
         });
     },
-    
+
+    getContaoVersion: function()
+    {
+        // Hackyhack, try to extract the contao version
+        // out of css classes.
+        var classes = $('top').get('class');
+        var version = /version_(\d)\-(\d)+/g.exec(classes);
+        var build = /build_(\d)+/g.exec(classes);
+
+        return {
+            major: parseInt(version[1], 10),
+            minor: parseInt(version[2], 10),
+            build: parseInt(build[1], 10)
+        };
+    },
+
     reinitStylect: function()
     {
-        var build = $('top').get('class').match(/build_\d+/g);
-        build = build[0];
-        build = build.replace('build_', '').toInt();
+        var version = this.contaoVersion;
+
         if(window.Stylect)
         {
-            if (!($('top').hasClass('version_3-2') && build > 3)) {
+            if (!(version.major > 3 || (version.major === 3 && version.minor >= 2 && version.build > 3))) {
                 $$('.styled_select').each(function(item, index){
                     item.dispose();
                 });
