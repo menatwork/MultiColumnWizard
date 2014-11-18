@@ -740,6 +740,9 @@ class MultiColumnWizard extends Widget implements uploadable
         if (defined('YACE'))
             $strContaoPrefix = '';
 
+        //pass activeRecord to widget
+        $arrField['activeRecord'] = $this->activeRecord;
+        
         // Toggle line wrap (textarea)
         if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '')
         {
