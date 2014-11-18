@@ -134,7 +134,7 @@ class MultiColumnWizardHelper extends System
 
             $objWidget = new $GLOBALS['BE_FFL'][$strKey]($arrAttribs);
             echo $objWidget->generate();
-            exit; break;
+            exit;
         }
     }
 
