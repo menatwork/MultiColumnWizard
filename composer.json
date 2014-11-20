@@ -63,7 +63,8 @@
 			}
 		},
 		"branch-alias": {
-			"dev-dev": "3.2.x-dev"
+			"dev-master": "3.3.x-dev",
+			"dev-dev": "3.4.x-dev"
 		}
 	}
 }
