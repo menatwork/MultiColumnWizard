@@ -908,20 +908,40 @@ class MultiColumnWizard extends Widget implements uploadable
                 unset($arrData['options_callback']);
             }
 
-            $environment = $this->objDca->getEnvironment();
             /* @var \ContaoCommunityAlliance\DcGeneral\EnvironmentInterface $environment */
-            $event   = new \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent($environment, $this->objDca->getModel());
-            $event->setPropertyName($strName);
-            $event->setOptions($arrData['options']);
-            $environment->getEventPropagator()->propagate(
-                $event::NAME,
-                $event,
-                array(
-                    $environment->getDataDefinition()->getName(),
-                    $this->strName,
-                    $strName
-                )
+            $environment = $this->objDca->getEnvironment();
+            // FIXME: begin of legacy code to be removed.
+            if (method_exists($environment, 'getEventPropagator'))
+            {
+                $event   = new \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent($environment, $this->objDca->getModel());
+                $event->setPropertyName($strName);
+                $event->setOptions($arrData['options']);
+                $environment->getEventPropagator()->propagate(
+                    $event::NAME,
+                    $event,
+                    array(
+                        $environment->getDataDefinition()->getName(),
+                        $this->strName,
+                        $strName
+                    )
+                );
+
+                if ($event->getOptions() !== $arrData['options'])
+                {
+                    $arrData['options'] = $event->getOptions();
+                }
+            }
+            // FIXME: end of legacy code to be removed.
+
+            $event = new \MenAtWork\MultiColumnWizard\Event\GetOptionsEvent(
+                $this->strName,
+                $strName,
+                $environment,
+                $this->objDca->getModel(),
+                $this,
+                $arrData['options']
             );
+            $environment->getEventDispatcher()->dispatch($event::NAME, $event);
 
             if ($event->getOptions() !== $arrData['options'])
             {

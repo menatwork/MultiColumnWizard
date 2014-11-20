@@ -48,7 +48,10 @@
 		"contao-community-alliance/composer-installer": "*"
 	},
 	"autoload":{
-		"classmap":["system/"]
+		"classmap":["system/"],
+		"psr-4": {
+			"MenAtWork\\MultiColumnWizard\\": "system/modules/multicolumnwizard/src/"
+		}
 	},
 	"replace": {
 		"contao-legacy/multicolumnwizard": "*"
