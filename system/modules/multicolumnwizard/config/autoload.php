@@ -18,4 +18,5 @@ ClassLoader::addClasses(array
 (
 	'MultiColumnWizardHelper' => 'system/modules/multicolumnwizard/MultiColumnWizardHelper.php',
 	'MultiColumnWizard'       => 'system/modules/multicolumnwizard/MultiColumnWizard.php',
+	'MenAtWork\MultiColumnWizard\Event\GetOptionsEvent'       => 'system/modules/multicolumnwizard/src/Event/GetOptionsEvent.php',
 ));
