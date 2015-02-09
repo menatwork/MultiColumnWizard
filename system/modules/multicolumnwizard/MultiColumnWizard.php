@@ -230,6 +230,17 @@ class MultiColumnWizard extends Widget implements uploadable
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField)
             {
+                if ($arrField['eval']['hideHead'] == true)
+                {
+                    $arrHiddenHeader[$strKey] = true;
+                }
+
+                // load row specific data (useful for example for default values in different rows)
+                if (isset($this->arrRowSpecificData[$i][$strKey]))
+                {
+                    $arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
+                }
+
                 $objWidget = $this->initializeWidget($arrField, $i, $strKey, $varInput[$i][$strKey]);
 
                 // can be null on error, or a string on input_field_callback
