@@ -676,8 +676,9 @@ class MultiColumnWizard extends Widget implements uploadable
                         });
                           </script>';
         }
-        else
-        {
+
+        elseif (version_compare(VERSION,'3.3.0','<')) {
+
             $format = Date::formatToJs($GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
             switch ($rgxp)
             {
@@ -703,6 +704,42 @@ class MultiColumnWizard extends Widget implements uploadable
                             format:"' . $format . '",
                             positionOffset:{x:-197,y:-182}' . $time . ',
                             pickerClass:"datepicker_dashboard",
+                            useFadeInOut:!Browser.ie,
+                            startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
+                            titleFormat:"' . $GLOBALS['TL_LANG']['MSC']['titleFormat'] . '"
+                            });
+                        });
+                        </script>';
+
+        }
+
+        else
+        {
+            $format = Date::formatToJs($GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+            switch ($rgxp)
+            {
+                case 'datim':
+                    $time = ",\n      timePicker:true";
+                    break;
+
+                case 'time':
+                    $time = ",\n      pickOnly:\"time\"";
+                    break;
+
+                default:
+                    $time = '';
+                    break;
+            }
+
+            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;cursor:pointer;">
+                        <script>
+                        window.addEvent("domready", function() {
+                            new Picker.Date($("ctrl_' . $strId . '"), {
+                            draggable:false,
+                            toggle:$("toggle_' . $strId . '"),
+                            format:"' . $format . '",
+                            positionOffset:{x:-211,y:-209}' . $time . ',
+                            pickerClass:"datepicker_bootstrap",
                             useFadeInOut:!Browser.ie,
                             startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
                             titleFormat:"' . $GLOBALS['TL_LANG']['MSC']['titleFormat'] . '"
