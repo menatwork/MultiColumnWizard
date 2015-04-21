@@ -760,6 +760,15 @@ MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick)
 
 /**
  * Compare Versions
+ *
+ * Example:
+ * versionCompare('3.1', '3.2') => -1
+ * versionCompare('3.1', '3.1') =>  0
+ * versionCompare('3.2', '3.1') =>  1
+ *
+ * @function
+ *
+ * @return {Number}
  */
 versionCompare = function(toCompare) {
 
