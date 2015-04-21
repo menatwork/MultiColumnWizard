@@ -757,34 +757,27 @@ MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick)
     };
 })(window.Backend);
 
+
 /**
- * Simply compares two string version values.
- *
- * Example:
- * versionCompare('1.1', '1.2') => -1
- * versionCompare('1.1', '1.1') =>  0
- * versionCompare('1.2', '1.1') =>  1
- * versionCompare('2.23.3', '2.22.3') => 1
- *
- * Returns:
- * -1 = left is LOWER than right
- *  0 = they are equal
- *  1 = left is GREATER = right is LOWER
- *  And FALSE if one of input versions are not valid
- *
- * @function
- * @param {String} left  Version #1
- * @param {String} right Version #2
- * @return {Integer|Boolean}
- * @author Alexey Bass (albass)
- * @since 2011-07-14
+ * Compare Versions
  */
-versionCompare = function(left, right) {
-    if (typeof left + typeof right != 'stringstring')
+versionCompare = function(toCompare) {
+
+    // Get Version-Class and convert it to a valid Version-String
+    var version = $('top').get('class').match(/version_[^\s]*/);
+    version = version[0];
+    version = version.replace('version_', '');
+    version = version.split('-').join('.');
+
+    if (typeof version !== 'string') {
+        return false;
+    }
+
+    if (typeof toCompare + typeof version != 'stringstring')
         return false;
 
-    var a = left.split('.')
-        ,   b = right.split('.')
+    var a = toCompare.split('.')
+        ,   b = version.split('.')
         ,   i = 0, len = Math.max(a.length, b.length);
 
     for (; i < len; i++) {
@@ -796,22 +789,4 @@ versionCompare = function(left, right) {
     }
 
     return 0;
-};
-
-/**
- * Parse the Version of Contao from Class "top"
- * see: MultiColumnWizardHelper::addVersionToClass()
- *
- * @function
- * @return {String}
- */
-parseContaoVersion = function() {
-
-    // Get Version-Class and convert it to a valid Version-String
-    var version = $('top').get('class').match(/version_[^\s]*/);
-    version = version[0];
-    version = version.replace('version_', '');
-    version = version.split('-').join('.');
-
-    return version
 };
