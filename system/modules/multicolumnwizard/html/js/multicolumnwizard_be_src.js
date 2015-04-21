@@ -447,7 +447,7 @@ var MultiColumnWizard = new Class(
 
         if(window.Stylect)
         {
-            if (versionCompare('3.2.3',version) >= 0) {
+            if (versionCompare('3.2.3') >= 0) {
                 $$('.styled_select').each(function(item, index){
                     item.dispose();
                 });
