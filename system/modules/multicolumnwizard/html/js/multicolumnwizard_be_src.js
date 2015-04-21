@@ -443,12 +443,11 @@ var MultiColumnWizard = new Class(
     
     reinitStylect: function()
     {
-        var build = $('top').get('class').match(/build_\d+/g);
-        build = build[0];
-        build = build.replace('build_', '').toInt();
+        var version = parseContaoVersion();
+
         if(window.Stylect)
         {
-            if (!($('top').hasClass('version_3-2') && build > 3)) {
+            if (versionCompare('3.2.3',version) >= 0) {
                 $$('.styled_select').each(function(item, index){
                     item.dispose();
                 });
@@ -757,3 +756,62 @@ MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick)
         }, 500);
     };
 })(window.Backend);
+
+/**
+ * Simply compares two string version values.
+ *
+ * Example:
+ * versionCompare('1.1', '1.2') => -1
+ * versionCompare('1.1', '1.1') =>  0
+ * versionCompare('1.2', '1.1') =>  1
+ * versionCompare('2.23.3', '2.22.3') => 1
+ *
+ * Returns:
+ * -1 = left is LOWER than right
+ *  0 = they are equal
+ *  1 = left is GREATER = right is LOWER
+ *  And FALSE if one of input versions are not valid
+ *
+ * @function
+ * @param {String} left  Version #1
+ * @param {String} right Version #2
+ * @return {Integer|Boolean}
+ * @author Alexey Bass (albass)
+ * @since 2011-07-14
+ */
+versionCompare = function(left, right) {
+    if (typeof left + typeof right != 'stringstring')
+        return false;
+
+    var a = left.split('.')
+        ,   b = right.split('.')
+        ,   i = 0, len = Math.max(a.length, b.length);
+
+    for (; i < len; i++) {
+        if ((a[i] && !b[i] && parseInt(a[i]) > 0) || (parseInt(a[i]) > parseInt(b[i]))) {
+            return 1;
+        } else if ((b[i] && !a[i] && parseInt(b[i]) > 0) || (parseInt(a[i]) < parseInt(b[i]))) {
+            return -1;
+        }
+    }
+
+    return 0;
+};
+
+/**
+ * Parse the Version of Contao from Class "top"
+ * see: MultiColumnWizardHelper::addVersionToClass()
+ *
+ * @function
+ * @return {String}
+ */
+parseContaoVersion = function() {
+
+    // Get Version-Class and convert it to a valid Version-String
+    var version = $('top').get('class').match(/version_[^\s]*/);
+    version = version[0];
+    version = version.replace('version_', '');
+    version = version.split('-').join('.');
+
+    return version
+};
