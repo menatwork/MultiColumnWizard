@@ -443,12 +443,11 @@ var MultiColumnWizard = new Class(
     
     reinitStylect: function()
     {
-        var build = $('top').get('class').match(/build_\d+/g);
-        build = build[0];
-        build = build.replace('build_', '').toInt();
+        var version = parseContaoVersion();
+
         if(window.Stylect)
         {
-            if (!($('top').hasClass('version_3-2') && build > 3)) {
+            if (versionCompare('3.2.3') >= 0) {
                 $$('.styled_select').each(function(item, index){
                     item.dispose();
                 });
@@ -757,3 +756,46 @@ MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick)
         }, 500);
     };
 })(window.Backend);
+
+
+/**
+ * Compare Versions
+ *
+ * Example:
+ * versionCompare('3.1', '3.2') => -1
+ * versionCompare('3.1', '3.1') =>  0
+ * versionCompare('3.2', '3.1') =>  1
+ *
+ * @function
+ *
+ * @return {Number}
+ */
+versionCompare = function(toCompare) {
+
+    // Get Version-Class and convert it to a valid Version-String
+    var version = $('top').get('class').match(/version_[^\s]*/);
+    version = version[0];
+    version = version.replace('version_', '');
+    version = version.split('-').join('.');
+
+    if (typeof version !== 'string') {
+        return false;
+    }
+
+    if (typeof toCompare + typeof version != 'stringstring')
+        return false;
+
+    var a = toCompare.split('.')
+        ,   b = version.split('.')
+        ,   i = 0, len = Math.max(a.length, b.length);
+
+    for (; i < len; i++) {
+        if ((a[i] && !b[i] && parseInt(a[i]) > 0) || (parseInt(a[i]) > parseInt(b[i]))) {
+            return 1;
+        } else if ((b[i] && !a[i] && parseInt(b[i]) > 0) || (parseInt(a[i]) < parseInt(b[i]))) {
+            return -1;
+        }
+    }
+
+    return 0;
+};
