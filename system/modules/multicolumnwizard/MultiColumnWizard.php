@@ -695,7 +695,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     break;
             }
 
-            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px">
+            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;cursor:pointer;">
                         <script>
                         window.addEvent("domready", function() {
                             new Picker.Date($$("#ctrl_' . $strId . '"), {
