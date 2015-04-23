@@ -677,7 +677,7 @@ class MultiColumnWizard extends Widget implements uploadable
                           </script>';
         }
 
-        elseif (version_compare(VERSION,'3.3.0','<')) {
+        elseif (version_compare(VERSION,'3.3','<')) {
 
             $format = Date::formatToJs($GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
             switch ($rgxp)
@@ -779,7 +779,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
         //pass activeRecord to widget
         $arrField['activeRecord'] = $this->activeRecord;
-        
+
         // Toggle line wrap (textarea)
         if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '')
         {
