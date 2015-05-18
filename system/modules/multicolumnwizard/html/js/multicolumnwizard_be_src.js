@@ -443,7 +443,6 @@ var MultiColumnWizard = new Class(
     
     reinitStylect: function()
     {
-        var version = parseContaoVersion();
 
         if(window.Stylect)
         {
