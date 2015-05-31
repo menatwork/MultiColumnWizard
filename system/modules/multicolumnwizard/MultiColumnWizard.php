@@ -423,6 +423,7 @@ class MultiColumnWizard extends Widget implements uploadable
             // Store tiny mce fields
             if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
             {
+                //TODO for CTO 3.2, 3.1, 3.0 id param hasn't row
                 $GLOBALS['TL_RTE']['tinyMCE'][$this->strField . '_' . $strKey] = array(
                     'id'   => $this->strField . '_' . $strKey,
                     'file' => 'tinyMCE',
@@ -562,7 +563,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     // Tiny MCE
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
                     {
-                        $tinyMce = $this->getMcWTinyMCEString($objWidget->id);
+                        $tinyMce = $this->getMcWTinyMCEString($objWidget->id, $arrField);
                         $arrField['eval']['tl_class'] .= ' tinymce';
                     }
 
@@ -749,12 +750,39 @@ class MultiColumnWizard extends Widget implements uploadable
         }
     }
 
-    protected function getMcWTinyMCEString($strId)
+    protected function getMcWTinyMCEString($strId, $arrField)
     {
-        return "<script>
+        if (version_compare(VERSION, '3.3', '<'))
+        {
+            return "<script>
             tinyMCE.execCommand('mceAddControl', false, 'ctrl_" . $strId . "');
             $('ctrl_" . $strId . "').erase('required');
                 </script>";
+        }
+
+        list ($file, $type) = explode('|', $arrField['eval']['rte'], 2);
+
+        if (!file_exists(TL_ROOT . '/system/config/' . $file . '.php'))
+        {
+            throw new \Exception(sprintf('Cannot find editor configuration file "%s.php"', $file));
+        }
+
+        // Backwards compatibility
+        $language = substr($GLOBALS['TL_LANGUAGE'], 0, 2);
+
+        if (!file_exists(TL_ROOT . '/assets/tinymce/langs/' . $language . '.js'))
+        {
+            $language = 'en';
+        }
+
+        $selector = 'ctrl_' . $strId;
+
+        ob_start();
+        include TL_ROOT . '/system/config/' . $file . '.php';
+        $editor = ob_get_contents();
+        ob_end_clean();
+
+        return $editor;
     }
 
     /**
