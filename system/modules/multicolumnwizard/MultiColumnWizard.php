@@ -423,12 +423,15 @@ class MultiColumnWizard extends Widget implements uploadable
             // Store tiny mce fields
             if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
             {
-                //TODO for CTO 3.2, 3.1, 3.0 id param hasn't row
-                $GLOBALS['TL_RTE']['tinyMCE'][$this->strField . '_' . $strKey] = array(
-                    'id'   => $this->strField . '_' . $strKey,
-                    'file' => 'tinyMCE',
-                    'type' => null
-                );
+                foreach ($this->varValue as $row => $value) {
+                    $tinyId = 'ctrl_' . $this->strField . '_row' . $row . '_' . $strKey;
+
+                    $GLOBALS['TL_RTE']['tinyMCE'][$tinyId] = array(
+                        'id'   => $tinyId,
+                        'file' => 'tinyMCE',
+                        'type' => null
+                    );
+                }
 
                 $arrTinyMCE[] = $strKey;
             }
