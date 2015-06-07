@@ -379,7 +379,7 @@ var MultiColumnWizard = new Class(
         var counter = 0;
 
         // get a list with tinymces
-        tinyMCE.editors.each(function(item, index){
+        tinymce.editors.each(function(item, index){
             if(item.editorId.match(myRegex) != null)
             { 
                 tinyMCEEditors[counter] = item.editorId;
@@ -390,8 +390,8 @@ var MultiColumnWizard = new Class(
         // clear tinymces
         tinyMCEEditors.each(function(item, index){
             try {
-                var editor = tinyMCE.get(item);
-                $(editor.editorId).set('text', editor.getContent()); 
+                var editor = tinymce.get(item);
+                $(editor.editorId).set('text', editor.getContent());
                 editor.remove();
             } catch (e) {
                 console.log(e)
@@ -433,11 +433,11 @@ var MultiColumnWizard = new Class(
         var varTinys = parent.getElements('.tinymce textarea');
         
         varTinys.each(function(item, index){ 
-            tinyMCE.execCommand('mceAddControl', false, item.get('id'));
-            tinyMCE.get(item.get('id')).show();
             
+            tinymce.execCommand('mceAddControl', false, item.get('id'));
+            tinymce.get(item.get('id')).show();
             $(item.get('id')).erase('required');
-            $(tinyMCE.get(item.get('id')).editorContainer).getElements('iframe')[0].set('title','MultiColumnWizard - TinyMCE');
+            $(tinymce.get(item.get('id')).editorContainer).getElements('iframe')[0].set('title','MultiColumnWizard - TinyMCE');
         });
     },
     
