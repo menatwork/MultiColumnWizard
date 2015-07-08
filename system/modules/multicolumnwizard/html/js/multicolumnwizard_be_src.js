@@ -456,6 +456,11 @@ var MultiColumnWizard = new Class(
 
         if(window.Stylect)
         {
+            if (versionCompare('3.2.3') >= 0) {
+                $$('.styled_select').each(function(item, index){
+                    item.dispose();
+                });
+            }else{
             var elemArr=elem.getElementsByClassName('styled_select');
             for (i = 0; i < elemArr.length; i++) {
                 elemArr[i].dispose();
