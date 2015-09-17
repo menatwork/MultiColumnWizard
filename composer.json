@@ -44,8 +44,8 @@
 		"source":"https://github.com/menatwork/MultiColumnWizard"
 	},
 	"require": {
-		"contao/core": ">=2.10,<4",
-		"contao-community-alliance/composer-installer": "*"
+		"contao/core-bundle":"~3.2 || ~4.1",
+		"contao-community-alliance/composer-plugin":"~2.4 || ~3.0"
 	},
 	"autoload":{
 		"classmap":["system/"],
@@ -58,7 +58,7 @@
 	},
 	"extra": {
 		"contao": {
-			"symlinks": {
+			"sources": {
 				"system/modules/multicolumnwizard": "system/modules/multicolumnwizard"
 			}
 		},
