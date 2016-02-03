@@ -10,6 +10,7 @@ Thumbs.db
 .external*/
 .idea/
 nbproject/
+_notes/
 
 # composer related
 vendor/
