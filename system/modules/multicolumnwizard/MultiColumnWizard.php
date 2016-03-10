@@ -361,7 +361,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 $this->Config->update(sprintf("\$GLOBALS['TL_CONFIG']['%s']", $this->strField), serialize($this->varValue));
 
                 // Reload the page
-                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', $this->Environment->request)));
+                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', Environment::get('request'))));
             }
             // Save in table
             else if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'Table')
@@ -392,7 +392,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 }
 
                 // Reload the page
-                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', $this->Environment->request)));
+                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', Environment::get('request'))));
             }
             // Unknow
             else
