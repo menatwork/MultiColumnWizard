@@ -34,7 +34,7 @@ class MultiColumnWizardHelper extends System
 
     public function supportModalSelector($strTable)
     {
-        if (strpos($this->Environment->script, 'contao/file.php') !== false)
+        if (strpos(Environment::get('script'), 'contao/file.php') !== false)
         {
             list($strField, $strColumn) = explode('__', $this->Input->get('field'));
 
