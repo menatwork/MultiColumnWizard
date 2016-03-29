@@ -265,7 +265,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
                         try
                         {
-                            $varValue = $this->$callback[0]->$callback[1]($varValue, $this);
+                            $varValue = $this->{$callback[0]}->$callback[1]($varValue, $this);
                         }
                         catch (Exception $e)
                         {
@@ -382,7 +382,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] AS $callback)
                     {
                         $this->import($callback[0]);
-                        $this->$callback[0]->$callback[1](serialize($this->varValue), $dc);
+                        $this->{$callback[0]}->$callback[1](serialize($this->varValue), $dc);
                     }
                 }
                 else
@@ -618,7 +618,7 @@ class MultiColumnWizard extends Widget implements uploadable
                         foreach ($arrField['wizard'] as $callback)
                         {
                             $this->import($callback[0]);
-                            $wizard .= $this->$callback[0]->$callback[1]($dc, $objWidget);
+                            $wizard .= $this->{$callback[0]}->$callback[1]($dc, $objWidget);
                         }
 
                         $objWidget->wizard = $wizard;
@@ -891,7 +891,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 $this->import($arrField['input_field_callback'][0]);
             }
 
-            return $this->$arrField['input_field_callback'][0]->$arrField['input_field_callback'][1]($this, $xlabel);
+            return $this->{$arrField['input_field_callback'][0]}->$arrField['input_field_callback'][1]($this, $xlabel);
         }
 
         $strClass = $GLOBALS[(TL_MODE == 'BE' ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType']];
@@ -943,7 +943,7 @@ class MultiColumnWizard extends Widget implements uploadable
             foreach ($arrField['load_callback'] as $callback)
             {
                 $this->import($callback[0]);
-                $varValue = $this->$callback[0]->$callback[1]($varValue, $this);
+                $varValue = $this->{$callback[0]}->$callback[1]($varValue, $this);
             }
         }
 
