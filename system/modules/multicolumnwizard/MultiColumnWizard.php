@@ -865,7 +865,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 $path = '?node=' . $arrField['eval']['path'];
             }
 
-            $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" rel="lightbox[files 765 80%]">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
+            $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" data-lightbox="files 765 80%">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
 
             $arrField['strField'] = $this->strField . '__' . $strKey;
         }
@@ -1093,7 +1093,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
 
         $return = '
-<table cellspacing="0" ' . (($this->style) ? ('style="' . $this->style . '"') : ('')) . 'rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . '] colorpicker[' . implode(',', $arrColorpicker) . ']" cellpadding="0" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard" summary="MultiColumnWizard">';
+<table' . (($this->style) ? (' style="' . $this->style . '"') : ('')) . ' data-operations="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . '] colorpicker[' . implode(',', $arrColorpicker) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
 
         if ($this->columnTemplate == '')
         {
@@ -1182,7 +1182,7 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
 
-        $return = '<div' . (($this->style) ? (' style="' . $this->style . '"') : '') . ' rel="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . '] colorpicker[' . implode(',', $arrColorpicker) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
+        $return = '<div' . (($this->style) ? (' style="' . $this->style . '"') : '') . ' data-operations="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . '] colorpicker[' . implode(',', $arrColorpicker) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
         $return .= '<div class="header_fields">' . implode('', $arrHeaderItems) . '</div>';
 
 
@@ -1228,7 +1228,7 @@ class MultiColumnWizard extends Widget implements uploadable
                 continue;
             }
 
-            $return .= '<a rel="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''] . '">' . $this->generateImage($image, $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''], 'class="tl_listwizard_img"') . '</a> ';
+            $return .= '<a data-operations="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''] . '">' . $this->generateImage($image, $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''], 'class="tl_listwizard_img"') . '</a> ';
         }
 
         return $return;
