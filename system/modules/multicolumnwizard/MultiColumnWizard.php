@@ -250,7 +250,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
                 // Convert date formats into timestamps (check the eval setting first -> #3063)
                 $rgxp = $arrField['eval']['rgxp'];
-                if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
+                if (!$objWidget->hasErrors() && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
                 {
                     $objDate  = new Date($varValue, $GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
                     $varValue = $objDate->tstamp;
@@ -949,9 +949,15 @@ class MultiColumnWizard extends Widget implements uploadable
 
         // Convert date formats into timestamps (check the eval setting first -> #3063)
         $rgxp = $arrField['eval']['rgxp'];
+        $dateFormatErrorMsg="";
         if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
         {
-            $objDate  = new Date($varValue, $GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+            try{
+                $objDate  = new Date($varValue, $GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+            }catch(\Exception $e){
+                $dateFormatErrorMsg=$e->getMessage();
+            }
+
             $varValue = $objDate->tstamp;
         }
 
@@ -973,6 +979,9 @@ class MultiColumnWizard extends Widget implements uploadable
         $objWidget->storeValues   = true;
         $objWidget->xlabel        = $xlabel;
         $objWidget->currentRecord = $this->currentRecord;
+        if(!empty($dateFormatErrorMsg)){
+            $objWidget->addError($e->getMessage());
+        }
 
         return $objWidget;
     }
