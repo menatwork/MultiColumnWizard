@@ -27,9 +27,19 @@ class MultiColumnWizardHelper extends System
         parent::__construct();
     }
 
-    public function addVersionToClass(&$objTemplate)
+    public function addScriptsAndStyles(&$objTemplate)
     {
-        $objTemplate->ua .= ' version_' . str_replace('.', '-', VERSION) . '-' . str_replace('.', '-', BUILD);
+        //do not allow version information to be leaked in the backend login and install tool (#184)
+        if ($objTemplate->getName() != 'be_login' && $objTemplate->getName() != 'be_install')
+        {
+            $GLOBALS['TL_JAVASCRIPT']['mcw'] = $GLOBALS['TL_CONFIG']['debugMode']
+                ? 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be_src.js'
+                : 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
+            $GLOBALS['TL_CSS']['mcw']        = $GLOBALS['TL_CONFIG']['debugMode']
+                ? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
+                : 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
+            $objTemplate->ua .= ' version_' . str_replace('.', '-', VERSION) . '-' . str_replace('.', '-', BUILD);
+        }
     }
 
     public function supportModalSelector($strTable)

@@ -39,11 +39,5 @@ $GLOBALS['TL_HOOKS']['executePostActions'][] = array('MultiColumnWizardHelper', 
 
 if (TL_MODE == 'BE')
 {
-    $GLOBALS['TL_JAVASCRIPT']['mcw'] = $GLOBALS['TL_CONFIG']['debugMode']
-            ? 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be_src.js'
-            : 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
-    $GLOBALS['TL_CSS']['mcw']        = $GLOBALS['TL_CONFIG']['debugMode']
-            ? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
-            : 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
-    $GLOBALS['TL_HOOKS']['parseTemplate'][] = array('MultiColumnWizardHelper', 'addVersionToClass');
+    $GLOBALS['TL_HOOKS']['parseTemplate'][] = array('MultiColumnWizardHelper', 'addScriptsAndStyles');
 }
