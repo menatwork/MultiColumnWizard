@@ -250,9 +250,9 @@ class MultiColumnWizard extends Widget implements uploadable
 
                 // Convert date formats into timestamps (check the eval setting first -> #3063)
                 $rgxp = $arrField['eval']['rgxp'];
-                if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
+                if (!$objWidget->hasErrors() && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
                 {
-                    $objDate  = new Date($varValue, $GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+                    $objDate  = new Date($varValue,$this->getNumericDateFormat($rgxp));
                     $varValue = $objDate->tstamp;
                 }
 
@@ -526,7 +526,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     if ($arrField['eval']['datepicker'])
                     {
                         $rgxp   = $arrField['eval']['rgxp'];
-                        $format = $GLOBALS['TL_CONFIG'][$rgxp . 'Format'];
+                        $format = $this->getNumericDateFormat($rgxp);
 
                         switch ($rgxp)
                         {
@@ -673,7 +673,7 @@ class MultiColumnWizard extends Widget implements uploadable
     {
         if (version_compare(VERSION, '2.11', '<'))
         {
-            $format = $GLOBALS['TL_CONFIG'][$rgxp . 'Format'];
+            $format = $this->getNumericDateFormat($rgxp);
             switch ($rgxp)
             {
                 case 'datim':
@@ -711,7 +711,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
         elseif (version_compare(VERSION,'3.3','<')) {
 
-            $format = Date::formatToJs($GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+            $format = Date::formatToJs($this->getNumericDateFormat($rgxp));
             switch ($rgxp)
             {
                 case 'datim':
@@ -747,7 +747,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
         else
         {
-            $format = Date::formatToJs($GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+            $format = Date::formatToJs($this->getNumericDateFormat($rgxp));
             switch ($rgxp)
             {
                 case 'datim':
@@ -949,9 +949,15 @@ class MultiColumnWizard extends Widget implements uploadable
 
         // Convert date formats into timestamps (check the eval setting first -> #3063)
         $rgxp = $arrField['eval']['rgxp'];
+        $dateFormatErrorMsg="";
         if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
         {
-            $objDate  = new Date($varValue, $GLOBALS['TL_CONFIG'][$rgxp . 'Format']);
+            try{
+                $objDate  = new Date($varValue, $this->getNumericDateFormat($rgxp));
+            }catch(\Exception $e){
+                $dateFormatErrorMsg=$e->getMessage();
+            }
+
             $varValue = $objDate->tstamp;
         }
 
@@ -973,6 +979,9 @@ class MultiColumnWizard extends Widget implements uploadable
         $objWidget->storeValues   = true;
         $objWidget->xlabel        = $xlabel;
         $objWidget->currentRecord = $this->currentRecord;
+        if(!empty($dateFormatErrorMsg)){
+            $objWidget->addError($e->getMessage());
+        }
 
         return $objWidget;
     }
@@ -1233,5 +1242,16 @@ class MultiColumnWizard extends Widget implements uploadable
 
         return $return;
     }
+
+    /**
+     * Get Time/Date-format from global config (BE) or Page settings (FE)
+     * @param $rgxp
+     *
+     * @return mixed
+     */
+    private function getNumericDateFormat($rgxp){
+        return call_user_func(array("\Contao\Date","getNumeric".ucfirst($rgxp)."Format" ));
+    }
+
 
 }
