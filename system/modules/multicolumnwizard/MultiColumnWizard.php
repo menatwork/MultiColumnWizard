@@ -886,7 +886,7 @@ class MultiColumnWizard extends Widget implements uploadable
         // Input field callback
         if (is_array($arrField['input_field_callback']))
         {
-            if (!is_object($this->$arrField['input_field_callback'][0]))
+            if (!is_object($this->{$arrField['input_field_callback'][0]}))
             {
                 $this->import($arrField['input_field_callback'][0]);
             }
