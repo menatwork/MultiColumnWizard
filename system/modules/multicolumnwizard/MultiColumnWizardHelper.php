@@ -53,9 +53,9 @@ class MultiColumnWizardHelper extends System
             }
         }
     }
-    
+
     /**
-     * 
+     *
      */
     public function changeAjaxPostActions()
     {
@@ -79,15 +79,15 @@ class MultiColumnWizardHelper extends System
                 }
             }
         }
-        
+
     }
-    
+
     /**
-     * 
+     *
      * @param type $action
      * @param type $dc
      */
-    public function executePostActions($action, $dc)
+    public function executePostActions($action, \DataContainer $dc)
     {
         if ($action == 'reloadFiletree_mcw' || $action == 'reloadPagetree_mcw' )
         {
@@ -96,21 +96,21 @@ class MultiColumnWizardHelper extends System
             $strRef = substr($strRef, stripos($strRef, 'field=')+6);
             $arrRef = explode('&', $strRef);
             $strField = $arrRef[0];
-            
+
             //get value and fieldName
             $strFieldName = \Input::post('name');
             $varValue = \Input::post('value');
-            
+
             //get the fieldname parts
             $arrfieldParts = preg_split('/_row[0-9]*_/i', $strFieldName);
             preg_match('/_row[0-9]*_/i', $strFieldName, $arrRow);
             $intRow = substr(substr($arrRow[0], 4), 0, -1);
-            
+
             //build fieldname
             $strFieldName = $arrfieldParts[0] . '[' . $intRow . '][' . $arrfieldParts[1] .']';
-            
+
             $strKey = ($action == 'reloadPagetree_mcw') ? 'pageTree' : 'fileTree';
-            
+
             // Convert the selected values
             if ($varValue != '')
             {
@@ -135,7 +135,7 @@ class MultiColumnWizardHelper extends System
 
                 $varValue = serialize($varValue);
             }
-            
+
             $arrAttribs['id'] = \Input::post('name');
             $arrAttribs['name'] = $strFieldName;
             $arrAttribs['value'] = $varValue;
@@ -143,6 +143,20 @@ class MultiColumnWizardHelper extends System
             $arrAttribs['strField'] = $strField;
 
             $objWidget = new $GLOBALS['BE_FFL'][$strKey]($arrAttribs);
+
+            // Re-initialize the activeRecord
+            $table = \Input::get('table');
+            if ($dc->activeRecord == null && \Database::getInstance()->tableExists($table)) {
+                $stmt = \Database::getInstance()
+                    ->prepare(sprintf('SELECT * FROM %s WHERE id = ?', $table))
+                    ->execute(\Input::get('id'));
+
+                if ($stmt->numRows > 0) {
+                    $dc->activeRecord = $stmt;
+                    $objWidget->dataContainer = $dc;
+                }
+            }
+
             echo $objWidget->generate();
             exit;
         }
