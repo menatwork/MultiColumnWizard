@@ -451,7 +451,7 @@ var MultiColumnWizard = new Class(
         });
     },
     
-    reinitStylect: function()
+    reinitStylect: function(elem)
     {
 
         if(window.Stylect)
@@ -460,8 +460,12 @@ var MultiColumnWizard = new Class(
                 $$('.styled_select').each(function(item, index){
                     item.dispose();
                 });
-                Stylect.convertSelects();
+            }else{
+            var elemArr=elem.getElementsByClassName('styled_select');
+            for (i = 0; i < elemArr.length; i++) {
+                elemArr[i].dispose();
             }
+            Stylect.convertSelects();
         }
     }
 });
@@ -581,7 +585,7 @@ Object.append(MultiColumnWizard,
         }
 
         this.reinitTinyMCE(el, row, false);
-        this.reinitStylect();
+        this.reinitStylect(copy);
     },
 
 
