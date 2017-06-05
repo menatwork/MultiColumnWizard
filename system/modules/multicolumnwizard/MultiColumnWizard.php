@@ -409,6 +409,8 @@ class MultiColumnWizard extends Widget implements uploadable
 
         foreach ($this->columnFields as $strKey => $arrField)
         {
+            $fullName =  $this->strName . '__' . $strKey;
+
             // Store unique fields
             if ($arrField['eval']['unique'])
             {
