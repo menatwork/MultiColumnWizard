@@ -689,16 +689,16 @@ class MultiColumnWizard extends Widget implements uploadable
                     break;
             }
 
-            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;">
+            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px; cursor: pointer;">
                           <script>
                         window.addEvent("domready", function() {
                           window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $strId . '\', {
                           allowEmpty:true,
                           toggleElements:\'#toggle_' . $strId . '\',
-                          pickerClass:\'datepicker_dashboard\',
+                          pickerClass:\'datepicker_bootstrap\',
                           format:\'' . $format . '\',
                           inputOutputFormat:\'' . $format . '\',
-                          positionOffset:{x:130,y:-185}' . $time . ',
+                          positionOffset:{x:-211,y:-209}' . $time . ',
                           startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
                           days:[\'' . implode("','", $GLOBALS['TL_LANG']['DAYS']) . '\'],
                           dayShort:' . $GLOBALS['TL_LANG']['MSC']['dayShortLength'] . ',
