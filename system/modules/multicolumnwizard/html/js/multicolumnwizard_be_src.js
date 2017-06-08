@@ -1,7 +1,10 @@
 /**
  * Contao Open Source CMS
  *
- * @copyright   Andreas Schempp 2011, certo web & design GmbH 2011, MEN AT WORK 2013
+ * @copyright   Andreas Schempp 2011
+ * @copyright   certo web & design GmbH 2011
+ * @copyright   MEN AT WORK 2013
+ * @author      Ingolf Steinhardt <info@e-spin.de>
  * @package     MultiColumnWizard
  * @license     GNU/LGPL
  * @info        tab is set to 4 whitespaces
@@ -41,11 +44,11 @@ var MultiColumnWizard = new Class(
         }
 
         var self = this;
-        
+
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index){
 
             el.getChildren('td.operations a').each(function(operation) {
-                var key = operation.get('rel');
+                var key = operation.get('data-operations');
 
                 // call static load callbacks
                 if (MultiColumnWizard.operationLoadCallbacks[key])
@@ -69,7 +72,6 @@ var MultiColumnWizard = new Class(
         this.updateOperations();
     },
 
-
     /**
      * Update operations
      */
@@ -80,23 +82,15 @@ var MultiColumnWizard = new Class(
         // execute load callback and register click event callback
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index)
         {
-            //            if(!el.getChildren('td.operations img.movehandler')[0]) {
-            //                var newMoveBtn = new Element('img.movehandler', {
-            //                    src: 'system/modules/multicolumnwizard/html/img/move.png',
-            //                    styles: {
-            //                        'cursor': 'move'
-            //                    }
-            //                });
-            //                newMoveBtn.inject(el.getChildren('td.operations')[0], 'bottom');
-            //            }
-
             el.getChildren('td.operations a').each(function(operation)
             {
-                var key = operation.get('rel');
+                var key = operation.get('data-operations');
 
                 // remove all click events
                 operation.removeEvents('click');
-
+                if(key ==='move') {
+                    self.dragAndDrop(el, operation);
+                }
                 // register static click callbacks
                 if (MultiColumnWizard.operationClickCallbacks[key])
                 {
@@ -149,14 +143,9 @@ var MultiColumnWizard = new Class(
                         callback.pass([operation, el], self)();
                     });
                 }
-                
 
             });
         });
-        
-    //        var sortingMcwEl = new Sortables(this.options.table.getElement('tbody'), {
-    //            handle: 'img.movehandler'
-    //        });
     },
 
 
@@ -295,7 +284,7 @@ var MultiColumnWizard = new Class(
                     if (typeOf(el.getProperty('id')) != 'string') el.destroy();
                     break;
                 case 'SCRIPT':
-                    //rewrite inline 
+                    //rewrite inline
                     //ToDO: refactor this part. For some reason replace will only find the first token of _row[0-9]+_
                     var newScript = '';
                     var script = el.get('html').toString();
@@ -303,7 +292,7 @@ var MultiColumnWizard = new Class(
                     var start = script.search(/_row[0-9]+_/i);
                     while(start > 0)
                     {
-                        length = script.match(/(_row[0-9]+)+_/i)[0].length; 
+                        length = script.match(/(_row[0-9]+)+_/i)[0].length;
                         newScript =  newScript + script.substr(0, start) + '_row' + level + '_';
                         script = script.substr(start + length);
                         start = script.search(/_row[0-9]+_/i);
@@ -319,8 +308,29 @@ var MultiColumnWizard = new Class(
     },
 
     /**
+     * Adding Sortable Mode for Drag and drop
+     * @param element table row
+     * @param element move button
+     */
+    dragAndDrop: function(tr, link) {
+        new Sortables(tr.getParent('table').getElement('tbody'), {
+            constrain: true,
+            opacity: 0.6,
+            handle: 'a[data-operations=move]',
+            onComplete: function() {
+                tr.getParent('table').getElement('tbody').getChildren('tr').each(function(el, i) {
+                    //Must be substract down 1 because the loop iterator begins with 1
+                    var level = i--;
+                    this.updateRowAttributes(level, el);
+                }, this);
+
+            }.bind(this)
+        });
+    },
+
+    /**
      * Add a load callback for the instance
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationLoadCallback: function(key, func)
@@ -329,13 +339,13 @@ var MultiColumnWizard = new Class(
         {
             this.operationLoadCallbacks[key] = [];
         }
-        
+
         this.operationLoadCallbacks[key].include(func);
     },
 
     /**
      * Add a load callback for the instance
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationUpdateCallback: function(key, func)
@@ -344,13 +354,13 @@ var MultiColumnWizard = new Class(
         {
             this.operationUpdateCallbacks[key] = [];
         }
-        
+
         this.operationLoadCallbacks[key].include(func);
     },
 
     /**
      * Add a click callback for the instance
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationClickCallback: function(key, func)
@@ -359,13 +369,13 @@ var MultiColumnWizard = new Class(
         {
             this.operationClickCallbacks[key] = [];
         }
-        
+
         this.operationClickCallbacks[key].include(func);
     },
 
     killAllTinyMCE: function(el, row)
     {
-        var parent = row.getParent('.multicolumnwizard'); 
+        var parent = row.getParent('.multicolumnwizard');
 
         // skip if no tinymce class was found
         if(parent.getElements('.tinymce').length == 0)
@@ -405,21 +415,21 @@ var MultiColumnWizard = new Class(
 
         // search for dmg tinymces
         parent.getElements('span.mceEditor').each(function(item, index){
-            item.dispose(); 
-        }); 
-        
+            item.dispose();
+        });
+
         // search for scripttags tinymces
         parent.getElements('.tinymce').each(function(item, index){
             item.getElements('script').each(function(item, index){
                 item.dispose();
             });
-        }); 
+        });
     },
-    
+
     reinitTinyMCE: function(el, row, isParent)
     {
         var parent = null;
-        
+
         if(isParent != true)
         {
             parent = row.getParent('.multicolumnwizard');
@@ -434,7 +444,7 @@ var MultiColumnWizard = new Class(
         {
             return;
         }
-        
+
         var varTinys = parent.getElements('.tinymce textarea');
 
         var addEditorCommand = 'mceAddControl';
@@ -450,7 +460,7 @@ var MultiColumnWizard = new Class(
             $(tinymce.get(item.get('id')).editorContainer).getElements('iframe')[0].set('title','MultiColumnWizard - TinyMCE');
         });
     },
-    
+
     reinitStylect: function()
     {
 
@@ -478,7 +488,7 @@ Object.append(MultiColumnWizard,
 
     /**
      * Add a load callback for all the MCW's
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationLoadCallback: function(key, func)
@@ -490,10 +500,10 @@ Object.append(MultiColumnWizard,
 
         MultiColumnWizard.operationLoadCallbacks[key].include(func);
     },
-    
+
     /**
      * Add a dupate callback for all the MCW's
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationUpdateCallback: function(key, func)
@@ -509,7 +519,7 @@ Object.append(MultiColumnWizard,
 
     /**
      * Add a click callback for all the MCW's
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationClickCallback: function(key, func)
@@ -520,6 +530,82 @@ Object.append(MultiColumnWizard,
         }
 
         MultiColumnWizard.operationClickCallbacks[key].include(func);
+    },
+
+    /**
+    * Operation "new" - update
+    * @param Element the icon element
+    * @param Element the row
+    */
+    newUpdate: function(el, row)
+    {
+        var rowCount = row.getSiblings().length + 1;
+
+        // remove the copy possibility if we have already reached maxCount
+        if (this.options.maxCount > 0 && rowCount >= this.options.maxCount)
+        {
+            el.setStyle('display', 'none');
+        }else{
+            el.setStyle('display', 'inline');
+        }
+    },
+
+
+    /**
+     * Operation "new" - click
+     * @param Element the icon element
+     * @param Element the row
+     */
+    newClick: function(el, row)
+    {
+        this.killAllTinyMCE(el, row);
+
+        var rowCount = row.getSiblings().length + 1;
+
+        // check maxCount for an inject
+        if (this.options.maxCount == 0 || (this.options.maxCount > 0 && rowCount < this.options.maxCount))
+        {
+            var copy = row.clone(true,true);
+
+            // clear all elements
+            copy.getElements('input,select,textarea').each(function(el){
+                MultiColumnWizard.clearElementValue(el);
+            });
+
+            // get the current level of the row
+            level = row.getAllPrevious().length;
+
+            // update the row attributes
+            copy = this.updateRowAttributes(++level, copy);
+            copy.inject(row, 'after');
+
+            // update tooltips
+            copy.getElements('a[rel]').each(function(el) {
+                $$(el).set('title', $$(el).getElement('img').get('alt'));
+                new Tips.Contao($$(el).filter(function(i) {
+                    return i.title != '';
+                }), {
+                    offset: {x:0, y:26}
+                });                
+            });
+
+            // exec script
+            if (copy.getElements('script').length > 0)
+            {
+                copy.getElements('script').each(function(script){
+                    Browser.exec(script.get('html'));
+                });
+            }
+
+            // update the row attribute of the following rows
+            var that = this;
+            copy.getAllNext().each(function(row){
+                that.updateRowAttributes(++level, row);
+            });
+        }
+
+        this.reinitTinyMCE(el, row, false);
+        this.reinitStylect();
     },
 
 
@@ -556,16 +642,26 @@ Object.append(MultiColumnWizard,
         // check maxCount for an inject
         if (this.options.maxCount == 0 || (this.options.maxCount > 0 && rowCount < this.options.maxCount))
         {
-            var copy = row.clone(true,true); 
+            var copy = row.clone(true,true);
 
-            //get the current level of the row
+            // get the current level of the row
             level = row.getAllPrevious().length;
 
-            //update the row attributes
+            // update the row attributes
             copy = this.updateRowAttributes(++level, copy);
             copy.inject(row, 'after');
 
-            //exec script
+            // update tooltips
+            copy.getElements('a[rel]').each(function(el) {
+                $$(el).set('title', $$(el).getElement('img').get('alt'));
+                new Tips.Contao($$(el).filter(function(i) {
+                    return i.title != '';
+                }), {
+                    offset: {x:0, y:26}
+                });                
+            });
+
+            // exec script
             if (copy.getElements('script').length > 0)
             {
                 copy.getElements('script').each(function(script){
@@ -573,7 +669,7 @@ Object.append(MultiColumnWizard,
                 });
             }
 
-            //updtae the row attribute of the following rows
+            // update the row attribute of the following rows
             var that = this;
             copy.getAllNext().each(function(row){
                 that.updateRowAttributes(++level, row);
@@ -613,8 +709,8 @@ Object.append(MultiColumnWizard,
      */
     deleteClick: function(el, row)
     {
-        this.killAllTinyMCE(el, row);   
-        var parent = row.getParent('.multicolumnwizard'); 
+        this.killAllTinyMCE(el, row);
+        var parent = row.getParent('.multicolumnwizard');
 
         if (row.getSiblings().length > 0) {
             //get all following rows
@@ -639,7 +735,7 @@ Object.append(MultiColumnWizard,
                 MultiColumnWizard.clearElementValue(el);
             });
         }
- 
+
         this.reinitTinyMCE(el, parent, true);
     },
 
@@ -652,7 +748,7 @@ Object.append(MultiColumnWizard,
     upClick: function(el, row)
     {
         this.killAllTinyMCE(el, row);
-        
+
         var previous = row.getPrevious();
         if (previous)
         {
@@ -699,10 +795,10 @@ Object.append(MultiColumnWizard,
 
             row.inject(next, 'after');
         }
-        
+
         this.reinitTinyMCE(el, row, false);
     },
-    
+
     /**
     * @param Element the element which should be cleared
     */
@@ -723,6 +819,8 @@ Object.append(MultiColumnWizard,
 /**
  * Register default callbacks
  */
+MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
+MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.newClick);
 MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
 MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
 MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteUpdate);
