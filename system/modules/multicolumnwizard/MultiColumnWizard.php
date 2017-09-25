@@ -1085,18 +1085,18 @@ class MultiColumnWizard extends Widget implements uploadable
 
             if ($arrField['eval']['columnPos'])
             {
-                $arrHeaderItems[$arrField['eval']['columnPos']] = '<td></td>';
+                $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
             }
             else
             {
-                $strHeaderItem = '<td>';
+                $strHeaderItem = '<th>';
 
                 $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="invisible">' : '';
                 $strHeaderItem .= (is_array($arrField['label'])) ? $arrField['label'][0] : ($arrField['label'] != null ? $arrField['label'] : $strKey);
                 $strHeaderItem .= ((is_array($arrField['label']) && $arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
                 $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
 
-                $arrHeaderItems[] = $strHeaderItem . '</td>';
+                $arrHeaderItems[] = $strHeaderItem . '</th>';
             }
         }
 
@@ -1110,7 +1110,7 @@ class MultiColumnWizard extends Widget implements uploadable
   <thead>
     <tr>
       ' . implode("\n      ", $arrHeaderItems) . '
-      <td></td>
+      <th></th>
     </tr>
   </thead>';
         }
