@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contao Open Source CMS
  *
@@ -9,7 +10,7 @@
  * @filesource
  */
 
-namespace MenAtWork\MultiColumnWizard\Event;
+namespace MultiColumnWizard\Event;
 
 use ContaoCommunityAlliance\DcGeneral\Data\ModelInterface;
 use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;

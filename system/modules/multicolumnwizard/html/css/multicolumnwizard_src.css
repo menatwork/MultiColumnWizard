@@ -48,6 +48,11 @@
     padding-right: 0;
 }
 
+.multicolumnwizard a[rel="move"] {
+    cursor: move;
+}
+
+
 .multicolumnwizard .w50 {
     float: none;
     width: auto;
