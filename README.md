@@ -66,6 +66,38 @@ $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = array
 ```
 
 
+Usage with Drag and Drop
+========================
+
+```php
+<?php
+
+$GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
+(
+    'label'         => &$GLOBALS['TL_LANG']['tl_theme']['templateSelection'],
+    'exclude'       => true,
+    'inputType'     => 'multiColumnWizard',
+    'eval'          => array
+        (
+        // add this line for a new button
+        'dragAndDrop' => true,
+        'columnFields' => array
+            (
+            'ts_client_browser' => array
+                (
+                'label'         => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],
+                'exclude'       => true,
+                'inputType'     => 'text',
+                'eval'          => array('style'=>'width:180px')
+                ),
+            )
+        )
+);
+
+?>
+```
+
+
 More information
 ================
 

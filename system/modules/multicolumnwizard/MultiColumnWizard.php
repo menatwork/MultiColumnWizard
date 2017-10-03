@@ -17,6 +17,7 @@
  * @copyright  Andreas Schempp 2011
  * @copyright  certo web & design GmbH 2011
  * @copyright  MEN AT WORK 2013
+ * @author     Ingolf Steinhardt <info@e-spin.de>
  * @package    MultiColumnWizard
  */
 class MultiColumnWizard extends Widget implements uploadable
@@ -80,7 +81,11 @@ class MultiColumnWizard extends Widget implements uploadable
      * Buttons
      * @var array
      */
-    protected $arrButtons = array('copy'   => 'copy.gif', 'up'     => 'up.gif', 'down'   => 'down.gif', 'delete' => 'delete.gif');
+    protected $arrButtons = array('new'    => 'new.gif',
+                                  'copy'   => 'copy.gif',
+                                  'up'     => 'up.gif',
+                                  'down'   => 'down.gif',
+                                  'delete' => 'delete.gif');
 
     /**
      * Initialize the object
@@ -157,6 +162,15 @@ class MultiColumnWizard extends Widget implements uploadable
             case 'disableSorting':
                 if ($varValue == true)
                 {
+                    unset($this->arrButtons['up']);
+                    unset($this->arrButtons['down']);
+                    unset($this->arrButtons['move']);
+                }
+                break;
+
+            case 'dragAndDrop':
+                if ($varValue === true) {
+                    $this->arrButtons['move'] = 'drag.gif';
                     unset($this->arrButtons['up']);
                     unset($this->arrButtons['down']);
                 }
