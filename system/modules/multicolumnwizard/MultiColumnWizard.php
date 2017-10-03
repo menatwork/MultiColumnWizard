@@ -390,8 +390,9 @@ class MultiColumnWizard extends Widget implements uploadable
                     }
 
                     $dc            = new $dataContainer($this->strTable);
-                    $dc->field     = $objWidget->id;
-                    $dc->inputName = $objWidget->id;
+                    $dc->field     = $this->strField;
+                    $dc->inputName = $this->strField;
+                    $dc->strInputName = $this->strField;
 
                     foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] AS $callback)
                     {
@@ -627,8 +628,9 @@ class MultiColumnWizard extends Widget implements uploadable
                         }
 
                         $dc            = new $dataContainer($this->strTable);
-                        $dc->field     = $objWidget->id;
+                        $dc->field     = $strKey;
                         $dc->inputName = $objWidget->id;
+                        $dc->strInputName = $objWidget->id;
                         $dc->value     = $objWidget->value;
 
                         foreach ($arrField['wizard'] as $callback)
