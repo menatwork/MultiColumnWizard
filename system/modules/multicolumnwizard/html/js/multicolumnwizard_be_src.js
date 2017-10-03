@@ -44,11 +44,11 @@ var MultiColumnWizard = new Class(
         }
 
         var self = this;
-        
+
         this.options.table.getElement('tbody').getChildren('tr').each(function(el, index){
 
             el.getChildren('td.operations a').each(function(operation) {
-                var key = operation.get('rel');
+                var key = operation.get('data-operations');
 
                 // call static load callbacks
                 if (MultiColumnWizard.operationLoadCallbacks[key])
@@ -84,7 +84,7 @@ var MultiColumnWizard = new Class(
         {
             el.getChildren('td.operations a').each(function(operation)
             {
-                var key = operation.get('rel');
+                var key = operation.get('data-operations');
 
                 // remove all click events
                 operation.removeEvents('click');
@@ -143,11 +143,11 @@ var MultiColumnWizard = new Class(
                         callback.pass([operation, el], self)();
                     });
                 }
-                
+
 
             });
         });
-        
+
     //        var sortingMcwEl = new Sortables(this.options.table.getElement('tbody'), {
     //            handle: 'img.movehandler'
     //        });
@@ -289,7 +289,7 @@ var MultiColumnWizard = new Class(
                     if (typeOf(el.getProperty('id')) != 'string') el.destroy();
                     break;
                 case 'SCRIPT':
-                    //rewrite inline 
+                    //rewrite inline
                     //ToDO: refactor this part. For some reason replace will only find the first token of _row[0-9]+_
                     var newScript = '';
                     var script = el.get('html').toString();
@@ -297,7 +297,7 @@ var MultiColumnWizard = new Class(
                     var start = script.search(/_row[0-9]+_/i);
                     while(start > 0)
                     {
-                        length = script.match(/(_row[0-9]+)+_/i)[0].length; 
+                        length = script.match(/(_row[0-9]+)+_/i)[0].length;
                         newScript =  newScript + script.substr(0, start) + '_row' + level + '_';
                         script = script.substr(start + length);
                         start = script.search(/_row[0-9]+_/i);
@@ -335,7 +335,7 @@ var MultiColumnWizard = new Class(
 
     /**
      * Add a load callback for the instance
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationLoadCallback: function(key, func)
@@ -344,13 +344,13 @@ var MultiColumnWizard = new Class(
         {
             this.operationLoadCallbacks[key] = [];
         }
-        
+
         this.operationLoadCallbacks[key].include(func);
     },
 
     /**
      * Add a load callback for the instance
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationUpdateCallback: function(key, func)
@@ -359,13 +359,13 @@ var MultiColumnWizard = new Class(
         {
             this.operationUpdateCallbacks[key] = [];
         }
-        
+
         this.operationLoadCallbacks[key].include(func);
     },
 
     /**
      * Add a click callback for the instance
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationClickCallback: function(key, func)
@@ -374,13 +374,13 @@ var MultiColumnWizard = new Class(
         {
             this.operationClickCallbacks[key] = [];
         }
-        
+
         this.operationClickCallbacks[key].include(func);
     },
 
     killAllTinyMCE: function(el, row)
     {
-        var parent = row.getParent('.multicolumnwizard'); 
+        var parent = row.getParent('.multicolumnwizard');
 
         // skip if no tinymce class was found
         if(parent.getElements('.tinymce').length == 0)
@@ -420,21 +420,21 @@ var MultiColumnWizard = new Class(
 
         // search for dmg tinymces
         parent.getElements('span.mceEditor').each(function(item, index){
-            item.dispose(); 
-        }); 
-        
+            item.dispose();
+        });
+
         // search for scripttags tinymces
         parent.getElements('.tinymce').each(function(item, index){
             item.getElements('script').each(function(item, index){
                 item.dispose();
             });
-        }); 
+        });
     },
-    
+
     reinitTinyMCE: function(el, row, isParent)
     {
         var parent = null;
-        
+
         if(isParent != true)
         {
             parent = row.getParent('.multicolumnwizard');
@@ -449,7 +449,7 @@ var MultiColumnWizard = new Class(
         {
             return;
         }
-        
+
         var varTinys = parent.getElements('.tinymce textarea');
 
         var addEditorCommand = 'mceAddControl';
@@ -465,7 +465,7 @@ var MultiColumnWizard = new Class(
             $(tinymce.get(item.get('id')).editorContainer).getElements('iframe')[0].set('title','MultiColumnWizard - TinyMCE');
         });
     },
-    
+
     reinitStylect: function()
     {
 
@@ -493,7 +493,7 @@ Object.append(MultiColumnWizard,
 
     /**
      * Add a load callback for all the MCW's
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationLoadCallback: function(key, func)
@@ -505,10 +505,10 @@ Object.append(MultiColumnWizard,
 
         MultiColumnWizard.operationLoadCallbacks[key].include(func);
     },
-    
+
     /**
      * Add a dupate callback for all the MCW's
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationUpdateCallback: function(key, func)
@@ -524,7 +524,7 @@ Object.append(MultiColumnWizard,
 
     /**
      * Add a click callback for all the MCW's
-     * @param string the key e.g. 'copy' - your button has to have the matching rel="" attribute (<a href="jsfallbackurl" rel="copy">...</a>)
+     * @param string the key e.g. 'copy' - your button has to have the matching data-operations="" attribute (<a href="jsfallbackurl" data-operations="copy">...</a>)
      * @param function callback
      */
     addOperationClickCallback: function(key, func)
@@ -714,8 +714,8 @@ Object.append(MultiColumnWizard,
      */
     deleteClick: function(el, row)
     {
-        this.killAllTinyMCE(el, row);   
-        var parent = row.getParent('.multicolumnwizard'); 
+        this.killAllTinyMCE(el, row);
+        var parent = row.getParent('.multicolumnwizard');
 
         if (row.getSiblings().length > 0) {
             //get all following rows
@@ -740,7 +740,7 @@ Object.append(MultiColumnWizard,
                 MultiColumnWizard.clearElementValue(el);
             });
         }
- 
+
         this.reinitTinyMCE(el, parent, true);
     },
 
@@ -753,7 +753,7 @@ Object.append(MultiColumnWizard,
     upClick: function(el, row)
     {
         this.killAllTinyMCE(el, row);
-        
+
         var previous = row.getPrevious();
         if (previous)
         {
@@ -800,10 +800,10 @@ Object.append(MultiColumnWizard,
 
             row.inject(next, 'after');
         }
-        
+
         this.reinitTinyMCE(el, row, false);
     },
-    
+
     /**
     * @param Element the element which should be cleared
     */
