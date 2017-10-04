@@ -321,7 +321,7 @@ var MultiColumnWizard = new Class(
         new Sortables(tr.getParent('table').getElement('tbody'), {
             constrain: true,
             opacity: 0.6,
-            handle: 'a[rel=move]',
+            handle: 'a[data-operations=move]',
             onComplete: function() {
                 tr.getParent('table').getElement('tbody').getChildren('tr').each(function(el, i) {
                     //Must be substract down 1 because the loop iterator begins with 1
