@@ -964,6 +964,10 @@ class MultiColumnWizard extends Widget implements uploadable
                 $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $this);
             }
         }
+        elseif (is_callable($arrField['load_callback']))
+        {
+            $varValue = $arrField['load_callback']($varValue, $this);
+        }
 
         // Convert date formats into timestamps (check the eval setting first -> #3063)
         $rgxp = $arrField['eval']['rgxp'];
