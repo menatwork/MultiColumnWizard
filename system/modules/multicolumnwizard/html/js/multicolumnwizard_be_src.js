@@ -147,12 +147,7 @@ var MultiColumnWizard = new Class(
 
             });
         });
-
-    //        var sortingMcwEl = new Sortables(this.options.table.getElement('tbody'), {
-    //            handle: 'img.movehandler'
-    //        });
     },
-
 
     /**
      * Update row attributes
@@ -585,13 +580,13 @@ Object.append(MultiColumnWizard,
             copy.inject(row, 'after');
 
             // update tooltips
-            copy.getElements('a[rel]').each(function(el) {
+            copy.getElements('a[data-operations]').each(function(el) {
                 $$(el).set('title', $$(el).getElement('img').get('alt'));
                 new Tips.Contao($$(el).filter(function(i) {
                     return i.title != '';
                 }), {
                     offset: {x:0, y:26}
-                });                
+                });
             });
 
             // exec script
@@ -613,7 +608,6 @@ Object.append(MultiColumnWizard,
         this.reinitStylect();
     },
 
-
     /**
     * Operation "copy" - update
     * @param Element the icon element
@@ -631,7 +625,6 @@ Object.append(MultiColumnWizard,
             el.setStyle('display', 'inline');
         }
     },
-
 
     /**
      * Operation "copy" - click
@@ -657,13 +650,13 @@ Object.append(MultiColumnWizard,
             copy.inject(row, 'after');
 
             // update tooltips
-            copy.getElements('a[rel]').each(function(el) {
+            copy.getElements('a[data-operations]').each(function(el) {
                 $$(el).set('title', $$(el).getElement('img').get('alt'));
                 new Tips.Contao($$(el).filter(function(i) {
                     return i.title != '';
                 }), {
                     offset: {x:0, y:26}
-                });                
+                });
             });
 
             // exec script
@@ -685,7 +678,6 @@ Object.append(MultiColumnWizard,
         this.reinitStylect();
     },
 
-
     /**
      * Operation "delete" - load
      * @param Element the icon element
@@ -705,7 +697,6 @@ Object.append(MultiColumnWizard,
             el.setStyle('display', 'inline');
         }
     },
-
 
     /**
      * Operation "delete" - click
@@ -744,7 +735,6 @@ Object.append(MultiColumnWizard,
         this.reinitTinyMCE(el, parent, true);
     },
 
-
     /**
      * Operation "up" - click
      * @param Element the icon element
@@ -773,7 +763,6 @@ Object.append(MultiColumnWizard,
 
         this.reinitTinyMCE(el, row, false);
     },
-
 
     /**
      * Operation "down" - click
