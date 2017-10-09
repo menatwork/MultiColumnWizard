@@ -4,7 +4,7 @@
  * @copyright   Andreas Schempp 2011
  * @copyright   certo web & design GmbH 2011
  * @copyright   MEN AT WORK 2013
- * @author      Ingolf Steinhardt <info@e-spin.de>
+ * @author      Ingolf Steinhardt <info@e-spin.de> 2017
  * @package     MultiColumnWizard
  * @license     GNU/LGPL
  * @info        tab is set to 4 whitespaces
@@ -199,9 +199,10 @@ var MultiColumnWizard = new Class(
             // rewrite elements name
             if (typeOf(el.getProperty('name')) == 'string')
             {
-                var matches = el.getProperty('name').match(/([^[\]]+)/g);
+                var oldName   = el.getProperty('name');
+                var matches   = oldName.match(/([^[\]]+)/g);
                 var lastIndex = null;
-                var newName = '';
+                var newName   = '';
 
                 matches.each(function(element, index) {
                     if (!isNaN(parseFloat(element)) && isFinite(element))
@@ -236,6 +237,10 @@ var MultiColumnWizard = new Class(
                         newName += '[' + element + ']';
                     }
                 });
+
+                if(oldName.substr(oldName.length - 2) == '[]') {
+                    newName += '[]';
+                }
 
                 el.setProperty('name', newName);
             }
