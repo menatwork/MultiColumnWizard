@@ -17,7 +17,7 @@
  * @copyright  Andreas Schempp 2011
  * @copyright  certo web & design GmbH 2011
  * @copyright  MEN AT WORK 2013
- * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @author     Ingolf Steinhardt <info@e-spin.de> 2017
  * @package    MultiColumnWizard
  */
 class MultiColumnWizard extends Widget implements uploadable
@@ -616,7 +616,7 @@ class MultiColumnWizard extends Widget implements uploadable
                     }
 
                     // Add custom wizard
-                    if (is_array($arrField['wizard']))
+                    if ($arrField['wizard'])
                     {
                         $wizard = '';
 
@@ -633,10 +633,17 @@ class MultiColumnWizard extends Widget implements uploadable
                         $dc->strInputName = $objWidget->id;
                         $dc->value     = $objWidget->value;
 
-                        foreach ($arrField['wizard'] as $callback)
+                        if (is_array($arrField['wizard']))
                         {
-                            $this->import($callback[0]);
-                            $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
+                            foreach ($arrField['wizard'] as $callback)
+                            {
+                                $this->import($callback[0]);
+                                $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
+                            }
+                        }
+                        elseif (is_callable($arrField['wizard']))
+                        {
+                            $wizard .= $arrField['wizard']($dc, $objWidget);
                         }
 
                         $objWidget->wizard = $wizard;
