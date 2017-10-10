@@ -17,7 +17,7 @@
  * @copyright  Andreas Schempp 2011
  * @copyright  certo web & design GmbH 2011
  * @copyright  MEN AT WORK 2013
- * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @author     Ingolf Steinhardt <info@e-spin.de> 2017
  * @package    MultiColumnWizard
  */
 class MultiColumnWizard extends Widget implements uploadable
@@ -886,6 +886,9 @@ class MultiColumnWizard extends Widget implements uploadable
             $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" data-lightbox="files 765 80%">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
 
             $arrField['strField'] = $this->strField . '__' . $strKey;
+
+            // Add title at modal window.
+            $GLOBALS['TL_DCA'][$this->strTable]['fields'][$arrField['strField']]['label'][0] = (is_array($arrField['label']) && $arrField['label'][0] != '') ? $arrField['label'][0] : $strKey;
         }
 
         // Add the table import wizard
