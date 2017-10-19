@@ -12,12 +12,16 @@
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
 use MultiColumnWizard\DcGeneral\UpdateDataDefinition;
 
-return array
-(
-    BuildDataDefinitionEvent::NAME => array(
-        array(
-            array(new UpdateDataDefinition(), 'addMcwFields'),
-            UpdateDataDefinition::PRIORITY
+if (class_exists(BuildDataDefinitionEvent::class)) {
+    return array
+    (
+        BuildDataDefinitionEvent::NAME => array(
+            array(
+                array(new UpdateDataDefinition(), 'addMcwFields'),
+                UpdateDataDefinition::PRIORITY
+            )
         )
-    )
-);
+    );
+}
+
+return array();
