@@ -45,8 +45,7 @@
 	},
 	"require": {
 		"contao/core-bundle":"~3.2 || ~4.1",
-		"contao-community-alliance/composer-plugin":"~2.4 || ~3.0",
-		"contao-community-alliance/dc-general": "^2.0@beta"
+		"contao-community-alliance/composer-plugin":"~2.4 || ~3.0"
 	},
 	"autoload":{
 		"classmap":["system/"],
