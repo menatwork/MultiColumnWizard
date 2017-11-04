@@ -11,7 +11,10 @@
 
 namespace MultiColumnWizard\DcGeneral;
 
+use Contao\Environment;
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\DefaultProperty;
+use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\PropertiesDefinitionInterface;
+use ContaoCommunityAlliance\DcGeneral\Event\ActionEvent;
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
 
 /**
@@ -31,12 +34,40 @@ class UpdateDataDefinition
      *
      * @return void
      */
-    function addMcwFields(BuildDataDefinitionEvent $event)
-    {
-        // Get the container and all properties.
-        $container = $event->getContainer();
-        $properties = $container->getPropertiesDefinition();
+    public function addMcwFieldsByScopeContaoFile (BuildDataDefinitionEvent $event) {
+        if (false === in_array(Environment::get('scriptName'), array(TL_PATH . '/contao/file.php', TL_PATH . '/contao/page.php'))) {
+            return;
+        }
 
+        $this->addMcwColumnProperties($event->getContainer()->getPropertiesDefinition());
+    }
+
+    /**
+     * Add all fields from the MCW to the DCA. This is needed for some fields, because other components need this
+     * to create the widget/view etc.
+     *
+     * @param ActionEvent $event
+     *
+     * @return void
+     */
+    public function addMcwFieldsByAjax3Action(ActionEvent $event)
+    {
+        if ('ajax3' !== $event->getAction()->getName()) {
+            return;
+        }
+
+        $this->addMcwColumnProperties($event->getEnvironment()->getDataDefinition()->getPropertiesDefinition());
+    }
+
+    /**
+     * Add the MCW column properties.
+     *
+     * @param PropertiesDefinitionInterface $properties
+     *
+     * @return void
+     */
+    private function addMcwColumnProperties(PropertiesDefinitionInterface $properties)
+    {
         /** @var DefaultProperty $property */
         foreach ($properties as $property) {
             // Only run for mcw.
@@ -55,6 +86,9 @@ class UpdateDataDefinition
             foreach ($config['columnFields'] as $fieldKey => $fieldConfig) {
                 // Build the default name.
                 $name = sprintf('%s__%s', $property->getName(), $fieldKey);
+                if (true === $properties->hasProperty($name)) {
+                    continue;
+                }
 
                 // Make a new field and fill it with the data from the config.
                 $subProperty = new DefaultProperty($name);

@@ -9,15 +9,22 @@
  * @filesource
  */
 
+use ContaoCommunityAlliance\DcGeneral\DcGeneralEvents;
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
 use MultiColumnWizard\DcGeneral\UpdateDataDefinition;
 
-if (class_exists(BuildDataDefinitionEvent::class)) {
+if (class_exists(DcGeneralEvents::class)) {
     return array
     (
+        DcGeneralEvents::ACTION => array(
+            array(
+                array(new UpdateDataDefinition(), 'addMcwFieldsByAjax3Action'),
+                UpdateDataDefinition::PRIORITY
+            )
+        ),
         BuildDataDefinitionEvent::NAME => array(
             array(
-                array(new UpdateDataDefinition(), 'addMcwFields'),
+                array(new UpdateDataDefinition(), 'addMcwFieldsByScopeContaoFile'),
                 UpdateDataDefinition::PRIORITY
             )
         )
