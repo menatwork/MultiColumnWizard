@@ -18,6 +18,7 @@
  * @copyright  certo web & design GmbH 2011
  * @copyright  MEN AT WORK 2013
  * @author     Ingolf Steinhardt <info@e-spin.de> 2017
+ * @author     Sven Baumann <baumann.sv@gmail.com> 2017
  * @package    MultiColumnWizard
  */
 class MultiColumnWizard extends Widget implements uploadable
@@ -989,12 +990,8 @@ class MultiColumnWizard extends Widget implements uploadable
         $arrField['eval']['tableless'] = true;
 
         $arrData = $this->handleDcGeneral($arrField, $strKey);
-        if(version_compare(VERSION,'3.1', '<')){
-            $objWidget = new $strClass($this->prepareForWidget($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable));
-        }
-        else{
-            $objWidget = new $strClass(\MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
-        }
+
+        $objWidget = $this->buildWidget($strClass, $arrData, $arrField);
 
         $objWidget->strId         = $arrField['id'];
         $objWidget->storeValues   = true;
@@ -1005,6 +1002,92 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
         return $objWidget;
+    }
+
+    /**
+     * Build the widget.
+     *
+     * @param string      $strClass The widget class name.
+     *
+     * @param array $arrData The data.
+     *
+     * @param array $arrField The fields.
+     *
+     * @return Widget
+     */
+    private function buildWidget($strClass, array $arrData, array &$arrField)
+    {
+        if ('General' === $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer']) {
+            return $this->buildWidgetForDcGeneral($arrData, $arrField);
+        }
+
+        if(version_compare(VERSION,'3.1', '<')){
+            return new $strClass($this->prepareForWidget($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable));
+        }
+
+        return new $strClass(\MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
+    }
+
+    /**
+     * Build the widget with the widget manager from dc general.
+     *
+     * @param array $arrData The data.
+     *
+     * @param array $arrField The field data.
+     *
+     * @return Widget
+     */
+    private function buildWidgetForDcGeneral(array $arrData, array &$arrField)
+    {
+        $environment = $this->objDca->getEnvironment();
+        $properties = $environment->getDataDefinition()->getPropertiesDefinition();
+        $input = $environment->getInputProvider();
+
+        $propertyClass = new \ReflectionClass($properties->getProperty($this->strId));
+        $property = $propertyClass->newInstance($arrField['name']);
+        $properties->addProperty($property);
+
+        $arrField['id'] = $arrField['name'];
+
+        $property->setLabel($arrData['label']);
+        $property->setWidgetType($arrField['inputType']);
+        if (isset($arrField['eval'])) {
+            $property->setExtra($arrField['eval']);
+        }
+        if (isset($arrField['description'])) {
+            $property->setDescription($arrField['description']);
+        }
+        if (isset($arrField['default'])) {
+            $property->setDefaultValue($arrField['default']);
+        }
+        if (isset($arrField['options'])) {
+            $property->setOptions($arrField['options']);
+        }
+        if (isset($arrField['reference'])) {
+            $property->setExtra(
+                array_merge(
+                    (array) $property->getExtra(),
+                    array('reference' => $arrField['reference'])
+                )
+            );
+        }
+
+        $modelId = \ContaoCommunityAlliance\DcGeneral\Data\ModelId::fromSerialized($input->getParameter('id'));
+        $dataProvider = $environment->getDataProvider($modelId->getDataProviderName());
+        $model = $dataProvider->getEmptyModel();
+        $model->setId(9999999);
+        $model->setProperty($property->getName(), $arrField['value']);
+
+        $manager = new \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager(
+            $environment,
+            $model
+        );
+
+        $widget = $manager->getWidget($property->getName());
+
+        $properties->removeProperty($property);
+
+        return $widget;
     }
 
     /**
