@@ -586,13 +586,13 @@ class MultiColumnWizard extends Widget implements uploadable
                           });
                           </script>'; */
                     }
-					
+
 					// Color picker
 					if ($arrField['eval']['colorpicker'])
 					{
 						// Support single fields as well (see #5240)
 						//$strKey = $arrData['eval']['multiple'] ? $this->strField . '_0' : $this->strField;
-			
+
 						$colorpicker = ' ' . \Image::getHtml('pickcolor.gif', $GLOBALS['TL_LANG']['MSC']['colorpicker'], 'style="vertical-align:top;cursor:pointer" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['colorpicker']).'" id="moo_' . $objWidget->id . '"') . '
 			  <script>
 				window.addEvent("domready", function() {
@@ -607,7 +607,7 @@ class MultiColumnWizard extends Widget implements uploadable
 				});
 			  </script>';
 					}
-					
+
 
                     // Tiny MCE
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
@@ -1072,8 +1072,7 @@ class MultiColumnWizard extends Widget implements uploadable
             );
         }
 
-        $modelId = \ContaoCommunityAlliance\DcGeneral\Data\ModelId::fromSerialized($input->getParameter('id'));
-        $dataProvider = $environment->getDataProvider($modelId->getDataProviderName());
+        $dataProvider = $environment->getDataProvider();
         $model = $dataProvider->getEmptyModel();
         $model->setId(9999999);
         $model->setProperty($property->getName(), $arrField['value']);

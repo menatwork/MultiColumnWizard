@@ -4,28 +4,30 @@
  * Contao Open Source CMS
  *
  * @copyright  MEN AT WORK 2017
+ * @author     Sven Baumann <baumann.sv@gmail.com> 2017
  * @package    MultiColumnWizard
  * @license    LGPL
  * @filesource
  */
 
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\BuildWidgetEvent;
 use ContaoCommunityAlliance\DcGeneral\DcGeneralEvents;
-use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
+use ContaoCommunityAlliance\DcGeneral\Factory\Event\PopulateEnvironmentEvent;
 use MultiColumnWizard\DcGeneral\UpdateDataDefinition;
 
 if (class_exists(DcGeneralEvents::class)) {
     return array
     (
-        DcGeneralEvents::ACTION => array(
+        PopulateEnvironmentEvent::NAME => array(
             array(
-                array(new UpdateDataDefinition(), 'addMcwFieldsByAjax3Action'),
-                UpdateDataDefinition::PRIORITY
+                array(new UpdateDataDefinition(), 'addMcwFields'),
+                UpdateDataDefinition::POPULATE_PRIORITY
             )
         ),
-        BuildDataDefinitionEvent::NAME => array(
+        BuildWidgetEvent::NAME => array(
             array(
-                array(new UpdateDataDefinition(), 'addMcwFieldsByScopeContaoFile'),
-                UpdateDataDefinition::PRIORITY
+                array(new UpdateDataDefinition(), 'setModalValue'),
+                UpdateDataDefinition::BUILD_WIDGET_PRIORITY
             )
         )
     );

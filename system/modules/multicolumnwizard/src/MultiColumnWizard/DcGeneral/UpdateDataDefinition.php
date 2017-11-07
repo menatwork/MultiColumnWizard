@@ -11,63 +11,84 @@
 
 namespace MultiColumnWizard\DcGeneral;
 
-use Contao\Environment;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\BuildWidgetEvent;
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\DefaultProperty;
-use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\PropertiesDefinitionInterface;
-use ContaoCommunityAlliance\DcGeneral\Event\ActionEvent;
-use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
+use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
+use ContaoCommunityAlliance\DcGeneral\Factory\Event\PopulateEnvironmentEvent;
 
 /**
  * Class UpdateDataDefinition
  *
- * @package MultiColumnWizard\DcGeneral
+ * @author     Sven Baumann <baumann.sv@gmail.com> 2017
+ * @package    MultiColumnWizard\DcGeneral
  */
 class UpdateDataDefinition
 {
-    const PRIORITY = -500000;
+    const POPULATE_PRIORITY     = -500000;
+    const BUILD_WIDGET_PRIORITY = 500000;
 
     /**
      * Add all fields from the MCW to the DCA. This is needed for some fields, because other components need this
      * to create the widget/view etc.
      *
-     * @param BuildDataDefinitionEvent $event
+     * @param PopulateEnvironmentEvent $event
      *
      * @return void
      */
-    public function addMcwFieldsByScopeContaoFile (BuildDataDefinitionEvent $event) {
-        if (false === in_array(Environment::get('scriptName'), array(TL_PATH . '/contao/file.php', TL_PATH . '/contao/page.php'))) {
+    public function addMcwFields(PopulateEnvironmentEvent $event)
+    {
+        $inputPropertyName = $this->getInputPropertyName($event->getEnvironment());
+
+        // If the property don´t find in post or get then do nothing. The property must only add for popups.
+        if (false === (bool) $inputPropertyName) {
             return;
         }
 
-        $this->addMcwColumnProperties($event->getContainer()->getPropertiesDefinition());
+        // Add the sub properties of MCW in modal view or in ajax call.
+        $this->buildProperty($inputPropertyName, $event->getEnvironment());
     }
 
     /**
-     * Add all fields from the MCW to the DCA. This is needed for some fields, because other components need this
-     * to create the widget/view etc.
+     * Set the used modal value.
+     * By Widget::getPost the post key split in parts, then don`t find the return value from modal.
      *
-     * @param ActionEvent $event
+     * @param BuildWidgetEvent $event The event.
      *
      * @return void
      */
-    public function addMcwFieldsByAjax3Action(ActionEvent $event)
+    public function setModalValue(BuildWidgetEvent $event)
     {
-        if ('ajax3' !== $event->getAction()->getName()) {
+        $environment    = $event->getEnvironment();
+        $sessionStorage = $environment->getSessionStorage();
+        $session        = (array) $sessionStorage->get('MCW_MODAL_UPDATE');
+
+        if (false === isset($session[md5($event->getProperty()->getName())])) {
             return;
         }
 
-        $this->addMcwColumnProperties($event->getEnvironment()->getDataDefinition()->getPropertiesDefinition());
+        $input = $environment->getInputProvider();
+        $data = $session[md5($event->getProperty()->getName())];
+
+        $input->setValue($data['key'], $input->getValue($data['valueFrom']));
+
+        unset($session[md5($event->getProperty()->getName())]);
+        $sessionStorage->set('MCW_MODAL_UPDATE', $session);
     }
 
     /**
-     * Add the MCW column properties.
+     * Build the MCW column property and add to properties.
      *
-     * @param PropertiesDefinitionInterface $properties
+     * @param string               $propertyName The property name.
+     *
+     * @param EnvironmentInterface $environment  The environment.
      *
      * @return void
      */
-    private function addMcwColumnProperties(PropertiesDefinitionInterface $properties)
+    private function buildProperty($propertyName, EnvironmentInterface $environment)
     {
+        $dataDefinition = $environment->getDataDefinition();
+        $properties     = $dataDefinition->getPropertiesDefinition();
+
         /** @var DefaultProperty $property */
         foreach ($properties as $property) {
             // Only run for mcw.
@@ -79,19 +100,20 @@ class UpdateDataDefinition
             $config = $property->getExtra();
 
             // If we have no data here, go to the next.
-            if(empty($config['columnFields']) || !is_array($config['columnFields'])){
+            if (empty($config['columnFields']) || !is_array($config['columnFields'])) {
                 continue;
             }
 
             foreach ($config['columnFields'] as $fieldKey => $fieldConfig) {
-                // Build the default name.
-                $name = sprintf('%s__%s', $property->getName(), $fieldKey);
-                if (true === $properties->hasProperty($name)) {
+                if ((true === $properties->hasProperty($propertyName))
+                    || (false === strpos($propertyName, $property->getName()))
+                    || ('[' . $fieldKey . ']' !== substr($propertyName, -strlen('[' . $fieldKey . ']')))
+                ) {
                     continue;
                 }
 
                 // Make a new field and fill it with the data from the config.
-                $subProperty = new DefaultProperty($name);
+                $subProperty = new DefaultProperty($propertyName);
                 foreach ($fieldConfig as $key => $value) {
                     switch ($key) {
                         case 'label':
@@ -111,15 +133,15 @@ class UpdateDataDefinition
                             break;
 
                         case 'exclude':
-                            $subProperty->setExcluded((bool)$value);
+                            $subProperty->setExcluded((bool) $value);
                             break;
 
                         case 'search':
-                            $subProperty->setSearchable((bool)$value);
+                            $subProperty->setSearchable((bool) $value);
                             break;
 
                         case 'filter':
-                            $subProperty->setFilterable((bool)$value);
+                            $subProperty->setFilterable((bool) $value);
                             break;
 
                         case 'inputType':
@@ -156,10 +178,57 @@ class UpdateDataDefinition
                     }
                 }
 
-                // Add all to the current list.
                 $properties->addProperty($subProperty);
+
+                $subExtra = $subProperty->getExtra();
+
+                // Fore some widgets must declare the evaluation in the data container configuration.
+                $GLOBALS['TL_DCA'][$dataDefinition->getName()]['fields'][$subProperty->getName()]['eval'] = $subExtra;
             }
         }
+    }
 
+    /**
+     * Get the input property from input.
+     *
+     * @param EnvironmentInterface $environment The environment.
+     *
+     * @return string
+     */
+    private function getInputPropertyName(EnvironmentInterface $environment)
+    {
+        $input = $environment->getInputProvider();
+
+        if ((true === $input->hasParameter('field'))
+            && (false === count($input->getParameter('field')))
+        ) {
+            return $input->getParameter('field');
+        }
+        if ((true === $input->hasValue('name'))
+            && (false === count($input->getValue('name')))
+        ) {
+            $sessionStorage = $environment->getSessionStorage();
+            $session        = $sessionStorage->get('MCW_MODAL_UPDATE');
+
+            $chunks = explode(
+                '::::',
+                str_replace(
+                    array('][', '[', ']'),
+                    array('::::', '::::', ''),
+                    $input->getValue('name')
+                )
+            );
+
+            $session[md5($input->getValue('name'))] = array(
+                'key'       => array_shift($chunks),
+                'valueFrom' => $input->getValue('name')
+            );
+
+            $sessionStorage->set('MCW_MODAL_UPDATE', $session);
+
+            return $input->getValue('name');
+        }
+
+        return '';
     }
 }
