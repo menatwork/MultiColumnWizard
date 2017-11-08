@@ -384,11 +384,6 @@ class MultiColumnWizard extends Widget implements uploadable
                 if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback']))
                 {
                     $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-                    // If less than 3.X, we must load the class by hand.
-                    if (version_compare(VERSION, '3.0', '<'))
-                    {
-                        require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
-                    }
 
                     $dc            = new $dataContainer($this->strTable);
                     $dc->field     = $this->strField;
@@ -622,11 +617,6 @@ class MultiColumnWizard extends Widget implements uploadable
                         $wizard = '';
 
                         $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-                        // If less than 3.X, we must load the class by hand.
-                        if (version_compare(VERSION, '3.0', '<'))
-                        {
-                            require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
-                        }
 
                         $dc            = new $dataContainer($this->strTable);
                         $dc->field     = $strKey;
@@ -690,45 +680,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
     protected function getMcWDatePickerString($strId, $strKey, $rgxp)
     {
-        if (version_compare(VERSION, '2.11', '<'))
-        {
-            $format = $this->getNumericDateFormat($rgxp);
-            switch ($rgxp)
-            {
-                case 'datim':
-                    $time = ",\n      timePicker:true";
-                    break;
-
-                case 'time':
-                    $time = ",\n      timePickerOnly:true";
-                    break;
-
-                default:
-                    $time = '';
-                    break;
-            }
-
-            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;">
-                          <script>
-                        window.addEvent("domready", function() {
-                          window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $strId . '\', {
-                          allowEmpty:true,
-                          toggleElements:\'#toggle_' . $strId . '\',
-                          pickerClass:\'datepicker_dashboard\',
-                          format:\'' . $format . '\',
-                          inputOutputFormat:\'' . $format . '\',
-                          positionOffset:{x:130,y:-185}' . $time . ',
-                          startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
-                          days:[\'' . implode("','", $GLOBALS['TL_LANG']['DAYS']) . '\'],
-                          dayShort:' . $GLOBALS['TL_LANG']['MSC']['dayShortLength'] . ',
-                          months:[\'' . implode("','", $GLOBALS['TL_LANG']['MONTHS']) . '\'],
-                          monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
-                          });
-                        });
-                          </script>';
-        }
-
-        elseif (version_compare(VERSION,'3.3','<')) {
+        if (version_compare(VERSION,'3.3','<')) {
 
             $format = Date::formatToJs($this->getNumericDateFormat($rgxp));
             switch ($rgxp)
@@ -867,11 +819,7 @@ class MultiColumnWizard extends Widget implements uploadable
         // Add the help wizard
         if ($arrField['eval']['helpwizard'])
         {
-            if(version_compare(VERSION,'3.1', '<')){
-                $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" data-lightbox="help 610 80%">' . $this->generateImage('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom"') . '</a>';
-            } else {
-                $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . specialchars(str_replace("'", "\\'", $arrField['label'][0])) . '\',\'url\':this.href});return false">' . \Image::getHtml('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom"') . '</a>';
-            }
+            $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . specialchars(str_replace("'", "\\'", $arrField['label'][0])) . '\',\'url\':this.href});return false">' . \Image::getHtml('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom"') . '</a>';
         }
 
         // Add the popup file manager
@@ -1019,10 +967,6 @@ class MultiColumnWizard extends Widget implements uploadable
     {
         if ('General' === $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer']) {
             return $this->buildWidgetForDcGeneral($arrData, $arrField);
-        }
-
-        if(version_compare(VERSION,'3.1', '<')){
-            return new $strClass($this->prepareForWidget($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable));
         }
 
         return new $strClass(\MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
