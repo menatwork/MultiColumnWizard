@@ -998,7 +998,6 @@ class MultiColumnWizard extends Widget implements uploadable
     {
         $environment = $this->objDca->getEnvironment();
         $properties = $environment->getDataDefinition()->getPropertiesDefinition();
-        $input = $environment->getInputProvider();
 
         $propertyClass = new \ReflectionClass($properties->getProperty($this->strId));
         $property = $propertyClass->newInstance($arrField['name']);
@@ -1017,8 +1016,8 @@ class MultiColumnWizard extends Widget implements uploadable
         if (isset($arrField['default'])) {
             $property->setDefaultValue($arrField['default']);
         }
-        if (isset($arrField['options'])) {
-            $property->setOptions($arrField['options']);
+        if (isset($arrData['options'])) {
+            $property->setOptions($arrData['options']);
         }
         if (isset($arrField['reference'])) {
             $property->setExtra(
