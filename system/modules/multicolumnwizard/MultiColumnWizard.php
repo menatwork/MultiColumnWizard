@@ -18,6 +18,7 @@
  * @copyright  certo web & design GmbH 2011
  * @copyright  MEN AT WORK 2013
  * @author     Ingolf Steinhardt <info@e-spin.de> 2017
+ * @author     Sven Baumann <baumann.sv@gmail.com> 2017
  * @package    MultiColumnWizard
  */
 class MultiColumnWizard extends Widget implements uploadable
@@ -383,11 +384,6 @@ class MultiColumnWizard extends Widget implements uploadable
                 if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback']))
                 {
                     $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-                    // If less than 3.X, we must load the class by hand.
-                    if (version_compare(VERSION, '3.0', '<'))
-                    {
-                        require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
-                    }
 
                     $dc            = new $dataContainer($this->strTable);
                     $dc->field     = $this->strField;
@@ -585,13 +581,13 @@ class MultiColumnWizard extends Widget implements uploadable
                           });
                           </script>'; */
                     }
-					
+
 					// Color picker
 					if ($arrField['eval']['colorpicker'])
 					{
 						// Support single fields as well (see #5240)
 						//$strKey = $arrData['eval']['multiple'] ? $this->strField . '_0' : $this->strField;
-			
+
 						$colorpicker = ' ' . \Image::getHtml('pickcolor.gif', $GLOBALS['TL_LANG']['MSC']['colorpicker'], 'style="vertical-align:top;cursor:pointer" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['colorpicker']).'" id="moo_' . $objWidget->id . '"') . '
 			  <script>
 				window.addEvent("domready", function() {
@@ -606,7 +602,7 @@ class MultiColumnWizard extends Widget implements uploadable
 				});
 			  </script>';
 					}
-					
+
 
                     // Tiny MCE
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
@@ -621,11 +617,6 @@ class MultiColumnWizard extends Widget implements uploadable
                         $wizard = '';
 
                         $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-                        // If less than 3.X, we must load the class by hand.
-                        if (version_compare(VERSION, '3.0', '<'))
-                        {
-                            require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
-                        }
 
                         $dc            = new $dataContainer($this->strTable);
                         $dc->field     = $strKey;
@@ -696,45 +687,7 @@ class MultiColumnWizard extends Widget implements uploadable
 
     protected function getMcWDatePickerString($strId, $strKey, $rgxp)
     {
-        if (version_compare(VERSION, '2.11', '<'))
-        {
-            $format = $this->getNumericDateFormat($rgxp);
-            switch ($rgxp)
-            {
-                case 'datim':
-                    $time = ",\n      timePicker:true";
-                    break;
-
-                case 'time':
-                    $time = ",\n      timePickerOnly:true";
-                    break;
-
-                default:
-                    $time = '';
-                    break;
-            }
-
-            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;">
-                          <script>
-                        window.addEvent("domready", function() {
-                          window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $strId . '\', {
-                          allowEmpty:true,
-                          toggleElements:\'#toggle_' . $strId . '\',
-                          pickerClass:\'datepicker_dashboard\',
-                          format:\'' . $format . '\',
-                          inputOutputFormat:\'' . $format . '\',
-                          positionOffset:{x:130,y:-185}' . $time . ',
-                          startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
-                          days:[\'' . implode("','", $GLOBALS['TL_LANG']['DAYS']) . '\'],
-                          dayShort:' . $GLOBALS['TL_LANG']['MSC']['dayShortLength'] . ',
-                          months:[\'' . implode("','", $GLOBALS['TL_LANG']['MONTHS']) . '\'],
-                          monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
-                          });
-                        });
-                          </script>';
-        }
-
-        elseif (version_compare(VERSION,'3.3','<')) {
+        if (version_compare(VERSION,'3.3','<')) {
 
             $format = Date::formatToJs($this->getNumericDateFormat($rgxp));
             switch ($rgxp)
@@ -873,11 +826,7 @@ class MultiColumnWizard extends Widget implements uploadable
         // Add the help wizard
         if ($arrField['eval']['helpwizard'])
         {
-            if(version_compare(VERSION,'3.1', '<')){
-                $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" data-lightbox="help 610 80%">' . $this->generateImage('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom"') . '</a>';
-            } else {
-                $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . specialchars(str_replace("'", "\\'", $arrField['label'][0])) . '\',\'url\':this.href});return false">' . \Image::getHtml('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom"') . '</a>';
-            }
+            $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . specialchars(str_replace("'", "\\'", $arrField['label'][0])) . '\',\'url\':this.href});return false">' . \Image::getHtml('about.gif', $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom"') . '</a>';
         }
 
         // Add the popup file manager
@@ -1000,12 +949,8 @@ class MultiColumnWizard extends Widget implements uploadable
         $arrField['eval']['tableless'] = true;
 
         $arrData = $this->handleDcGeneral($arrField, $strKey);
-        if(version_compare(VERSION,'3.1', '<')){
-            $objWidget = new $strClass($this->prepareForWidget($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable));
-        }
-        else{
-            $objWidget = new $strClass(\MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
-        }
+
+        $objWidget = $this->buildWidget($strClass, $arrData, $arrField);
 
         $objWidget->strId         = $arrField['id'];
         $objWidget->storeValues   = true;
@@ -1016,6 +961,87 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
         return $objWidget;
+    }
+
+    /**
+     * Build the widget.
+     *
+     * @param string      $strClass The widget class name.
+     *
+     * @param array $arrData The data.
+     *
+     * @param array $arrField The fields.
+     *
+     * @return Widget
+     */
+    private function buildWidget($strClass, array $arrData, array &$arrField)
+    {
+        if ('General' === $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer']) {
+            return $this->buildWidgetForDcGeneral($arrData, $arrField);
+        }
+
+        return new $strClass(\MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
+    }
+
+    /**
+     * Build the widget with the widget manager from dc general.
+     *
+     * @param array $arrData The data.
+     *
+     * @param array $arrField The field data.
+     *
+     * @return Widget
+     */
+    private function buildWidgetForDcGeneral(array $arrData, array &$arrField)
+    {
+        $environment = $this->objDca->getEnvironment();
+        $properties = $environment->getDataDefinition()->getPropertiesDefinition();
+        $input = $environment->getInputProvider();
+
+        $propertyClass = new \ReflectionClass($properties->getProperty($this->strId));
+        $property = $propertyClass->newInstance($arrField['name']);
+        $properties->addProperty($property);
+
+        $arrField['id'] = $arrField['name'];
+
+        $property->setLabel($arrData['label']);
+        $property->setWidgetType($arrField['inputType']);
+        if (isset($arrField['eval'])) {
+            $property->setExtra($arrField['eval']);
+        }
+        if (isset($arrField['description'])) {
+            $property->setDescription($arrField['description']);
+        }
+        if (isset($arrField['default'])) {
+            $property->setDefaultValue($arrField['default']);
+        }
+        if (isset($arrField['options'])) {
+            $property->setOptions($arrField['options']);
+        }
+        if (isset($arrField['reference'])) {
+            $property->setExtra(
+                array_merge(
+                    (array) $property->getExtra(),
+                    array('reference' => $arrField['reference'])
+                )
+            );
+        }
+
+        $dataProvider = $environment->getDataProvider();
+        $model = $dataProvider->getEmptyModel();
+        $model->setId(9999999);
+        $model->setProperty($property->getName(), $arrField['value']);
+
+        $manager = new \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager(
+            $environment,
+            $model
+        );
+
+        $widget = $manager->getWidget($property->getName());
+
+        $properties->removeProperty($property);
+
+        return $widget;
     }
 
     /**
