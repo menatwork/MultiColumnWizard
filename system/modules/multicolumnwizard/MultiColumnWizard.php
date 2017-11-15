@@ -976,7 +976,9 @@ class MultiColumnWizard extends Widget implements uploadable
      */
     private function buildWidget($strClass, array $arrData, array &$arrField)
     {
-        if ('General' === $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer']) {
+        // Check if the data container driver is an DC-General.
+        if (is_subclass_of($this->objDca, 'ContaoCommunityAlliance\DcGeneral\EnvironmentAwareInterface'))
+        {
             return $this->buildWidgetForDcGeneral($arrData, $arrField);
         }
 
