@@ -770,28 +770,26 @@ class MultiColumnWizard extends Widget implements uploadable
         }
 
         list ($file, $type) = explode('|', $arrField['eval']['rte'], 2);
+        $fileBrowserTypes = [];
+        $pickerBuilder = \System::getContainer()->get('contao.picker.builder');
 
-        if (!file_exists(TL_ROOT . '/system/config/' . $file . '.php'))
+        foreach (['file' => 'image', 'link' => 'file'] as $context => $fileBrowserType)
         {
-            throw new \Exception(sprintf('Cannot find editor configuration file "%s.php"', $file));
+            if ($pickerBuilder->supportsContext($context))
+            {
+                $fileBrowserTypes[] = $fileBrowserType;
+            }
         }
 
-        // Backwards compatibility
-        $language = substr($GLOBALS['TL_LANGUAGE'], 0, 2);
+        $objTemplate = new \BackendTemplate('be_' . $file);
+        $objTemplate->selector = 'ctrl_' . $strId;
+        $objTemplate->type = $type;
+        $objTemplate->language = \Backend::getTinyMceLanguage();
+        $objTemplate->fileBrowserTypes = $fileBrowserTypes;
 
-        if (!file_exists(TL_ROOT . '/assets/tinymce/langs/' . $language . '.js'))
-        {
-            $language = 'en';
-        }
+        unset($file, $type, $pickerBuilder, $fileBrowserTypes, $fileBrowserType);
 
-        $selector = 'ctrl_' . $strId;
-
-        ob_start();
-        include TL_ROOT . '/system/config/' . $file . '.php';
-        $editor = ob_get_contents();
-        ob_end_clean();
-
-        return $editor;
+        return $objTemplate->parse();
     }
 
     /**
