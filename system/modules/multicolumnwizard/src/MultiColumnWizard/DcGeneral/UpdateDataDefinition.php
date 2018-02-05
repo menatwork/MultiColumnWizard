@@ -12,6 +12,8 @@
 namespace MultiColumnWizard\DcGeneral;
 
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\DefaultProperty;
+use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\PropertyInterface;
+use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\PropertiesDefinitionInterface;
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
 
 /**
@@ -31,7 +33,7 @@ class UpdateDataDefinition
      *
      * @return void
      */
-    function addMcwFields(BuildDataDefinitionEvent $event)
+    public function addMcwFields(BuildDataDefinitionEvent $event)
     {
         // Get the container and all properties.
         $container = $event->getContainer();
@@ -45,87 +47,108 @@ class UpdateDataDefinition
             }
 
             // Get the extra and make an own field from it.
-            $config = $property->getExtra();
+            $extra = $property->getExtra();
 
             // If we have no data here, go to the next.
-            if(empty($config['columnFields']) || !is_array($config['columnFields'])){
+            if(empty($extra['columnFields']) || !is_array($extra['columnFields'])){
                 continue;
             }
 
-            foreach ($config['columnFields'] as $fieldKey => $fieldConfig) {
-                // Build the default name.
-                $name = sprintf('%s__%s', $property->getName(), $fieldKey);
+            $this->addPropertyToDefinition($extra, $property, $properties);
+        }
+    }
 
-                // Make a new field and fill it with the data from the config.
-                $subProperty = new DefaultProperty($name);
-                foreach ($fieldConfig as $key => $value) {
-                    switch ($key) {
-                        case 'label':
-                            $subProperty->setLabel($value);
-                            break;
+    private function addPropertyToDefinition(
+        array $extra,
+        PropertyInterface $property,
+        PropertiesDefinitionInterface $properties
+    ) {
+        foreach ($extra['columnFields'] as $fieldKey => $fieldConfig) {
+            // Build the default name.
+            $name = sprintf('%s__%s', $property->getName(), $fieldKey);
 
-                        case 'description':
-                            if (!$subProperty->getDescription()) {
-                                $subProperty->setDescription($value);
-                            }
-                            break;
+            // Make a new field and fill it with the data from the config.
+            $subProperty = new DefaultProperty($name);
+            foreach ($fieldConfig as $key => $value) {
+                switch ($key) {
+                    case 'label':
+                        $subProperty->setLabel($value);
+                        break;
 
-                        case 'default':
-                            if (!$subProperty->getDefaultValue()) {
-                                $subProperty->setDefaultValue($value);
-                            }
-                            break;
+                    case 'description':
+                        if (!$subProperty->getDescription()) {
+                            $subProperty->setDescription($value);
+                        }
+                        break;
 
-                        case 'exclude':
-                            $subProperty->setExcluded((bool)$value);
-                            break;
+                    case 'default':
+                        if (!$subProperty->getDefaultValue()) {
+                            $subProperty->setDefaultValue($value);
+                        }
+                        break;
 
-                        case 'search':
-                            $subProperty->setSearchable((bool)$value);
-                            break;
+                    case 'exclude':
+                        $subProperty->setExcluded((bool) $value);
+                        break;
 
-                        case 'filter':
-                            $subProperty->setFilterable((bool)$value);
-                            break;
+                    case 'search':
+                        $subProperty->setSearchable((bool) $value);
+                        break;
 
-                        case 'inputType':
-                            $subProperty->setWidgetType($value);
-                            break;
+                    case 'filter':
+                        $subProperty->setFilterable((bool) $value);
+                        break;
 
-                        case 'options':
-                            $subProperty->setOptions($value);
-                            break;
+                    case 'inputType':
+                        $subProperty->setWidgetType($value);
+                        break;
 
-                        case 'explanation':
-                            $subProperty->setExplanation($value);
-                            break;
+                    case 'options':
+                        $subProperty->setOptions($value);
+                        break;
 
-                        case 'eval':
-                            $subProperty->setExtra(
-                                array_merge(
-                                    (array) $subProperty->getExtra(),
-                                    (array) $value
-                                )
-                            );
-                            break;
+                    case 'explanation':
+                        $subProperty->setExplanation($value);
+                        break;
 
-                        case 'reference':
-                            $subProperty->setExtra(
-                                array_merge(
-                                    (array) $subProperty->getExtra(),
-                                    array('reference' => &$value['reference'])
-                                )
-                            );
-                            break;
+                    case 'eval':
+                        $subProperty->setExtra(
+                            array_merge(
+                                (array) $subProperty->getExtra(),
+                                (array) $value
+                            )
+                        );
+                        break;
 
-                        default:
-                    }
+                    case 'reference':
+                        $subProperty->setExtra(
+                            array_merge(
+                                (array) $subProperty->getExtra(),
+                                array('reference' => &$value['reference'])
+                            )
+                        );
+                        break;
+
+                    default:
                 }
-
-                // Add all to the current list.
-                $properties->addProperty($subProperty);
             }
+
+            // Add all to the current list.
+            $properties->addProperty($subProperty);
+            $this->addSubMultiColumnWizardProperty($subProperty, $properties);
+        }
+    }
+
+    private function addSubMultiColumnWizardProperty(
+        PropertyInterface $property,
+        PropertiesDefinitionInterface $properties
+    ) {
+        $extra = $property->getExtra();
+
+        if (empty($extra['columnFields']) || !is_array($extra['columnFields'])) {
+            return;
         }
 
+        $this->addPropertyToDefinition($extra, $property, $properties);
     }
 }
