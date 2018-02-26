@@ -4,7 +4,7 @@
 	"keywords":["contao", "widget", "wizard"],
 	"type": "contao-module",
 	"homepage":"http://www.men-at-work.de",
-	"license":"LGPL-3.0+",
+	"license":"LGPL-3.0-or-later",
 	"authors":[
 		{
 			"name": "Andreas Isaak",
@@ -44,7 +44,7 @@
 		"source":"https://github.com/menatwork/MultiColumnWizard"
 	},
 	"require": {
-		"contao/core-bundle":"~3.2 || ~4.1",
+		"contao/core-bundle":"~3.5 || ~4.1",
 		"contao-community-alliance/composer-plugin":"~2.4 || ~3.0"
 	},
 	"autoload":{
