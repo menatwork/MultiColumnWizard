@@ -999,7 +999,12 @@ class MultiColumnWizard extends Widget implements uploadable
         $environment = $this->objDca->getEnvironment();
         $properties = $environment->getDataDefinition()->getPropertiesDefinition();
 
-        $propertyClass = new \ReflectionClass($properties->getProperty($this->strId));
+        // Convert the property name for find the property in the definition.
+        $search  = array('/([\[][0-9]{1,}[\]])/', '/[\[\]]/');
+        $replace = array('__', '');
+        $propertyName = trim(preg_replace($search, $replace, $this->id), '__');
+
+        $propertyClass = new \ReflectionClass($properties->getProperty($propertyName));
         $property = $propertyClass->newInstance($arrField['name']);
         $properties->addProperty($property);
 
