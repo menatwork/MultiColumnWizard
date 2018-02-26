@@ -585,22 +585,28 @@ class MultiColumnWizard extends Widget implements uploadable
 					// Color picker
 					if ($arrField['eval']['colorpicker'])
 					{
-						// Support single fields as well (see #5240)
-						//$strKey = $arrData['eval']['multiple'] ? $this->strField . '_0' : $this->strField;
-
-						$colorpicker = ' ' . \Image::getHtml('pickcolor.gif', $GLOBALS['TL_LANG']['MSC']['colorpicker'], 'style="vertical-align:top;cursor:pointer" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['colorpicker']).'" id="moo_' . $objWidget->id . '"') . '
-			  <script>
-				window.addEvent("domready", function() {
-				  new MooRainbow("moo_' . $objWidget->id . '", {
-					id: "ctrl_' . $objWidget->id . '",
-					startColor: ((cl = $("ctrl_' . $objWidget->id . '").value.hexToRgb(true)) ? cl : [255, 0, 0]),
-					imgPath: "assets/mootools/colorpicker/' . $GLOBALS['TL_ASSETS']['COLORPICKER'] . '/images/",
-					onComplete: function(color) {
-					  $("ctrl_' . $objWidget->id . '").value = color.hex.replace("#", "");
-					}
-				  });
-				});
-			  </script>';
+                          // Support single fields as well (see #5240)
+ +                        $strId = $arrField['eval']['multiple'] ? $objWidget->id . '_0' : $objWidget->id;
+ +
+ +                        $colorpicker = ' ' . \Image::getHtml(
+ +                                'pickcolor.gif',
+ +                                $GLOBALS['TL_LANG']['MSC']['colorpicker'],
+ +                                'style="vertical-align:top;cursor:pointer" title="' .
+ +                                specialchars($GLOBALS['TL_LANG']['MSC']['colorpicker']) .
+ +                                '" id="moo_' . $strId . '"'
+ +                            ) . '
+ +                              <script>
+ +                                window.addEvent("domready", function() {
+ +                                  new MooRainbow("moo_' . $strId . '", {
+ +                                    id: "ctrl_' . $strId . '",
+ +                                    startColor: ((cl = $("ctrl_' . $strId . '").value.hexToRgb(true)) ? cl : [255, 0, 0]),
+ +                                    imgPath: "assets/mootools/colorpicker/' . $GLOBALS['TL_ASSETS']['COLORPICKER'] . '/images/",
+ +                                    onComplete: function(color) {
+ +                                      $("ctrl_' . $strId . '").value = color.hex.replace("#", "");
+ +                                    }
+ +                                  });
+ +                                });
+ +                              </script>';
 					}
 
 
