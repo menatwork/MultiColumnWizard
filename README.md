@@ -4,41 +4,35 @@ Usage with columnFields
 ```php
 <?php
 
-$GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
-(
-    'label'         => &$GLOBALS['TL_LANG']['tl_theme']['templateSelection'],
-    'exclude'       => true,
-    'inputType'     => 'multiColumnWizard',
-    'eval'          => array
-        (
-        'columnFields' => array
-            (
-            'ts_client_os' => array
-                (
-                'label'         => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_os'],
-                'exclude'       => true,
-                'inputType'     => 'select',
-                'eval'          => array
-                    (
-                        'style'                     => 'width:250px',
-                        'includeBlankOption'        => true
-                    ),
-                'options'       => array
-                    (
-                        'option1'       => 'Option 1',
-                        'option2'       => 'Option 2',
-                    )                
-                ),
-            'ts_client_browser' => array
-                (
-                'label'         => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],
-                'exclude'       => true,
-                'inputType'     => 'text',
-                'eval'          => array('style'=>'width:180px')
-                ),
-            )
-        )
-);
+$GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_theme']['templateSelection'],
+    'exclude'   => true,
+    'inputType' => 'multiColumnWizard',
+    'eval'      => [
+        'columnFields' => [
+            'ts_client_os'      => [
+                'label'     => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_os'],
+                'exclude'   => true,
+                'inputType' => 'select',
+                'eval'      => [
+                    'style'              => 'width:250px',
+                    'includeBlankOption' => true,
+                ],
+                'options'   => [
+                    'option1' => 'Option 1',
+                    'option2' => 'Option 2',
+                ],
+            ],
+            'ts_client_browser' => [
+                'label'     => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],
+                'exclude'   => true,
+                'inputType' => 'text',
+                'eval'      => [ 'style' => 'width:180px' ],
+            ],
+        ],
+    ],
+    'sql'       => 'blob NULL',
+];
 
 ?>
 ```
@@ -50,17 +44,16 @@ Usage with callback
 ```php
 <?php
 
-$GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = array
-(
-    'label'         => &$GLOBALS['TL_LANG']['tl_table']['anything'],
-    'exclude'       => true,
-    'inputType'     => 'multiColumnWizard',
-    'eval'          => array
-        (
-        'mandatory'             => true,
-        'columnsCallback'       => array('Class', 'Method')
-        )
-);
+$GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_table']['anything'],
+    'exclude'   => true,
+    'inputType' => 'multiColumnWizard',
+    'eval'      => [
+        'mandatory'       => true,
+        'columnsCallback' => [ 'Class', 'Method' ],
+    ],
+    'sql'       => 'blob NULL',
+];
 
 ?>
 ```
@@ -72,27 +65,24 @@ Usage with Drag and Drop
 ```php
 <?php
 
-$GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = array
-(
-    'label'         => &$GLOBALS['TL_LANG']['tl_theme']['templateSelection'],
-    'exclude'       => true,
-    'inputType'     => 'multiColumnWizard',
-    'eval'          => array
-        (
+$GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_theme']['templateSelection'],
+    'exclude'   => true,
+    'inputType' => 'multiColumnWizard',
+    'eval'      => [
         // add this line for a new button
-        'dragAndDrop' => true,
-        'columnFields' => array
-            (
-            'ts_client_browser' => array
-                (
-                'label'         => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],
-                'exclude'       => true,
-                'inputType'     => 'text',
-                'eval'          => array('style'=>'width:180px')
-                ),
-            )
-        )
-);
+        'dragAndDrop'  => true,
+        'columnFields' => [
+            'ts_client_browser' => [
+                'label'     => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],
+                'exclude'   => true,
+                'inputType' => 'text',
+                'eval'      => [ 'style' => 'width:180px' ],
+            ],
+        ],
+    ],
+    'sql'       => 'blob NULL',
+];
 
 ?>
 ```
