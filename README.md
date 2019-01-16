@@ -87,6 +87,10 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
 ?>
 ```
 
+Contao 4
+========
+
+At Contao 4 use the MCW bundle - see https://github.com/menatwork/contao-multicolumnwizard-bundle
 
 More information
 ================
