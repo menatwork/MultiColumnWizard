@@ -945,7 +945,7 @@ class MultiColumnWizard extends Widget implements uploadable
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
-        $arrField['value']             = ($varValue !== '') ? $varValue : $arrField['default'];
+        $arrField['value']             = $varValue === null || $varValue === '' ? $arrField['default'] : $varValue;
         $arrField['eval']['tableless'] = true;
 
         $arrData = $this->handleDcGeneral($arrField, $strKey);
